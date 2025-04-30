@@ -1,0 +1,67 @@
+package gmart.gmart.config;
+
+import gmart.gmart.service.CustomUserDetailService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@RequiredArgsConstructor
+@EnableWebSecurity
+public class WebSecurityConfig {
+
+    private final CustomUserDetailService customUserDetailService;
+
+    /**
+     *  패스워드 인코더로 사용할 Bean 등록
+     */
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 인증 매니저 빈 등록 ,  Spring Security에서 커스텀 인증을 처리
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(customUserDetailService);
+        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+        return new ProviderManager(daoAuthenticationProvider);
+    }
+
+    /**
+     * 특정 HTTP 요쳥에 대한 웹 기반 보안 구성
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        // TokenAuthenticationFilter 생성 및 Security 필터 체인에 추가
+
+        http
+                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 모드
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/gmart/members","/api/gmart/login")
+                        .permitAll()
+                );
+
+        return http.build();
+
+    }
+
+
+
+
+}
