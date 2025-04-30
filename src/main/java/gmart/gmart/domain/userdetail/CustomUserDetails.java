@@ -1,0 +1,75 @@
+package gmart.gmart.domain.userdetail;
+
+import gmart.gmart.domain.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * 커스텀 UserDetails ->Spring Security에 필요
+ */
+@RequiredArgsConstructor
+public class CustomUserDetails implements UserDetails {
+
+    private final Member member;
+
+    /**
+     * 권한 반환
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_"+member.getMemberRole().name()));
+    }
+
+    /**
+     * 사용자의 비밀번호를 반환
+     */
+    @Override
+    public String getPassword() {
+        return member.getPassword();
+    }
+
+    /**
+     * 사용자의 id를 반환 (고유한 값)
+     */
+    @Override
+    public String getUsername() {
+        return member.getLoginId();
+    }
+
+    /**
+     * 계정 만료여부 반환
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    /**
+     * 계정 잠금여부 반환
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    /**
+     * 패드워드 만료 여부
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    /**
+     * 계정 사용 여부 반환
+     */
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+}
