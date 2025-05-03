@@ -31,5 +31,22 @@ public class MemberProfileImage extends BaseTimeEntity {
     @Column(name = "image_url",nullable = false)
     private String imageUrl;
 
+    /**
+     * 엔티티 생성 메서드
+     */
+    public static MemberProfileImage createEntity( String imageUrl) {
+        MemberProfileImage memberProfileImage = new MemberProfileImage();
+        memberProfileImage.imageUrl = imageUrl;
+        return memberProfileImage;
+    }
+
+    /**
+     * 회원 설정
+     * @param member
+     */
+    protected void setMember(Member member) {
+        this.member = member;
+    }
+
 
 }

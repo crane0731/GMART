@@ -4,6 +4,7 @@ import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.AccountActiveStatus;
 import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
+import gmart.gmart.dto.SignUpRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,7 +61,7 @@ public class Member extends BaseTimeEntity {
 
     @Comment("매너포인트")
     @Column(name = "manner_point" ,nullable = false)
-    private Long mannerPoint=0L;
+    private Long mannerPoint;
 
     @Comment("매너 등급")
     @Enumerated(EnumType.STRING)
@@ -90,12 +91,61 @@ public class Member extends BaseTimeEntity {
     private MemberRole memberRole;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MemberProfileImage memberProfileImage;
+    private MemberProfileImage memberProfileImage=new MemberProfileImage();
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberCoupon> memberCoupons = new ArrayList<>();
+
+
+    /**
+     * 회원 생성 로직
+     */
+    public static Member createEntity(SignUpRequestDto dto,String encodedPassword){
+
+        Address address = createAddress(dto);
+
+        Member member = new Member();
+
+        member.loginId = dto.getLoginId();
+        member.password = encodedPassword;
+        member.name = dto.getName();
+        member.nickname = dto.getNickname();
+        member.phoneNumber = dto.getPhone();
+        member.memberProfileImage=null;
+        member.address = address;
+        member.gMoney=0L;
+        member.gPoint=0L;
+        member.mannerPoint=25L;
+        member.mannerGrade = MannerGrade.NORMAL;
+        member.totalSpent = 0L;
+        member.reportedCount = 0L;
+        member.reviewedCount = 0L;
+        member.accountActiveStatus = AccountActiveStatus.Active;
+        member.memberRole = MemberRole.MEMBER;
+
+
+        return member;
+    }
+
+    //==Address 생성==//
+    private static Address createAddress(SignUpRequestDto dto) {
+        return Address.builder()
+                .address(dto.getAddress())
+                .addressDetails(dto.getAddressDetail())
+                .zipCode(dto.getZipcode())
+                .build();
+    }
+
+    /**
+     * 프로필 이미지 등록
+     */
+    public void settingProfileImage(MemberProfileImage memberProfileImage) {
+        this.memberProfileImage = memberProfileImage;
+        memberProfileImage.setMember(this);
+    }
+
 
 }

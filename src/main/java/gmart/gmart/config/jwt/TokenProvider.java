@@ -1,0 +1,128 @@
+package gmart.gmart.config.jwt;
+
+import gmart.gmart.domain.Member;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.JwtCustomException;
+import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+
+/**
+ * 토큰을 생성하고,  올바른 토큰인지 유효성을 확인하고 ,  토큰에서 필요한 정보를 가져오는 기능들을 담은 클래스
+ */
+@Service
+@RequiredArgsConstructor
+public class TokenProvider {
+
+    private final JwtProperties jwtProperties;
+
+    /**
+     * 토큰 생성
+     * @param member : 회원
+     * @param expiredAt : 만료기간
+     */
+    public String generateToken(Member member , Duration expiredAt){
+
+        //현재 시각
+        Date now = new Date();
+
+        //now.getTime() -> 현재 시각
+        //expiredAt.toMillis() -> 만료 기간
+        //now.getTime()+ expiredAt.toMillis() -> 만료 날짜, 토큰 유지 기간
+        return makeToken(new Date(now.getTime()+ expiredAt.toMillis()),member);
+    }
+
+
+   //==JWT 토큰 생성 ==//
+    private String makeToken(Date expiry, Member member) {
+
+        //현재 시각
+        Date now = new Date();
+
+        //JWT 토큰 생성  -> 헤더 + 내용 + 서명
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE,Header.JWT_TYPE) //헤더 타입 : JWT
+                .setIssuer(jwtProperties.getIssuer())  // 내용 iss : propertise 파일에서 설정한 값
+                .setIssuedAt(now) //내용 iat : 현재시간
+                .setExpiration(expiry) //내용 exp : expiry 멤버 변숫값, 만료일
+                .setSubject(member.getLoginId()) //내용 sub : 회원의 이메일
+                .claim("id",member.getId()) // 클레임 id : 유저 id
+                .claim("role", member.getMemberRole().name()) // 유저의 권한
+                //서명 : 비밀값과 함께 해시값을 HS256 방식으로 암호화
+                .signWith(SignatureAlgorithm.HS256,jwtProperties.getAccessSecretKey())
+                .compact();
+    }
+
+    /**
+     * JWT 토큰 유효성 검증 로직
+     * @param token : 토큰
+     * @return
+     */
+    public boolean validToken(String token) {
+        try{
+            Jwts.parser()
+                    .setSigningKey(jwtProperties.getAccessSecretKey()) //비밀값으로 복호화
+                    .parseClaimsJws(token);  // 토큰 파싱 (복호화 + 서명 검증 + 유효성 체크)
+            return true;
+        } catch (Exception e) { //복호화 과정에서 에러가 나면 유효하지 않은 토큰
+            return false;
+        }
+    }
+
+    /**
+     * 토큰 기반으로 인증 정보를 가져오는 메서드
+     * @param token : 토큰
+     * @return
+     */
+    public Authentication getAuthentication(String token) {
+
+        //클레임 조회
+        Claims claims = getClaims(token);
+
+        //권한 조회
+        String role = claims.get("role", String.class); // 예: "ROLE_ADMIN"
+
+        //권한 생성
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(role));
+
+        //인증된 Authentication 객체 생성
+        return new UsernamePasswordAuthenticationToken(new org.springframework.security.core.userdetails.User(claims.getSubject(),"",authorities),token,authorities);
+    }
+
+    /**
+     * 토큰 기반으로 유저 ID를 가져오는 메서드
+     * @param token : 토큰
+     * @return
+     */
+    public Long getUserId(String token){
+
+        // 클레임 조회
+        Claims claims = getClaims(token);
+
+        // 회원 아이디 반환
+        return claims.get("id", Long.class);
+    }
+
+
+    //== 클레임 조회 ==//
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(jwtProperties.getAccessSecretKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new JwtCustomException(ErrorMessage.INVALID_TOKEN, e);
+        }
+    }
+
+
+}

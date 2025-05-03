@@ -16,4 +16,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByLoginId(String loginId);
 
 
+    /**
+     * 닉네임으로 회원 조회
+     */
+    Optional<Member> findByNickname(String nickname);
+
+    /**
+     * 전화번호로 회운 조회
+     */
+    Optional<Member> findByPhoneNumber(String phoneNumber);
+
 }

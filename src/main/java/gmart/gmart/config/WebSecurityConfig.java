@@ -1,5 +1,7 @@
 package gmart.gmart.config;
 
+import gmart.gmart.config.jwt.TokenAuthenticationFilter;
+import gmart.gmart.config.jwt.TokenProvider;
 import gmart.gmart.service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +15,18 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ *스프링 시큐리티 설정 클래스
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
+    private final TokenProvider tokenProvider;
 
     /**
      *  패스워드 인코더로 사용할 Bean 등록
@@ -48,14 +55,20 @@ public class WebSecurityConfig {
 
         // TokenAuthenticationFilter 생성 및 Security 필터 체인에 추가
 
+        //토큰 인증 필터
+        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(tokenProvider);
+
+
         http
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 모드
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/gmart/members","/api/gmart/login")
+                        .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/profile/**","/profile-images/**")
                         .permitAll()
-                );
+                )
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
+
 
         return http.build();
 

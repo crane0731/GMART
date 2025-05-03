@@ -9,12 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * CustomUserDetails를 생성하는 서비스 -> Spring Security에 필요
  */
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CustomUserDetailService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
