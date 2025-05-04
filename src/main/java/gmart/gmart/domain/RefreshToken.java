@@ -28,11 +28,6 @@ public class RefreshToken  extends BaseTimeEntity {
     @Column(name = "refresh_token",nullable = false)
     private String refreshToken;
 
-    public RefreshToken(Long memberId, String refreshToken) {
-        this.memberId = memberId;
-        this.refreshToken = refreshToken;
-    }
-
 
     /**
      * 리프레시 토큰 업데이트 메서드
@@ -42,5 +37,13 @@ public class RefreshToken  extends BaseTimeEntity {
     public RefreshToken update(String refreshToken) {
         this.refreshToken = refreshToken;
         return this;
+    }
+
+    public static RefreshToken createEntity(Long memberId, String refreshToken) {
+        RefreshToken token = new RefreshToken();
+        token.memberId=memberId;
+        token.refreshToken = refreshToken;
+        return token;
+
     }
 }

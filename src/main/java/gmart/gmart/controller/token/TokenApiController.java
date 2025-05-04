@@ -19,6 +19,11 @@ public class TokenApiController {
 
     private final TokenService tokenService;
 
+    /**
+     * 새로운 엑세스 토큰 생성
+     * @param requestDto
+     * @return
+     */
     @PostMapping("/api/gmart/token")
     public ResponseEntity<CreateAccessTokenResponseDto> createNewAccessToken(@RequestBody CreateAccessTokenRequestDto requestDto) {
         String newAccessToken = tokenService.createNewAccessToken(requestDto.getRefreshToken());

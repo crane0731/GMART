@@ -3,13 +3,20 @@ package gmart.gmart.service;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.MemberProfileImage;
 import gmart.gmart.domain.UploadedImage;
+import gmart.gmart.domain.userdetail.CustomUserDetails;
+import gmart.gmart.dto.LoginRequestDto;
 import gmart.gmart.dto.SignUpRequestDto;
+import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.MemberRepository;
 import gmart.gmart.service.image.ProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +29,61 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProfileImageService profileImageService;
+    private final RefreshTokenService refreshTokenService;
+    private final TokenService tokenService;
 
     private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
+    private final AuthenticationManager authenticationManager;
+
+    /**
+     * 로그인 서비스
+     * @param dto
+     * @return
+     */
+    @Transactional
+    public TokenResponseDto loginMember(LoginRequestDto dto){
+
+        //스프링 시큐리티 수동 로그인
+        Member loginMember = securityLogin(dto);
+
+        //JWT 토큰 생성 , 반환
+        return makeToken(loginMember);
+
+    }
+
+    //==리프레쉬 토큰 + 엑세스 토큰 생성==//
+    private TokenResponseDto makeToken(Member loginMember) {
+        //리프레시 토큰 생성
+        String refreshToken = refreshTokenService.createRefreshToken(loginMember);
+
+        //엑세스 토큰 생성
+        String accessToken = tokenService.createNewAccessToken(refreshToken);
+
+        //응답 DTO 반환
+        TokenResponseDto responseDto = TokenResponseDto.createDto(accessToken, refreshToken);
+        return responseDto;
+    }
+
+    //==스프링 시큐리티 수동 로그인==//
+    private Member securityLogin(LoginRequestDto dto) {
+        //UsernamePasswordAuthenticationToken 생성
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(dto.getLoginId(), dto.getPassword());
+
+        //AuthenticationManager로 인증 시도 (loadUser + password 체크 내부 수행)
+        Authentication authentication = authenticationManager.authenticate(authToken);
+
+        //인증 정보 SecurityContext에 저장 (로그인 처리)
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //로그인된 회원 정보 가져오기
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        return  memberRepository.findByLoginId(userDetails.getUsername()).orElseThrow(() -> new CustomException(ErrorMessage.NOT_FOUND_MEMBER));
+
+
+    }
+
 
     /**
      * ID 를 통해 회원을 조회

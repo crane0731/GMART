@@ -1,7 +1,9 @@
 package gmart.gmart.controller;
 
+import gmart.gmart.dto.LoginRequestDto;
 import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,27 @@ import java.util.Map;
 public class LoginController {
 
     private final MemberService memberService;
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginRequestDto loginRequestDto, BindingResult bindingResult) {
+
+        // 오류 메시지를 담을 Map
+        Map<String, String> errorMessages = new HashMap<>();
+
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        //로그인
+        TokenResponseDto tokenResponseDto = memberService.loginMember(loginRequestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(tokenResponseDto));
+
+    }
+
+
 
     /**
      * 회원 가입 컨트롤러

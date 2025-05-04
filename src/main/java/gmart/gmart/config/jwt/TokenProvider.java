@@ -1,6 +1,7 @@
 package gmart.gmart.config.jwt;
 
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.TokenType;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.JwtCustomException;
 import io.jsonwebtoken.*;
@@ -29,20 +30,25 @@ public class TokenProvider {
      * @param member : 회원
      * @param expiredAt : 만료기간
      */
-    public String generateToken(Member member , Duration expiredAt){
+    public String generateToken(Member member , Duration expiredAt, TokenType tokenType) {
 
         //현재 시각
         Date now = new Date();
 
-        //now.getTime() -> 현재 시각
-        //expiredAt.toMillis() -> 만료 기간
-        //now.getTime()+ expiredAt.toMillis() -> 만료 날짜, 토큰 유지 기간
-        return makeToken(new Date(now.getTime()+ expiredAt.toMillis()),member);
-    }
+        if(tokenType==TokenType.ACCESS) {
+            //now.getTime() -> 현재 시각
+            //expiredAt.toMillis() -> 만료 기간
+            //now.getTime()+ expiredAt.toMillis() -> 만료 날짜, 토큰 유지 기간
+            return makeAccessToken(new Date(now.getTime() + expiredAt.toMillis()), member);
+        }else{
+            return makeRefreshToken(new Date(now.getTime() + expiredAt.toMillis()), member);
+        }
+
+        }
 
 
-   //==JWT 토큰 생성 ==//
-    private String makeToken(Date expiry, Member member) {
+   //==JWT 엑세스 토큰 생성 ==//
+    private String makeAccessToken(Date expiry, Member member) {
 
         //현재 시각
         Date now = new Date();
@@ -61,15 +67,51 @@ public class TokenProvider {
                 .compact();
     }
 
+    //==JWT 리프레쉬 토큰 생성 ==//
+    private String makeRefreshToken(Date expiry, Member member) {
+
+        //현재 시각
+        Date now = new Date();
+
+        //JWT 토큰 생성  -> 헤더 + 내용 + 서명
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE,Header.JWT_TYPE) //헤더 타입 : JWT
+                .setIssuer(jwtProperties.getIssuer())  // 내용 iss : propertise 파일에서 설정한 값
+                .setIssuedAt(now) //내용 iat : 현재시간
+                .setExpiration(expiry) //내용 exp : expiry 멤버 변숫값, 만료일
+                .setSubject(member.getLoginId()) //내용 sub : 회원의 이메일
+                .claim("id",member.getId()) // 클레임 id : 유저 id
+                .claim("role", member.getMemberRole().name()) // 유저의 권한
+                //서명 : 비밀값과 함께 해시값을 HS256 방식으로 암호화
+                .signWith(SignatureAlgorithm.HS256,jwtProperties.getRefreshSecretKey())
+                .compact();
+    }
+
     /**
-     * JWT 토큰 유효성 검증 로직
+     * JWT 엑세스 토큰 유효성 검증 로직
      * @param token : 토큰
      * @return
      */
-    public boolean validToken(String token) {
+    public boolean validAccessToken(String token) {
         try{
             Jwts.parser()
                     .setSigningKey(jwtProperties.getAccessSecretKey()) //비밀값으로 복호화
+                    .parseClaimsJws(token);  // 토큰 파싱 (복호화 + 서명 검증 + 유효성 체크)
+            return true;
+        } catch (Exception e) { //복호화 과정에서 에러가 나면 유효하지 않은 토큰
+            return false;
+        }
+    }
+
+    /**
+     * JWT 리프레쉬 토큰 유효성 검증 로직
+     * @param token : 토큰
+     * @return
+     */
+    public boolean validRefreshToken(String token) {
+        try{
+            Jwts.parser()
+                    .setSigningKey(jwtProperties.getRefreshSecretKey()) //비밀값으로 복호화
                     .parseClaimsJws(token);  // 토큰 파싱 (복호화 + 서명 검증 + 유효성 체크)
             return true;
         } catch (Exception e) { //복호화 과정에서 에러가 나면 유효하지 않은 토큰

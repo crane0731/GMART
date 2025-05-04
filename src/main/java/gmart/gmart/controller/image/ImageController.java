@@ -5,7 +5,6 @@ import gmart.gmart.dto.image.ProfileImageUrlResponseDto;
 import gmart.gmart.service.image.ProfileImageService;
 import gmart.gmart.service.image.StorageService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/gmart")
+@RequestMapping("/api/gmart/image")
 public class ImageController {
 
     private final ProfileImageService profileImageService;
@@ -27,7 +26,7 @@ public class ImageController {
     /**
      * 프로필 이미지 업로드
      */
-    @PostMapping("/profile/image")
+    @PostMapping("/profile")
     public ResponseEntity<ApiResponse<?>> profileImageUpload(@RequestParam("file") MultipartFile file) {
 
         ProfileImageUrlResponseDto responseDto = profileImageService.uploadProfileImage(file);
@@ -39,7 +38,7 @@ public class ImageController {
     /**
      * 프로필 이미지 업로드 취소
      */
-    @DeleteMapping("/profile/image")
+    @DeleteMapping("/profile")
     public ResponseEntity<ApiResponse<?>> cancelProfileImageUpload(@RequestParam("imageUrl") String imageUrl) {
 
         storageService.deleteImageFile(imageUrl);

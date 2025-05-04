@@ -64,7 +64,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 모드
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/profile/**","/profile-images/**")
+                        .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/image/profile","/profile-images/**")
                         .permitAll()
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가

@@ -1,6 +1,5 @@
 package gmart.gmart.dto.token;
 
-import jakarta.persistence.GeneratedValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
