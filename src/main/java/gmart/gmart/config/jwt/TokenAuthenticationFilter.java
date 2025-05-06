@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,6 +15,7 @@ import java.io.IOException;
 /**
  * JWT 토큰 필터
  */
+@Slf4j
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
@@ -42,6 +44,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         //가져온 토큰이 유효한지 확인하고 , 유효한 때는 인증 정보 설정
         if(tokenProvider.validAccessToken(token)) {
 
+            log.info("필터 성공");
+
             //인증 정보 가져오기
             Authentication authentication = tokenProvider.getAuthentication(token);
 
@@ -49,6 +53,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
+        log.info("다음으로");
         // 다음 필터 실행
         filterChain.doFilter(request, response);
 

@@ -27,6 +27,21 @@ public class RefreshTokenService {
 
     private final Duration refreshTokenValidity = Duration.ofDays(1);  // Refresh Token 유효 시간 (1일)
 
+    public RefreshToken findByMemberId(Long memberId) {
+        return refreshTokenRepository.findByMemberId(memberId).orElseThrow(()->new JwtCustomException(ErrorMessage.NOT_FOUND_REFRESH_TOKEN));
+    }
+
+
+    /**
+     * 회원을 통해 리프레쉬 토큰 삭제
+     * @param member
+     */
+    @Transactional
+    public void delete(Member member) {
+        RefreshToken refreshToken = findByMemberId(member.getId());
+        refreshTokenRepository.delete(refreshToken);
+    }
+
     /**
      * 리프레쉬 토큰 조회
      * @param refreshToken

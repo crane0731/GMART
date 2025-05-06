@@ -2,6 +2,7 @@ package gmart.gmart.service;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.MemberProfileImage;
+import gmart.gmart.domain.RefreshToken;
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
 import gmart.gmart.dto.LoginRequestDto;
@@ -34,6 +35,39 @@ public class MemberService {
 
     private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
     private final AuthenticationManager authenticationManager;
+
+    /**
+     * 로그아웃
+     */
+    @Transactional
+    public void logout(){
+
+        //현재 로그인한 회원 조회
+        Member member = findBySecurityContextHolder();
+
+        //리프레쉬 토큰 삭제
+        refreshTokenService.delete(member);
+
+    }
+
+
+    /**
+     * 로그인된 회원 정보 가져오기 (Spring Security)
+     * @return
+     */
+    public Member findBySecurityContextHolder(){
+
+        //시큐리티 컨텍스트 홀더에서 인증 객체 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        //설정한 username (loginId) 조회
+        String loginId = authentication.getName();
+
+        // Member 반환
+        return findByLoginId(loginId);
+
+    }
+
 
     /**
      * 로그인 서비스
@@ -79,9 +113,17 @@ public class MemberService {
         //로그인된 회원 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        return  memberRepository.findByLoginId(userDetails.getUsername()).orElseThrow(() -> new CustomException(ErrorMessage.NOT_FOUND_MEMBER));
+        return findByLoginId(userDetails.getUsername());
 
 
+    }
+
+    /**
+     * Login ID를 통해 회원을 조회
+     * @return
+     */
+    public Member findByLoginId(String loginId) {
+        return memberRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorMessage.NOT_FOUND_MEMBER));
     }
 
 
@@ -193,5 +235,6 @@ public class MemberService {
             throw new CustomException(ErrorMessage.DUPLICATED_LOGIN_ID);
         }
     }
+
 
 }

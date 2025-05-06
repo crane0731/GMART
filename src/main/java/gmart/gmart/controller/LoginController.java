@@ -1,5 +1,6 @@
 package gmart.gmart.controller;
 
+import gmart.gmart.domain.Member;
 import gmart.gmart.dto.LoginRequestDto;
 import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
@@ -25,6 +26,12 @@ public class LoginController {
 
     private final MemberService memberService;
 
+    /**
+     * 로그인 컨트롤러
+     * @param loginRequestDto
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginRequestDto loginRequestDto, BindingResult bindingResult) {
 
@@ -45,6 +52,18 @@ public class LoginController {
     }
 
 
+    /**
+     * (임시) : 로그아웃 컨트롤러
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<?>> logout() {
+
+        //로그아웃
+        memberService.logout();
+
+        return ResponseEntity.ok(ApiResponse.success(Map.of("message", "로그아웃 성공")));
+
+    }
 
     /**
      * 회원 가입 컨트롤러
