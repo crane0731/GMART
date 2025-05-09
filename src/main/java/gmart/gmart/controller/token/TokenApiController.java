@@ -34,7 +34,10 @@ public class TokenApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(new CreateAccessTokenResponseDto(newAccessToken)));
     }
 
-
+    /**
+     * 테스트용 api
+     * @return
+     */
     @PostMapping("/api/hello")
     public ResponseEntity<ApiResponse<?>> hello() {
         return ResponseEntity.ok(ApiResponse.success("Hello World!"));

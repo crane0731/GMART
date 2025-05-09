@@ -18,4 +18,7 @@ public final class ErrorMessage {
     public static final String FAILED_IMAGE_UPLOAD="이미지 업로드에 실패하였습니다.";
     public static final String FAILED_DELETE_FILE = "파일 삭제에 실패했습니다.";
     public static final String NOT_FOUND_FILE = "파일을 찾을 수 없습니다.";
+    public static final String EXPIRED_TOKEN = "토큰이 만료되었습니다.";
+    public static final String LOGOUT_TOKEN ="로그아웃 된 토큰입니다.";
+    public static final String INCORRECT_PASSWORD="잘못된 비밀번호입니다.";
 }

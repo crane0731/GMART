@@ -48,5 +48,11 @@ public class MemberProfileImage extends BaseTimeEntity {
         this.member = member;
     }
 
+    /**
+     * 이미지 URL 설정
+     */
+    protected void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
 }

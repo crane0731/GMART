@@ -1,24 +1,17 @@
-package gmart.gmart.dto;
+package gmart.gmart.dto.member;
 
+import gmart.gmart.dto.AddressDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 회원 가입 요청 DTO
+ * 회원 정보 수정 요청 DTO
  */
 @Getter
 @Setter
-public class SignUpRequestDto {
-    @NotBlank(message = "로그인 아이디를 입력해 주세요.")
-    private String loginId;   //로그인 아이디
-
-    @NotBlank(message = "비밀번호를 입력해 주세요.")
-    private String password; //비밀번호
-
-    @NotBlank(message = "비밀번호 검증을 입력해 주세요.")
-    private String passwordCheck;  //비밀번호 검증
+public class UpdateMemberInfoRequestDto {
 
     @NotBlank(message = "이름을 입력해 주세요.")
     private String name; //이름

@@ -26,6 +26,35 @@ public class TokenProvider {
     private final JwtProperties jwtProperties;
 
     /**
+     * 엑세스 토큰의 남은 유효 기간을 확인하기 위한 로직
+     * @param token
+     * @return
+     */
+    public long getAccessTokenExpiration(String token) {
+        try{
+            //클레임 조회
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtProperties.getAccessSecretKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            //만료 시각 조회
+            Date expiration = claims.getExpiration();
+
+            //현재 시각 조회
+            Long now = System.currentTimeMillis();
+
+            //남은 만료 기간
+            return expiration.getTime() - now;
+
+        }
+        catch (JwtException | IllegalArgumentException e){
+            throw new JwtCustomException(ErrorMessage.INVALID_TOKEN,e);
+        }
+    }
+
+
+    /**
      * 토큰 생성
      * @param member : 회원
      * @param expiredAt : 만료기간

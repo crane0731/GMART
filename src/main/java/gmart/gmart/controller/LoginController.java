@@ -6,6 +6,7 @@ import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -53,13 +54,15 @@ public class LoginController {
 
 
     /**
-     * (임시) : 로그아웃 컨트롤러
+     * 로그아웃 컨트롤러
+     * @param request
+     * @return
      */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<?>> logout() {
+    public ResponseEntity<ApiResponse<?>> logout(HttpServletRequest request) {
 
         //로그아웃
-        memberService.logout();
+        memberService.logout(request);
 
         return ResponseEntity.ok(ApiResponse.success(Map.of("message", "로그아웃 성공")));
 

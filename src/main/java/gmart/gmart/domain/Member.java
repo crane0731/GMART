@@ -4,7 +4,9 @@ import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.AccountActiveStatus;
 import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
+import gmart.gmart.dto.AddressDto;
 import gmart.gmart.dto.SignUpRequestDto;
+import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -105,7 +107,7 @@ public class Member extends BaseTimeEntity {
      */
     public static Member createEntity(SignUpRequestDto dto,String encodedPassword){
 
-        Address address = createAddress(dto);
+        Address address = createAddress(dto.getAddress());
 
         Member member = new Member();
 
@@ -131,21 +133,64 @@ public class Member extends BaseTimeEntity {
     }
 
     //==Address 생성==//
-    private static Address createAddress(SignUpRequestDto dto) {
-        return Address.builder()
-                .address(dto.getAddress())
-                .addressDetails(dto.getAddressDetail())
-                .zipCode(dto.getZipcode())
-                .build();
+    private static Address createAddress(AddressDto dto) {
+        return Address.createEntity(dto);
     }
 
     /**
-     * 프로필 이미지 등록
+     * 연관관계편의메서드 - 프로필 이미지 등록
      */
-    public void settingProfileImage(MemberProfileImage memberProfileImage) {
+    public void addProfileImage(MemberProfileImage memberProfileImage) {
         this.memberProfileImage = memberProfileImage;
         memberProfileImage.setMember(this);
     }
 
 
+    /**
+     * 연관관계편의메서드 - 선호 건담 등급 등록
+     */
+    public void updateMemberGundamGrade(List<MemberGundamGrade> gundamGrades) {
+        this.memberGundamGrades.clear();
+        this.memberGundamGrades.addAll(gundamGrades);
+
+        for (MemberGundamGrade gundamGrade : gundamGrades) {
+            gundamGrade.setMember(this);
+        }
+    }
+
+    /**
+     * 비밀번호 변경
+     */
+    public void updatePassword(String newPassword){
+        this.password=newPassword;
+    }
+
+    /**
+     * 회원 정보 수정 (프로필 이미지 포함)
+     */
+    public void updateWithProfileImage(UpdateMemberInfoRequestDto dto,String imageUrl){
+
+        //주소 객체 생성
+        Address address = createAddress(dto.getAddress());
+
+        this.nickname=dto.getNickname();
+        this.name = dto.getName();
+        this.phoneNumber = dto.getPhone();
+        this.address = address;
+        this.memberProfileImage.setImageUrl(imageUrl);
+
+    }
+
+    /**
+     * 회원 정보 수정(프로필 이미지 미포함)
+     */
+    public void update(UpdateMemberInfoRequestDto dto){
+        //주소 객체 생성
+        Address address = createAddress(dto.getAddress());
+
+        this.nickname=dto.getNickname();
+        this.name = dto.getName();
+        this.phoneNumber = dto.getPhone();
+        this.address = address;
+    }
 }

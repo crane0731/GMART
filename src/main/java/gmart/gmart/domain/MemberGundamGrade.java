@@ -33,5 +33,26 @@ public class MemberGundamGrade extends BaseTimeEntity {
     @Column(name = "gundam_grade", nullable = false)
     private GundamGrade gundamGrade;
 
+    /**
+     * setter
+     * @param member
+     */
+    protected void setMember(Member member) {
+        this.member = member;
+    }
+
+
+    /**
+     * 생성 메서드
+     * @param gundamGrade
+     * @return
+     */
+    public static MemberGundamGrade createEntity(String gundamGrade) {
+        MemberGundamGrade memberGundamGrade = new MemberGundamGrade();
+        memberGundamGrade.gundamGrade= GundamGrade.valueOf(gundamGrade);
+        return memberGundamGrade;
+
+    }
+
 
 }

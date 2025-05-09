@@ -3,6 +3,7 @@ package gmart.gmart.config;
 import gmart.gmart.config.jwt.TokenAuthenticationFilter;
 import gmart.gmart.config.jwt.TokenProvider;
 import gmart.gmart.service.CustomUserDetailService;
+import gmart.gmart.service.redis.TokenBlackListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class WebSecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
     private final TokenProvider tokenProvider;
+    private final TokenBlackListService tokenBlackListService;
 
     /**
      *  패스워드 인코더로 사용할 Bean 등록
@@ -56,7 +58,7 @@ public class WebSecurityConfig {
         // TokenAuthenticationFilter 생성 및 Security 필터 체인에 추가
 
         //토큰 인증 필터
-        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(tokenProvider);
+        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(tokenBlackListService,tokenProvider);
 
 
         http

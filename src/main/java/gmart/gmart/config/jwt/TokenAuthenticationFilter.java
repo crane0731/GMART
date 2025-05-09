@@ -1,5 +1,8 @@
 package gmart.gmart.config.jwt;
 
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.JwtCustomException;
+import gmart.gmart.service.redis.TokenBlackListService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +22,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private final TokenBlackListService tokenBlackListService;
     private final TokenProvider tokenProvider;
+
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
 
@@ -35,6 +40,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        log.info("JWT 필터링 시작");
+
         //요청 헤더의 Authorization 키의 값 조회
         String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
 
@@ -42,9 +49,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = getAccessToken(authorizationHeader);
 
         //가져온 토큰이 유효한지 확인하고 , 유효한 때는 인증 정보 설정
-        if(tokenProvider.validAccessToken(token)) {
+        if(token!=null & tokenProvider.validAccessToken(token)) {
 
-            log.info("필터 성공");
+            log.info("JWT 토큰 유효");
+
+            //블랙 리스트 확인
+            if(tokenBlackListService.isBlacklisted(token)) {
+
+                log.warn("블랙리스트에 등록된 토큰");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ErrorMessage.LOGOUT_TOKEN);
+            }
 
             //인증 정보 가져오기
             Authentication authentication = tokenProvider.getAuthentication(token);
@@ -53,7 +67,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        log.info("다음으로");
+        log.info("JWT 필터링 성공");
+
         // 다음 필터 실행
         filterChain.doFilter(request, response);
 
