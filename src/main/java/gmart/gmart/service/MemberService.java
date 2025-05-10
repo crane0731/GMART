@@ -48,6 +48,21 @@ public class MemberService {
 
 
     /**
+     * 회원 탈퇴
+     * @param request
+     */
+    @Transactional
+    public void withdrawMember(HttpServletRequest request){
+
+        //로그인한 회원 조회
+        Member member = findBySecurityContextHolder();
+
+        //회원 삭제
+        deleteMember(request, member);
+
+    }
+
+    /**
      * 회원정보 수정
      * @param dto
      */
@@ -139,10 +154,7 @@ public class MemberService {
         Member member = findBySecurityContextHolder();
 
         //리프레쉬 토큰 삭제
-        refreshTokenService.delete(member);
-
-        //엑세스 토큰 블랙리스트 등록
-        setBlackListAccessToken(request);
+        deleteToken(request, member);
 
     }
 
@@ -228,11 +240,11 @@ public class MemberService {
         //패스워드 인코딩
         String encodedPassword = bCryptPasswordEncoder.encode(signUpRequestDto.getPassword());
 
-        //회원 생성
-        Member member = Member.createEntity(signUpRequestDto,encodedPassword);
-
         //회원 프로필 이미지 생성
         MemberProfileImage memberProfileImage = MemberProfileImage.createEntity(uploadedImage.getImageUrl());
+
+        //회원 생성
+        Member member = Member.createEntity(signUpRequestDto,encodedPassword);
 
         //회원 - 프로필 이미지 세팅
         member.addProfileImage(memberProfileImage);
@@ -388,6 +400,31 @@ public class MemberService {
         //전화번호 중복 검사
         phoneDuplicatedCheck(dto.getPhone());
     }
+
+    //==회원 삭제 로직==//
+    private void deleteMember(HttpServletRequest request, Member member) {
+        //회원 삭제
+        memberRepository.delete(member);
+
+        //업로드된 이미지 조회
+        UploadedImage uploadedImage = profileImageService.findByImageUrl(member.getMemberProfileImage().getImageUrl());
+
+        //이미지 사용안함 처리
+        uploadedImage.usedFalse();
+
+        //토큰 삭제(엑세스, 리프레쉬)
+        deleteToken(request, member);
+    }
+
+    //==토큰 삭제 처리 로직==//
+    private void deleteToken(HttpServletRequest request, Member member) {
+        //리프레쉬 토큰 삭제
+        refreshTokenService.delete(member);
+
+        //엑세스 토큰 블랙리스트 등록
+        setBlackListAccessToken(request);
+    }
+
 
 
 }

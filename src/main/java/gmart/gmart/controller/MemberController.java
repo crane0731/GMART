@@ -6,6 +6,7 @@ import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.dto.password.ChangePasswordRequestDto;
 import gmart.gmart.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +78,12 @@ public class MemberController {
 
     }
 
-    //회원 자신의 정보 수정
+    /**
+     * 회원 자신의 정보 수정 컨트롤러
+     * @param requestDto
+     * @param bindingResult
+     * @return
+     */
     @PutMapping("/me")
     public ResponseEntity<ApiResponse<?>> UpdateMyInfo(@RequestBody UpdateMemberInfoRequestDto requestDto , BindingResult bindingResult){
 
@@ -95,6 +101,23 @@ public class MemberController {
 
         return  ResponseEntity.ok(ApiResponse.success(Map.of("message","수정 완료")));
     }
+
+
+    /**
+     * 회원 탈퇴 컨트롤러
+     * @param request
+     * @return
+     */
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<?>> withdrawMember(HttpServletRequest request){
+
+        //회원 탈퇴 처리
+        memberService.withdrawMember(request);
+
+        return  ResponseEntity.ok(ApiResponse.success(Map.of("message","회원 탈퇴 완료")));
+    }
+
+
 
     //==필드에러가 있는지 확인하는 로직==//
     private boolean errorCheck(BindingResult bindingResult, Map<String, String> errorMessages) {

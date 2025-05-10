@@ -7,7 +7,6 @@ import gmart.gmart.domain.enums.TokenType;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.JwtCustomException;
 import gmart.gmart.repository.RefreshTokenRepository;
-import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

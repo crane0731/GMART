@@ -22,10 +22,9 @@ public class MemberProfileImage extends BaseTimeEntity {
     @Column(name = "member_profile_image_id")
     private Long id;
 
-    @Comment("회원 아이디")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+
+    @OneToOne(mappedBy = "memberProfileImage")
+    private Member member=new Member();
 
     @Comment("이미지 URL")
     @Column(name = "image_url",nullable = false)

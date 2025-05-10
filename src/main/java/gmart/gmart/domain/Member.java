@@ -92,8 +92,9 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_role",nullable = false)
     private MemberRole memberRole;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MemberProfileImage memberProfileImage=new MemberProfileImage();
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="member_profile_image_id")
+    private MemberProfileImage memberProfileImage;
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();

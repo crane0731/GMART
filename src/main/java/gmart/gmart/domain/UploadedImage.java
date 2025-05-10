@@ -60,4 +60,12 @@ public class UploadedImage extends BaseTimeEntity {
         isUsed = true;
     }
 
+    /**
+     * 이미지 사용 여부 처리 (false)
+     */
+    public void usedFalse(){
+        isUsed = false;
+    }
+
+
 }
