@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 import java.util.ArrayList;
@@ -87,12 +88,14 @@ public class Member extends BaseTimeEntity {
     @Column(name = "account_active_status",nullable = false)
     private AccountActiveStatus accountActiveStatus;
 
+
+    @Setter
     @Comment("회원 권환")
     @Enumerated(EnumType.STRING)
     @Column(name = "member_role",nullable = false)
     private MemberRole memberRole;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name="member_profile_image_id")
     private MemberProfileImage memberProfileImage;
 
@@ -126,7 +129,7 @@ public class Member extends BaseTimeEntity {
         member.totalSpent = 0L;
         member.reportedCount = 0L;
         member.reviewedCount = 0L;
-        member.accountActiveStatus = AccountActiveStatus.Active;
+        member.accountActiveStatus = AccountActiveStatus.ACTIVE;
         member.memberRole = MemberRole.MEMBER;
 
 
@@ -143,7 +146,7 @@ public class Member extends BaseTimeEntity {
      */
     public void addProfileImage(MemberProfileImage memberProfileImage) {
         this.memberProfileImage = memberProfileImage;
-        memberProfileImage.setMember(this);
+//        memberProfileImage.setMember(this);
     }
 
 
@@ -169,7 +172,7 @@ public class Member extends BaseTimeEntity {
     /**
      * 회원 정보 수정 (프로필 이미지 포함)
      */
-    public void updateWithProfileImage(UpdateMemberInfoRequestDto dto,String imageUrl){
+    public void updateWithProfileImage(UpdateMemberInfoRequestDto dto,MemberProfileImage memberProfileImage){
 
         //주소 객체 생성
         Address address = createAddress(dto.getAddress());
@@ -178,7 +181,7 @@ public class Member extends BaseTimeEntity {
         this.name = dto.getName();
         this.phoneNumber = dto.getPhone();
         this.address = address;
-        this.memberProfileImage.setImageUrl(imageUrl);
+        this.memberProfileImage=memberProfileImage;
 
     }
 

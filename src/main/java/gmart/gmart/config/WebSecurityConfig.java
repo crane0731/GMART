@@ -68,6 +68,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/image/profile","/profile-images/**","/api/gmart/token")
                         .permitAll()
+                        .requestMatchers("/api/gmart/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가

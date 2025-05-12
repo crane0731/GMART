@@ -5,7 +5,7 @@ package gmart.gmart.domain.enums;
  */
 public enum AccountActiveStatus {
 
-    Active,  //활성화
-    Inactive //비활성화
+    ACTIVE,  //활성화
+    INACTIVE //비활성화
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 @Setter
 public class MemberInfoResponseDto {
 
+    private Long memberId; //회원 아이디
     private String loginId; //로그인 아이디
     private String name; //이름
     private String nickname; //닉네임
@@ -55,6 +56,7 @@ public class MemberInfoResponseDto {
 
         MemberInfoResponseDto dto = new MemberInfoResponseDto();
 
+        dto.setMemberId(member.getId());
         dto.setLoginId(member.getLoginId());
         dto.setName(member.getName());
         dto.setNickname(member.getNickname());

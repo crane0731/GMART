@@ -12,6 +12,7 @@ import gmart.gmart.dto.password.ChangePasswordRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.repository.MemberProfileImageRepository;
 import gmart.gmart.repository.MemberRepository;
 import gmart.gmart.service.image.ProfileImageService;
 import gmart.gmart.service.redis.TokenBlackListService;
@@ -42,6 +43,7 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final TokenService tokenService;
     private final TokenBlackListService tokenBlackListService;
+    private final MemberProfileImageRepository memberProfileImageRepository;
 
     private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
     private final AuthenticationManager authenticationManager;
@@ -246,8 +248,13 @@ public class MemberService {
         //회원 생성
         Member member = Member.createEntity(signUpRequestDto,encodedPassword);
 
-        //회원 - 프로필 이미지 세팅
+        //회원 프로필 이미지 저장
+        memberProfileImageRepository.save(memberProfileImage);
+
+        //회원 -> 프로필 이미지 세팅
         member.addProfileImage(memberProfileImage);
+
+
         return member;
     }
 
@@ -259,7 +266,10 @@ public class MemberService {
             UploadedImage uploadedImage = profileImageService.findByImageUrl(profileImageUrl);
 
             //이미지 사용 처리
-            uploadedImage.usedTrue();
+            if(!uploadedImage.isUsed()) {
+                uploadedImage.usedTrue();
+            }
+
             return uploadedImage;
         }else {
             //프로필 이미지가 null 일 경우 기본 프로필 이미지 사용
@@ -337,14 +347,19 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(dto.getLoginId(), dto.getPassword());
 
+
         //AuthenticationManager로 인증 시도 (loadUser + password 체크 내부 수행)
         Authentication authentication = authenticationManager.authenticate(authToken);
+
+
 
         //인증 정보 SecurityContext에 저장 (로그인 처리)
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+
         //로그인된 회원 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
 
         return findByLoginId(userDetails.getUsername());
 
@@ -382,14 +397,30 @@ public class MemberService {
         //업로드된 이미지 조회
         UploadedImage uploadedImage = getUploadedImage(dto.getProfileImageUrl());
 
+        //회원의 기존 프로필 이미지 조회
+        MemberProfileImage oldImage = member.getMemberProfileImage();
+
         //업로드된 이미지가 현재 프로필 이미지인지 확인
         //맞다면 프로필 이미지는 제외하고 업데이트
-        if(member.getMemberProfileImage().getImageUrl().equals(uploadedImage.getImageUrl())) {
+        if(oldImage.getImageUrl().equals(uploadedImage.getImageUrl())) {
             member.update(dto);
+            return;
+        }
+
+        //새로운 회원 프로필 이미지 생성 + 저장
+        MemberProfileImage newMemberProfileImage = MemberProfileImage.createEntity(uploadedImage.getImageUrl());
+        memberProfileImageRepository.save(newMemberProfileImage);
+
+        //기존 프로필 이미지가 기본이미지가 아니라면 삭제 ,예전 업로드 이미지 비활성화
+        if(!oldImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
+            memberProfileImageRepository.delete(oldImage);
+
+            UploadedImage oldUploadImage = getUploadedImage(oldImage.getImageUrl());
+            oldUploadImage.usedFalse();
         }
 
         //업데이트
-        member.updateWithProfileImage(dto,uploadedImage.getImageUrl());
+        member.updateWithProfileImage(dto,newMemberProfileImage);
     }
 
     //==회원 정보 수정에 필요한 검증 로직==//
@@ -403,14 +434,25 @@ public class MemberService {
 
     //==회원 삭제 로직==//
     private void deleteMember(HttpServletRequest request, Member member) {
-        //회원 삭제
-        memberRepository.delete(member);
+
+        //회원 프로필 이미지 조회
+        MemberProfileImage memberProfileImage = member.getMemberProfileImage();
+
+        //프로필 이미지가 기본이미지가 아니라면 회원 프로필 이미지 삭제
+        if(!memberProfileImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
+            memberProfileImageRepository.delete(memberProfileImage);
+        }
 
         //업로드된 이미지 조회
         UploadedImage uploadedImage = profileImageService.findByImageUrl(member.getMemberProfileImage().getImageUrl());
 
-        //이미지 사용안함 처리
-        uploadedImage.usedFalse();
+        if(!uploadedImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
+            //이미지 사용안함 처리
+            uploadedImage.usedFalse();
+        }
+
+        //회원 삭제
+        memberRepository.delete(member);
 
         //토큰 삭제(엑세스, 리프레쉬)
         deleteToken(request, member);

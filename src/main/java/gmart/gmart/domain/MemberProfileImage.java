@@ -22,10 +22,6 @@ public class MemberProfileImage extends BaseTimeEntity {
     @Column(name = "member_profile_image_id")
     private Long id;
 
-
-    @OneToOne(mappedBy = "memberProfileImage")
-    private Member member=new Member();
-
     @Comment("이미지 URL")
     @Column(name = "image_url",nullable = false)
     private String imageUrl;
@@ -39,13 +35,13 @@ public class MemberProfileImage extends BaseTimeEntity {
         return memberProfileImage;
     }
 
-    /**
-     * 회원 설정
-     * @param member
-     */
-    protected void setMember(Member member) {
-        this.member = member;
-    }
+//    /**
+//     * 회원 설정
+//     * @param member
+//     */
+//    protected void setMember(Member member) {
+//        this.member = member;
+//    }
 
     /**
      * 이미지 URL 설정

@@ -162,7 +162,7 @@ public class TokenProvider {
         String role = claims.get("role", String.class); // 예: "ROLE_ADMIN"
 
         //권한 생성
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(role));
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
 
         //인증된 Authentication 객체 생성
         return new UsernamePasswordAuthenticationToken(new org.springframework.security.core.userdetails.User(claims.getSubject(),"",authorities),token,authorities);
