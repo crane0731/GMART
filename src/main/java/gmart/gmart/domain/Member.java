@@ -99,9 +99,12 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberSuspension> memberSuspensions = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Inquiry> inquiries = new ArrayList<>();
 
     /**
      * 회원 생성 로직
@@ -158,6 +161,7 @@ public class Member extends BaseTimeEntity {
             gundamGrade.setMember(this);
         }
     }
+
 
     /**
      * 비밀번호 변경
