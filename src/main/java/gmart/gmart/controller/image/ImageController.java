@@ -2,7 +2,7 @@ package gmart.gmart.controller.image;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.image.ProfileImageUrlResponseDto;
-import gmart.gmart.service.image.ProfileImageService;
+import gmart.gmart.service.image.UploadImageService;
 import gmart.gmart.service.image.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/gmart/image")
 public class ImageController {
 
-    private final ProfileImageService profileImageService;
+    private final UploadImageService profileImageService;
     private final StorageService storageService;
 
     /**

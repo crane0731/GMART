@@ -2,8 +2,10 @@ package gmart.gmart.config.jwt;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.enums.TokenType;
+import gmart.gmart.domain.userdetail.CustomUserDetails;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.JwtCustomException;
+import gmart.gmart.service.CustomUserDetailService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,7 @@ import java.util.Set;
 public class TokenProvider {
 
     private final JwtProperties jwtProperties;
+    private final CustomUserDetailService customUserDetailService;
 
     /**
      * 엑세스 토큰의 남은 유효 기간을 확인하기 위한 로직
@@ -153,19 +156,21 @@ public class TokenProvider {
      * @param token : 토큰
      * @return
      */
-    public Authentication getAuthentication(String token) {
 
-        //클레임 조회
+
+    public Authentication getAuthentication(String token) {
+        // 클레임 조회
         Claims claims = getClaims(token);
 
-        //권한 조회
-        String role = claims.get("role", String.class); // 예: "ROLE_ADMIN"
+        // DB에서 사용자 정보 로딩 (CustomUserDetails)
+         CustomUserDetails userDetails = (CustomUserDetails) customUserDetailService.loadUserByUsername(claims.getSubject());
 
-        //권한 생성
+        // JWT에서 권한 꺼내기 (DB 권한이 아닌 JWT 기준 유지)
+        String role = claims.get("role", String.class);
         Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
 
-        //인증된 Authentication 객체 생성
-        return new UsernamePasswordAuthenticationToken(new org.springframework.security.core.userdetails.User(claims.getSubject(),"",authorities),token,authorities);
+        // CustomUserDetails + JWT 권한으로 인증 객체 생성
+        return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
 
     /**

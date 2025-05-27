@@ -14,12 +14,12 @@ import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.MemberProfileImageRepository;
 import gmart.gmart.repository.MemberRepository;
-import gmart.gmart.service.image.ProfileImageService;
+import gmart.gmart.service.image.MemberProfileImageService;
+import gmart.gmart.service.image.UploadImageService;
 import gmart.gmart.service.redis.TokenBlackListService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.Update;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,16 +38,26 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ProfileImageService profileImageService;
+    private final UploadImageService profileImageService;
     private final RefreshTokenService refreshTokenService;
     private final TokenService tokenService;
     private final TokenBlackListService tokenBlackListService;
-    private final MemberProfileImageRepository memberProfileImageRepository;
+    private final MemberProfileImageService memberProfileImageService;
+    private final MemberSuspensionService memberSuspensionService;
 
     private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
+    /**
+     * 회원 삭제
+     * @param member
+     */
+    @Transactional
+    public void delete(Member member){
+        memberRepository.delete(member);
+    }
 
     /**
      * 회원 탈퇴
@@ -60,7 +70,7 @@ public class MemberService {
         Member member = findBySecurityContextHolder();
 
         //회원 삭제
-        deleteMember(request, member);
+        processingDelete(request, member);
 
     }
 
@@ -128,8 +138,7 @@ public class MemberService {
 
         //업데이트
         member.updateMemberGundamGrade(memberGundamGrades);
-
-
+        
     }
 
     /**
@@ -190,6 +199,9 @@ public class MemberService {
         //스프링 시큐리티 수동 로그인
         Member loginMember = securityLogin(dto);
 
+        //정지된 계정인지 확인
+        validateNotSuspended(loginMember);
+
         //JWT 토큰 생성 , 반환
         return makeToken(loginMember);
 
@@ -237,6 +249,13 @@ public class MemberService {
 
     }
 
+    //==계정 정지당한 회원인지 확인하는 로직==//
+    private void validateNotSuspended(Member member) {
+        if (memberSuspensionService.isCurrentlySuspended(member)) {
+            throw new CustomException(ErrorMessage.ALREADY_SUSPENDED_MEMBER);
+        }
+    }
+
     //==회원 생성 + 프로필 이미지 세팅==//
     private Member createMemberWithProfileImage(SignUpRequestDto signUpRequestDto, UploadedImage uploadedImage) {
         //패스워드 인코딩
@@ -249,7 +268,7 @@ public class MemberService {
         Member member = Member.createEntity(signUpRequestDto,encodedPassword);
 
         //회원 프로필 이미지 저장
-        memberProfileImageRepository.save(memberProfileImage);
+        memberProfileImageService.save(memberProfileImage);
 
         //회원 -> 프로필 이미지 세팅
         member.addProfileImage(memberProfileImage);
@@ -409,11 +428,11 @@ public class MemberService {
 
         //새로운 회원 프로필 이미지 생성 + 저장
         MemberProfileImage newMemberProfileImage = MemberProfileImage.createEntity(uploadedImage.getImageUrl());
-        memberProfileImageRepository.save(newMemberProfileImage);
+        memberProfileImageService.save(newMemberProfileImage);
 
         //기존 프로필 이미지가 기본이미지가 아니라면 삭제 ,예전 업로드 이미지 비활성화
         if(!oldImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
-            memberProfileImageRepository.delete(oldImage);
+            memberProfileImageService.delete(oldImage);
 
             UploadedImage oldUploadImage = getUploadedImage(oldImage.getImageUrl());
             oldUploadImage.usedFalse();
@@ -433,26 +452,23 @@ public class MemberService {
     }
 
     //==회원 삭제 로직==//
-    private void deleteMember(HttpServletRequest request, Member member) {
+    private void processingDelete(HttpServletRequest request, Member member) {
 
         //회원 프로필 이미지 조회
         MemberProfileImage memberProfileImage = member.getMemberProfileImage();
 
         //프로필 이미지가 기본이미지가 아니라면 회원 프로필 이미지 삭제
         if(!memberProfileImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
-            memberProfileImageRepository.delete(memberProfileImage);
-        }
+            memberProfileImageService.delete(memberProfileImage);
 
-        //업로드된 이미지 조회
-        UploadedImage uploadedImage = profileImageService.findByImageUrl(member.getMemberProfileImage().getImageUrl());
+            //업로드된 이미지 조회
+            UploadedImage uploadedImage = profileImageService.findByImageUrl(member.getMemberProfileImage().getImageUrl());
 
-        if(!uploadedImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
-            //이미지 사용안함 처리
             uploadedImage.usedFalse();
-        }
 
+        }
         //회원 삭제
-        memberRepository.delete(member);
+        delete(member);
 
         //토큰 삭제(엑세스, 리프레쉬)
         deleteToken(request, member);

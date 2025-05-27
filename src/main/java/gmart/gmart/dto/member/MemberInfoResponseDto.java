@@ -1,10 +1,8 @@
 package gmart.gmart.dto.member;
 
 import gmart.gmart.domain.Member;
-import gmart.gmart.domain.MemberCoupon;
 import gmart.gmart.domain.MemberGundamGrade;
 import gmart.gmart.dto.AddressDto;
-import gmart.gmart.dto.MemberCouponDto;
 import gmart.gmart.dto.MemberPreferredGundamGradeDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +38,6 @@ public class MemberInfoResponseDto {
     private String memberRole; //권한
 
     private List<MemberPreferredGundamGradeDto> preferredGundamGrades; //회원이 선호하는 건담 등급들
-    private List<MemberCouponDto> coupons; //회원이 가지고 있는 쿠폰들
 
 
     /**
@@ -52,7 +49,6 @@ public class MemberInfoResponseDto {
 
         List<MemberPreferredGundamGradeDto> memberPreferredGundamGradesDtos = getMemberPreferredGundamGradesDtos(member);
 
-        List<MemberCouponDto> memberCouponDtos = getMemberCouponDtos(member);
 
         MemberInfoResponseDto dto = new MemberInfoResponseDto();
 
@@ -75,7 +71,6 @@ public class MemberInfoResponseDto {
         dto.setMemberRole(member.getMemberRole().toString());
 
         dto.setPreferredGundamGrades(memberPreferredGundamGradesDtos);
-        dto.setCoupons(memberCouponDtos);
 
         return dto;
 
@@ -88,15 +83,7 @@ public class MemberInfoResponseDto {
         return addressDto;
     }
 
-    //==MemberCouponDto 리스트 생성==//
-    private static List<MemberCouponDto> getMemberCouponDtos(Member member) {
-        List<MemberCouponDto> memberCouponDtos = new ArrayList<>();
-        for (MemberCoupon memberCoupon : member.getMemberCoupons()) {
-            MemberCouponDto dto = MemberCouponDto.createDto(memberCoupon);
-            memberCouponDtos.add(dto);
-        }
-        return memberCouponDtos;
-    }
+
 
     //==MemberPreferredGundamGradesDto 리스트 생성==//
     private static List<MemberPreferredGundamGradeDto> getMemberPreferredGundamGradesDtos(Member member) {

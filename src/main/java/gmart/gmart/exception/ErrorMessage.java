@@ -21,4 +21,5 @@ public final class ErrorMessage {
     public static final String EXPIRED_TOKEN = "토큰이 만료되었습니다.";
     public static final String LOGOUT_TOKEN ="로그아웃 된 토큰입니다.";
     public static final String INCORRECT_PASSWORD="잘못된 비밀번호입니다.";
+    public static final String ALREADY_SUSPENDED_MEMBER = "이미 정지된 회원입니다.";
 }

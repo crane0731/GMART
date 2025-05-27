@@ -18,6 +18,14 @@ public class CustomUserDetails implements UserDetails {
     private final Member member;
 
     /**
+     * 회원 아이디 반환
+     * @return 회원 아이디
+     */
+    public Long getId(){
+        return member.getId();
+    }
+
+    /**
      * 권한 반환
      */
     @Override

@@ -50,6 +50,11 @@ logging:
     org.hibernate.sql: debug
     org.springframework.security: DEBUG
 
+mybatis:
+  type-aliases-package: gmart.gmart.domain, gmart.gmart.dto.mybatis
+  configuration:
+    map-underscore-to-camel-case: true
+
 
 jwt:
   issuer: dlwnsgkr8318@skuniv.ac.kr

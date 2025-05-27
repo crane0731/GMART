@@ -1,7 +1,6 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
-import gmart.gmart.domain.enums.AccountActiveStatus;
 import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
 import gmart.gmart.dto.AddressDto;
@@ -79,15 +78,13 @@ public class Member extends BaseTimeEntity {
     @Column(name = "reported_count",nullable = false)
     private Long reportedCount=0L;
 
+    @Comment("제재 당한 수")
+    @Column(name = "suspension_count",nullable = false)
+    private Long suspensionCount=0L;
+
     @Comment("리뷰 수")
     @Column(name = "reviewed_count",nullable = false)
     private Long reviewedCount=0L;
-
-    @Comment("계정 활성화 여부")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "account_active_status",nullable = false)
-    private AccountActiveStatus accountActiveStatus;
-
 
     @Setter
     @Comment("회원 권환")
@@ -102,9 +99,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberCoupon> memberCoupons = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberSuspension> memberSuspensions = new ArrayList<>();
 
     /**
      * 회원 생성 로직
@@ -129,7 +126,7 @@ public class Member extends BaseTimeEntity {
         member.totalSpent = 0L;
         member.reportedCount = 0L;
         member.reviewedCount = 0L;
-        member.accountActiveStatus = AccountActiveStatus.ACTIVE;
+        member.suspensionCount=0L;
         member.memberRole = MemberRole.MEMBER;
 
 

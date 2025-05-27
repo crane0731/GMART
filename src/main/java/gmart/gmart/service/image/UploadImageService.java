@@ -12,28 +12,20 @@
     import org.springframework.web.multipart.MultipartFile;
 
     /**
-     * 프로필 이미지 업로드 서비스
+     * 업로드 이미지 서비스
      */
     @Service
     @RequiredArgsConstructor
     @Transactional(readOnly = true)
-    public class ProfileImageService {
+    public class UploadImageService {
 
 
         private final UploadedImageRepository uploadImageRepository;
         private final LocalStorageService localStorageService;
 
-        /**
-         * ImageUrl 존재 여부 확인
-         * @param imageUrl
-         * @return 존재하면 true, 없으면 false
-         */
-        public boolean existsByImageUrl(String imageUrl) {
-            return uploadImageRepository.findByImageUrl(imageUrl).isPresent();
-        }
 
         /**
-         * ImageUrl로 이미지 조회
+         * ImageUrl로 업로드 이미지 조회
          * @param imageUrl
          * @return
          */
