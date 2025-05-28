@@ -79,5 +79,25 @@ public class Inquiry extends BaseTimeEntity {
         this.content = content;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 문의에 답변 등록
+     * 답변 상태  -> ANSWERED
+     */
+    public void creteAnswer(String answer){
+        this.answer = answer;
+        this.answerStatus=AnswerStatus.ANSWERED;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 문의 답변 삭제
+     * 답변 상태 -> UNANSWERED
+     */
+    public void deleteAnswer(){
+        this.answer=null;
+        this.answerStatus=AnswerStatus.UNANSWERED;
+    }
+
 
 }

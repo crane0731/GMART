@@ -25,5 +25,7 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_INQUIRY = "문의를 찾을 수 없습니다.";
     public static final String NO_PERMISSION = "권한이 없습니다.";
+    public static final String ALREADY_ANSWER ="이미 답변을 완료했습니다.";
+    public static final String NOT_FOUND_ANSWER="답변을 찾을 수 없습니다.";
 
 }
