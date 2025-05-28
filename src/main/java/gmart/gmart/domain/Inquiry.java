@@ -71,5 +71,13 @@ public class Inquiry extends BaseTimeEntity {
         member.getInquiries().add(this);
     }
 
+    /**
+     * 업데이트 로직
+     */
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
+
 
 }

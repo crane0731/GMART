@@ -26,4 +26,9 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(InquiryCustomException.class)
+    public ResponseEntity<Object> handleInquiryCustomException(InquiryCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
 }
