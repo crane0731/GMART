@@ -92,7 +92,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_role",nullable = false)
     private MemberRole memberRole;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_profile_image_id")
     private MemberProfileImage memberProfileImage;
 
@@ -102,9 +102,15 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberSuspension> memberSuspensions = new ArrayList<>();
 
-
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member",cascade = CascadeType.PERSIST)
     private List<Inquiry> inquiries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Article> articles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<gmart.gmart.domain.Comment> comments = new ArrayList<>();
+
 
     /**
      * 회원 생성 로직

@@ -35,13 +35,7 @@ public class MemberProfileImage extends BaseTimeEntity {
         return memberProfileImage;
     }
 
-//    /**
-//     * 회원 설정
-//     * @param member
-//     */
-//    protected void setMember(Member member) {
-//        this.member = member;
-//    }
+
 
     /**
      * 이미지 URL 설정

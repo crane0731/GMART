@@ -54,12 +54,13 @@ public class Inquiry extends BaseTimeEntity {
      * @param content 내용
      * @return 문의 엔티티
      */
-    public static void create(Member member, String title, String content){
+    public static Inquiry createEntity(Member member, String title, String content){
         Inquiry inquiry = new Inquiry();
         inquiry.title = title;
         inquiry.content = content;
         inquiry.answerStatus=AnswerStatus.UNANSWERED;
         inquiry.setMember(member); // 연관관계 세팅 포함
+        return inquiry;
     }
 
     /**

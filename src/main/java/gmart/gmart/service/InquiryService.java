@@ -41,9 +41,11 @@ public class InquiryService {
         //로그인한 회원
         Member member = memberService.findBySecurityContextHolder();
 
-        //문의 객체 생성 + 저장
-        Inquiry.create(member,requestDto.getTitle(), requestDto.getContent());
+        //문의 객체 생성
+        Inquiry inquiry = Inquiry.createEntity(member, requestDto.getTitle(), requestDto.getContent());
 
+        //문의 저장
+        save(inquiry);
     }
 
     /**
@@ -127,6 +129,15 @@ public class InquiryService {
      */
     public Inquiry findById(Long inquiryId) {
         return inquiryRepository.findById(inquiryId).orElseThrow(()->new InquiryCustomException(ErrorMessage.NOT_FOUND_INQUIRY));
+    }
+
+    /**
+     * 문의 저장 메서드
+     * @param inquiry 문의 객체
+     */
+    @Transactional
+    public void save(Inquiry inquiry) {
+        inquiryRepository.save(inquiry);
     }
 
 
