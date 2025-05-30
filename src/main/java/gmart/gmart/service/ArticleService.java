@@ -1,6 +1,7 @@
 package gmart.gmart.service;
 
 import gmart.gmart.domain.*;
+import gmart.gmart.dto.article.ArticleResponseDto;
 import gmart.gmart.dto.article.CreateArticleRequestDto;
 import gmart.gmart.dto.article.UpdateArticleRequestDto;
 import gmart.gmart.exception.ArticleCustomException;
@@ -152,8 +153,19 @@ public class ArticleService {
 
 
     /**
-     * 게시글 단일 조회(상세) 서비스 로직
+     * [서비스 로직]
+     * 게시글 단일 조회(상세)
+     * @param articleId 게시글 아이디
+     * @return ArticleResponseDto 응답 DTO
      */
+    public ArticleResponseDto getArticleInfo(Long articleId) {
+
+        //게시글 조회
+        Article article = findById(articleId);
+
+        return ArticleResponseDto.createDto(article);
+
+    }
 
     /**
      *게시글 리스트 조회 서비스 로직

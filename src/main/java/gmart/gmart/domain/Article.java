@@ -49,6 +49,14 @@ public class Article extends BaseAuditingEntity {
     @Column(name = "view_count", nullable = false)
     private Long viewCount;
 
+    @Comment("신고 수")
+    @Column(name = "reported_count",nullable = false)
+    private Long reportedCount;
+
+    @Comment("댓글 수")
+    @Column(name = "comment_count",nullable = false)
+    private Long commentCount;
+
     @Enumerated(EnumType.STRING)
     @Comment("게시글 신고 상태")
     @Column(name = "article_reported_status", nullable = false)
@@ -77,6 +85,8 @@ public class Article extends BaseAuditingEntity {
         article.articleReportedStatus=ArticleReportedStatus.NOT_REPORTED;
         article.viewCount=0L;
         article.likeCount=0L;
+        article.commentCount=0L;
+        article.reportedCount=0L;
 
         return article;
     }
@@ -110,8 +120,6 @@ public class Article extends BaseAuditingEntity {
         for (ArticleImage newImage : newArticleImages) {
             newImage.setArticle(this);
         }
-
-
 
     }
 

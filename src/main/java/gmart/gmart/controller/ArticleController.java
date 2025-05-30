@@ -1,6 +1,7 @@
 package gmart.gmart.controller;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.article.ArticleResponseDto;
 import gmart.gmart.dto.article.CreateArticleRequestDto;
 import gmart.gmart.dto.article.UpdateArticleRequestDto;
 import gmart.gmart.service.ArticleService;
@@ -96,7 +97,12 @@ public class ArticleController {
     }
 
     /**
-     *  게시글 수정
+     * [컨트롤러]
+     * 게시글 수정
+     * @param articleId 게시글 아이디
+     * @param requestDto 수정 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
+     * @return 성공 메시지
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable("id")Long articleId, @Valid @RequestBody UpdateArticleRequestDto requestDto, BindingResult bindingResult) {
@@ -118,8 +124,20 @@ public class ArticleController {
 
 
     /**
+     * [컨트롤러]
      * 게시글 단일 조회(상세)
+     * @param articleId 게시글 아이디
+     * @return  ArticleResponseDto 응답 DTO
      */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> getArticle(@PathVariable("id")Long articleId) {
+
+        ArticleResponseDto responseDto = articleService.getArticleInfo(articleId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+
+    }
+
 
     /**
      *게시글 리스트 조회
