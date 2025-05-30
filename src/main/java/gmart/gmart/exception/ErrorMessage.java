@@ -22,10 +22,14 @@ public final class ErrorMessage {
     public static final String LOGOUT_TOKEN = "로그아웃 된 토큰입니다.";
     public static final String INCORRECT_PASSWORD = "잘못된 비밀번호입니다.";
     public static final String ALREADY_SUSPENDED_MEMBER = "이미 정지된 회원입니다.";
+    public static final String NO_PERMISSION = "권한이 없습니다.";
+
 
     public static final String NOT_FOUND_INQUIRY = "문의를 찾을 수 없습니다.";
-    public static final String NO_PERMISSION = "권한이 없습니다.";
     public static final String ALREADY_ANSWER ="이미 답변을 완료했습니다.";
     public static final String NOT_FOUND_ANSWER="답변을 찾을 수 없습니다.";
+
+    public static final String NOT_FOUND_ARTICLE="게시글을 찾을 수 없습니다.";
+    public static final String ALREADY_LIKE_ARTICLE="이미 좋아요한 게시글 입니다.";
 
 }

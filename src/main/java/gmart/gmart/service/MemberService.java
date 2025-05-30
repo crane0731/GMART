@@ -12,10 +12,9 @@ import gmart.gmart.dto.password.ChangePasswordRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.MemberProfileImageRepository;
 import gmart.gmart.repository.MemberRepository;
 import gmart.gmart.service.image.MemberProfileImageService;
-import gmart.gmart.service.image.UploadImageService;
+import gmart.gmart.service.image.UploadMemberProfileImageService;
 import gmart.gmart.service.redis.TokenBlackListService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final UploadImageService profileImageService;
+    private final UploadMemberProfileImageService profileImageService;
     private final RefreshTokenService refreshTokenService;
     private final TokenService tokenService;
     private final TokenBlackListService tokenBlackListService;

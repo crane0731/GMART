@@ -24,9 +24,27 @@ public class ArticleImage {
     @Column(name = "image_url",nullable = false)
     private String imageUrl;
 
+
     @Comment("게시글 아이디")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
+
+    /**
+     * [생성 메서드]
+     */
+    public static ArticleImage createEntity(String imageUrl){
+        ArticleImage articleImage = new ArticleImage();
+        articleImage.imageUrl = imageUrl;
+        return articleImage;
+    }
+
+    /**
+     * [setter]
+     * Article 게시글 세팅
+     */
+    protected void setArticle(Article article){
+        this.article = article;
+    }
 
 }

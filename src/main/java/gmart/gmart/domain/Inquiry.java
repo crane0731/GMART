@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
+
 /**
  * 문의
  * - 문의 테이블은 회원에 의해서만 유일하게 관리되기 때문에 CASCADE와 고아객체를 이용해
@@ -27,7 +28,7 @@ public class Inquiry extends BaseTimeEntity {
 
     @Comment("회원 아이디")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Comment("제목")

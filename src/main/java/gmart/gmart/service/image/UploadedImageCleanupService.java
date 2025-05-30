@@ -1,6 +1,7 @@
 package gmart.gmart.service.image;
 
 import gmart.gmart.domain.UploadedImage;
+import gmart.gmart.domain.enums.UploadPurpose;
 import gmart.gmart.repository.UploadedImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +18,10 @@ import java.util.List;
 @Slf4j
 public class UploadedImageCleanupService {
 
-    private final UploadedImageRepository uploadImageRepository;
-    private final StorageService storageService;
+    private final UploadMemberProfileImageService uploadMemberProfileImageService; //회원 프로필 이미지 서비스
+    private final UploadArticleImageService uploadArticleImageService; //게시글 이미지 서비스
+
+    private final UploadedImageRepository uploadImageRepository; //업로드 이미지 레파지토리
 
     /**
      * 매일 새벽 3시에 실행 (초 분 시 일 월 요일)
@@ -32,11 +35,20 @@ public class UploadedImageCleanupService {
         for (UploadedImage image : unusedImages) {
 
             try{
-                //실제 파일 삭제
-                storageService.deleteImageFile(image.getImageUrl());
+                if(image.getPurpose()== UploadPurpose.PROFILE) {
 
+                    //실제 파일 삭제
+                    uploadMemberProfileImageService.deleteProfileImage(image.getImageUrl());
+
+                }
+                else{
+                    //실제 파일 삭제
+                    uploadArticleImageService.deleteArticleImage(image.getImageUrl());
+
+                }
                 //DB에서 삭제
                 uploadImageRepository.delete(image);
+
 
             }catch (Exception e) {
                 log.info("파일삭제 실패 = {}",image.getImageUrl());

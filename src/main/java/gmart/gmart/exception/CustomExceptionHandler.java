@@ -31,4 +31,9 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(ArticleCustomException.class)
+    public ResponseEntity<Object> handleArticleCustomException(ArticleCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
 }

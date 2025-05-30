@@ -6,22 +6,30 @@
     import gmart.gmart.exception.ErrorMessage;
     import gmart.gmart.exception.ImageCustomException;
     import gmart.gmart.repository.UploadedImageRepository;
-    import lombok.RequiredArgsConstructor;
+    import org.springframework.beans.factory.annotation.Qualifier;
     import org.springframework.stereotype.Service;
     import org.springframework.transaction.annotation.Transactional;
     import org.springframework.web.multipart.MultipartFile;
 
     /**
-     * 업로드 이미지 서비스
+     * 업로드 회원 프로필 이미지 서비스
      */
     @Service
-    @RequiredArgsConstructor
     @Transactional(readOnly = true)
-    public class UploadImageService {
+    public class UploadMemberProfileImageService {
 
 
         private final UploadedImageRepository uploadImageRepository;
-        private final LocalStorageService localStorageService;
+
+        private final StorageService storageService;
+
+        public UploadMemberProfileImageService(
+                UploadedImageRepository uploadImageRepository,
+                @Qualifier("profileImageStorageService") StorageService storageService
+        ) {
+            this.uploadImageRepository = uploadImageRepository;
+            this.storageService = storageService;
+        }
 
 
         /**
@@ -42,7 +50,7 @@
         @Transactional
         public ProfileImageUrlResponseDto uploadProfileImage(MultipartFile file) {
             //실제 파일 저장
-            String imageUrl = localStorageService.uploadFile(file);
+            String imageUrl = storageService.uploadFile(file);
             String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
 
             //DB 저장
@@ -51,4 +59,17 @@
 
             return ProfileImageUrlResponseDto.createDto(imageUrl);
         }
+
+        /**
+         * 프로필 이미지 업로드 취소
+         * @param imageUrl 이미지 URL
+         */
+        @Transactional
+        public void deleteProfileImage(String imageUrl) {
+            storageService.deleteImageFile(imageUrl);
+        }
+
+
+
+
     }

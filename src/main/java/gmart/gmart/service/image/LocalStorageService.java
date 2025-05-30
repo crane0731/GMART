@@ -20,14 +20,13 @@ import java.util.UUID;
  * 이미지를 로컬 디렉토리에 저장,삭제 하기 위한 서비스
  */
 @Slf4j
-@Service
 public class LocalStorageService implements StorageService {
 
     //파일이 저장될 디렉토리를 나타내는 Path 객체
     public final Path fileStorageLocation;
 
     //생성자 : 로컬 저장소의 디렉토리를 설정
-    public LocalStorageService(@Value("${file.upload-dir}")String uploadDir) {
+    public LocalStorageService(String uploadDir) {
         //업로드 디렉토리를 절대 경로로 반환하고 정규화
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
 
@@ -94,34 +93,27 @@ public class LocalStorageService implements StorageService {
         }
     }
 
-    /**
-     * URL 을 통해 폴더에 저장된 이미지를 삭제하는 메서드
-     * @param imageUrl
-     */
     @Override
     public void deleteImageFile(String imageUrl) {
-        //폴더 경로 설정
-        String folderPath = "C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ProfileImage";
-
-
         // URL에서 파일 이름만 추출
         if (imageUrl.contains("/")) {
             imageUrl = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
         }
 
-        //삭제할 파일의 전체 경로 생성
-        File file = new File(folderPath,imageUrl);
+        // 삭제할 파일의 전체 경로 생성
+        Path filePath = fileStorageLocation.resolve(imageUrl);
+        File file = filePath.toFile();
 
-        //파일이 존재하면 삭제
-        if(file.exists()){
+        // 파일이 존재하면 삭제
+        if (file.exists()) {
             boolean isDeleted = file.delete();
-            if(isDeleted){
+            if (isDeleted) {
                 log.info("파일이 성공적으로 삭제되었습니다.");
-            }else{
+            } else {
                 throw new ImageCustomException(ErrorMessage.FAILED_DELETE_FILE);
             }
-        }else{
-            throw  new ImageCustomException(ErrorMessage.NOT_FOUND_FILE);
+        } else {
+            throw new ImageCustomException(ErrorMessage.NOT_FOUND_FILE);
         }
     }
 

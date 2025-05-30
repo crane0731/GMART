@@ -10,13 +10,12 @@ import gmart.gmart.dto.mybatis.MemberListResponseDto;
 import gmart.gmart.dto.mybatis.SearchMemberListDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.MemberRepository;
 import gmart.gmart.repository.mybatis.MybatisMemberRepository;
 import gmart.gmart.service.MemberService;
 import gmart.gmart.service.MemberSuspensionService;
 import gmart.gmart.service.RefreshTokenService;
 import gmart.gmart.service.image.MemberProfileImageService;
-import gmart.gmart.service.image.UploadImageService;
+import gmart.gmart.service.image.UploadMemberProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ public class AdminMemberService {
 
     private final MemberService memberService;
     private final MemberProfileImageService memberProfileImageService;
-    private final UploadImageService profileImageService;
+    private final UploadMemberProfileImageService profileImageService;
     private final RefreshTokenService refreshTokenService;
     private final MemberSuspensionService memberSuspensionService;
     private final MybatisMemberRepository mybatisMemberRepository;
@@ -129,6 +128,10 @@ public class AdminMemberService {
 
         //저장
         memberSuspensionService.save(memberSuspension);
+
+        //회원 제재 수 증가
+        member.upSuspensionCount();
+
     }
 
 

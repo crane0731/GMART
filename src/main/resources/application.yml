@@ -4,7 +4,8 @@ server:
 
 #파일 업로드 디렉토리 설정
 file:
-  upload-dir: ../ProfileImage
+  upload-profile-dir: ../ProfileImage
+  upload-article-dir: ../ArticleImage
 
 storage:
   type: local
@@ -24,12 +25,12 @@ spring:
       max-request-size: 5MB
 
 
-  mvc:
-    static-path-pattern: /profile-images/**
-
-  web:
-    resources:
-      static-locations: file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ProfileImage/
+#  mvc:
+#    static-path-pattern: /profile-images/**
+#
+#  web:
+#    resources:
+#      static-locations: file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ProfileImage/
 
 
   datasource:

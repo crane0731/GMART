@@ -111,6 +111,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<gmart.gmart.domain.Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<LikeArticle> likeArticles = new ArrayList<>();
+
 
     /**
      * 회원 생성 로직
@@ -203,5 +206,22 @@ public class Member extends BaseTimeEntity {
         this.name = dto.getName();
         this.phoneNumber = dto.getPhone();
         this.address = address;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 회원 제대 수 증가
+     */
+    public void upSuspensionCount(){
+        this.suspensionCount++;
+    }
+
+    /**
+     * [연관관계 편의 메서드]
+     */
+    public void addLikeArticle(LikeArticle likeArticle){
+        this.likeArticles.add(likeArticle);
+        likeArticle.setMember(this);
+
     }
 }
