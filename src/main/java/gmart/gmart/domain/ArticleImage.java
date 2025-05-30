@@ -2,6 +2,7 @@ package gmart.gmart.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.Comment;
 /**
  * 게시글 이미지
  */
+@EqualsAndHashCode
 @Entity
 @Table(name = "article_image")
 @Getter
@@ -32,6 +34,8 @@ public class ArticleImage {
 
     /**
      * [생성 메서드]
+     * @param imageUrl 이미지URL
+     * @return ArticleImage 엔티티 객체
      */
     public static ArticleImage createEntity(String imageUrl){
         ArticleImage articleImage = new ArticleImage();

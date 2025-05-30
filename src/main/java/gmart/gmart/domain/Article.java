@@ -83,6 +83,40 @@ public class Article extends BaseAuditingEntity {
 
     /**
      * [비즈니스 로직]
+     * 업데이트
+     * @param title 게시글
+     * @param content 내용
+     * @param articleImages 이미지 리스트
+     */
+    public void update(String title, String content, List<ArticleImage> articleImages){
+        this.title=title;
+        this.content=content;
+
+        System.out.println("기존 이미지 수: " + this.getArticleImages().size());
+        updateImage(articleImages);
+
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 이미지 업데이트
+     * @param newArticleImages 이미지 리스트
+     */
+    private void updateImage(List<ArticleImage> newArticleImages){
+
+        this.articleImages.clear();
+        this.articleImages.addAll(newArticleImages);
+
+        for (ArticleImage newImage : newArticleImages) {
+            newImage.setArticle(this);
+        }
+
+
+
+    }
+
+    /**
+     * [비즈니스 로직]
      * 게시글 이미지 생성 + 세팅
      */
     public void attachArticleImage(String imageUrl){
@@ -101,6 +135,15 @@ public class Article extends BaseAuditingEntity {
 
     /**
      * [비즈니스 로직]
+     * 게시글 좋아요 수 감소
+     */
+    public void unlike(LikeArticle likeArticle){
+        deleteLikeArticle(likeArticle);
+        this.likeCount--;
+    }
+
+    /**
+     * [비즈니스 로직]
      * 회원이 게시글의 주인인지 확인 하는 로직
      * @param loginMember 로그인한 회원
      */
@@ -109,6 +152,7 @@ public class Article extends BaseAuditingEntity {
             throw new ArticleCustomException(ErrorMessage.NO_PERMISSION);
         }
     }
+
 
     /**
      * [연관관계 편의 메서드]
@@ -121,11 +165,29 @@ public class Article extends BaseAuditingEntity {
 
     /**
      * [연관관계 편의 메서드]
+     * 게시글 이미지 양방향 삭제
+     */
+    public void deleteArticleImage(ArticleImage articleImage){
+        articleImage.setArticle(null);
+        this.articleImages.remove(articleImage);
+    }
+
+    /**
+     * [연관관계 편의 메서드]
      * 게시글 좋아요 양방향 세팅
      */
     private void addLikeArticle(LikeArticle likeArticle){
         this.likeArticles.add(likeArticle);
         likeArticle.setArticle(this);
 
+    }
+
+    /**
+     * [연관관계 편의 메서드]
+     * 게시글 좋아요 양방향 삭제
+     */
+    private void deleteLikeArticle(LikeArticle likeArticle){
+        this.likeArticles.remove(likeArticle);
+        likeArticle.setArticle(null);
     }
 }

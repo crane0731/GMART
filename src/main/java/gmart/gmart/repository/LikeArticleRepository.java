@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 /**
  * 게시글 좋아요 레파지토리
  */
@@ -22,5 +24,13 @@ public interface LikeArticleRepository extends JpaRepository<LikeArticle,Long> {
             "FROM LikeArticle la " +
             "WHERE la.member=:member and la.article=:article")
     boolean existsByMemberAndArticle(@Param("member") Member member, @Param("article") Article article);
+
+    /**
+     * 회원과 게시글로 게시글 좋아요 찾기
+     * @param member 회원
+     * @param article 게시글
+     * @return LikeArticle 엔티티
+     */
+    Optional<LikeArticle> findByMemberAndArticle(Member member, Article article);
 
 }
