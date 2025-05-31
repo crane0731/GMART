@@ -1,11 +1,8 @@
 package gmart.gmart.service.report;
 
-import ch.qos.logback.core.status.Status;
 import gmart.gmart.domain.Article;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.ReportArticle;
-import gmart.gmart.domain.enums.ReportStatus;
-import gmart.gmart.dto.article.CreateArticleRequestDto;
 import gmart.gmart.dto.reportarticle.CreateReportArticleRequestDto;
 import gmart.gmart.exception.ArticleCustomException;
 import gmart.gmart.exception.ErrorMessage;
@@ -47,8 +44,14 @@ public class ReportArticleService {
         //게시글 조회(신고 대상)
         Article article = articleService.findById(articleId);
 
+        //신고 당한 회원 조회
+        Member reportedMember = article.getMember();
+
+        //만약 신고자와 신고 당한 회원이 같은 회원 이라면 신고 불가(예외 던짐)
+        validateSelfReport(member, reportedMember);
+
         //게시글 신고 로직 진행
-        processReportArticle(requestDto, member, article);
+        processReportArticle(requestDto, member, article,reportedMember);
     }
 
     /**
@@ -88,18 +91,25 @@ public class ReportArticleService {
     }
 
     //==게시글 신고 로직==//
-    private void processReportArticle(CreateReportArticleRequestDto requestDto, Member member, Article article) {
+    private void processReportArticle(CreateReportArticleRequestDto requestDto, Member member, Article article,Member reportedMember) {
+
+
         //게시글 신고 객체 생성 + 양방향 연관관계 세팅
         ReportArticle reportArticle = ReportArticle.createEntity(member, article, requestDto.getReason());
 
-        //신고 당한 회원 조회 + 신고 당한 수 증가
-        Member reportedMember = reportArticle.getArticle().getMember();
+        //신고당한 회원의  신고 당한 수 증가
         reportedMember.plusReportedCount();
 
         //저장
         save(reportArticle);
     }
 
+    //==신고자와 신고당한 회원이 같은 회원인지 확인하는 로직==//
+    private void validateSelfReport(Member member, Member reportedMember) {
+        if(member.getId().equals(reportedMember.getId())) {
+            throw new ArticleCustomException(ErrorMessage.SELF_REPORT_NOT_ALLOWED);
+        }
+    }
 
 
 }
