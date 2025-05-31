@@ -4,13 +4,16 @@ import gmart.gmart.domain.Article;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.ReportArticle;
 import gmart.gmart.dto.reportarticle.CreateReportArticleRequestDto;
+import gmart.gmart.dto.reportarticle.SearchReportArticleCondDto;
 import gmart.gmart.exception.ArticleCustomException;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.ReportArticleRepository;
+import gmart.gmart.repository.reportarticle.ReportArticleRepository;
 import gmart.gmart.service.ArticleService;
 import gmart.gmart.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,12 +107,25 @@ public class ReportArticleService {
         save(reportArticle);
     }
 
+
+    /**
+     * 조회
+     */
+    public Page<ReportArticle> findAllByCond(SearchReportArticleCondDto condDto,Pageable pageable) {
+
+        return reportArticleRepository.findAllByCond(condDto, pageable);
+
+    }
+
+
     //==신고자와 신고당한 회원이 같은 회원인지 확인하는 로직==//
     private void validateSelfReport(Member member, Member reportedMember) {
         if(member.getId().equals(reportedMember.getId())) {
             throw new ArticleCustomException(ErrorMessage.SELF_REPORT_NOT_ALLOWED);
         }
     }
+
+
 
 
 }

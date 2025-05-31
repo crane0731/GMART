@@ -1,4 +1,4 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.article;
 
 import gmart.gmart.domain.Article;
 import org.springframework.data.jpa.repository.JpaRepository;

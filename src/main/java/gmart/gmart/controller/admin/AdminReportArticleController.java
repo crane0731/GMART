@@ -1,7 +1,10 @@
 package gmart.gmart.controller.admin;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.dto.reportarticle.ReportArticleDetailResponseDto;
+import gmart.gmart.dto.reportarticle.ReportArticleListResponseDto;
+import gmart.gmart.dto.reportarticle.SearchReportArticleCondDto;
 import gmart.gmart.service.admin.AdminReportArticleService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +66,18 @@ public class AdminReportArticleController {
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
     }
 
+    /**
+     * [컨트롤러]
+     * 관리자 - 조건에 따라 게시글 모든 신고 리스트 조회(+페이징)
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ReportArticleListResponseDto> 응답 DTO
+     */
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllReportArticles(@RequestBody SearchReportArticleCondDto condDto) {
 
+        PagedResponseDto<ReportArticleListResponseDto> responseDto = adminReportArticleService.getAllReportArticle(condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+    }
 
 }

@@ -6,7 +6,7 @@ import gmart.gmart.dto.inquiry.*;
 import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.InquiryCustomException;
-import gmart.gmart.repository.InquiryRepository;
+import gmart.gmart.repository.inquiry.InquiryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -107,7 +107,7 @@ public class InquiryService {
     public PagedResponseDto<InquiryListResponseDto> getAllInquiry(SearchInquiryCondDto cond) {
 
         //검색 조건에 따라 문의 리스트 조회 + 페이징
-        Page<Inquiry> page = findAllBycond(cond);
+        Page<Inquiry> page = findAllByCond(cond);
 
         //DTO로 변환
         List<InquiryListResponseDto> content = createInquiryListResponseDtos(page);
@@ -182,7 +182,7 @@ public class InquiryService {
     }
 
     //==검색 조건에 따라 문의 리스트 조회 + 페이징 하는 로직==//
-    private Page<Inquiry> findAllBycond(SearchInquiryCondDto cond) {
+    private Page<Inquiry> findAllByCond(SearchInquiryCondDto cond) {
         //페이징 생성
         Pageable pageable = createPageable();
 

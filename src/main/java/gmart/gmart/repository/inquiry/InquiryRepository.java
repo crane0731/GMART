@@ -1,9 +1,7 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.inquiry;
 
 import gmart.gmart.domain.Inquiry;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 /**
  * 문의 레파지토리

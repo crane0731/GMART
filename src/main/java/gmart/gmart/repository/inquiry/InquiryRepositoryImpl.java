@@ -1,4 +1,4 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.inquiry;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
