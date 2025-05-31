@@ -3,19 +3,16 @@ package gmart.gmart.dto.article;
 
 import gmart.gmart.domain.Article;
 import gmart.gmart.domain.enums.ArticleReportedStatus;
-import gmart.gmart.dto.comment.CommentResponseDto;
 import gmart.gmart.util.DateFormatUtil;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * 게시글 단일 상세조회 DTO
  */
 @Getter
 @Setter
-public class ArticleResponseDto {
+public class ArticleDetailResponseDto {
 
     private Long memberId;
     private String nickname; //닉네임
@@ -43,9 +40,9 @@ public class ArticleResponseDto {
      * @param article 게시글 엔티티
      * @return ArticleResponseDto DTO
      */
-    public static ArticleResponseDto createDto(Article article) {
+    public static ArticleDetailResponseDto createDto(Article article) {
 
-        ArticleResponseDto dto = new ArticleResponseDto();
+        ArticleDetailResponseDto dto = new ArticleDetailResponseDto();
         dto.memberId = article.getMember().getId();
         dto.nickname = article.getMember().getNickname();
         dto.loginId = article.getMember().getLoginId();

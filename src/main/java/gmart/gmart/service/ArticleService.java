@@ -1,15 +1,20 @@
 package gmart.gmart.service;
 
 import gmart.gmart.domain.*;
-import gmart.gmart.dto.article.ArticleResponseDto;
+import gmart.gmart.dto.article.ArticleDetailResponseDto;
 import gmart.gmart.dto.article.CreateArticleRequestDto;
+import gmart.gmart.dto.article.SearchArticleCondDto;
 import gmart.gmart.dto.article.UpdateArticleRequestDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ArticleCustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.article.ArticleRepository;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,25 +159,36 @@ public class ArticleService {
      * @return ArticleResponseDto 응답 DTO
      */
     @Transactional
-    public ArticleResponseDto getArticleInfo(Long articleId) {
+    public ArticleDetailResponseDto getArticleInfo(Long articleId) {
 
         //게시글 조회
         Article article = findById(articleId);
 
+        //게시글 조회수 증가 시키기
         article.addViewCount();
 
-        return ArticleResponseDto.createDto(article);
+        return ArticleDetailResponseDto.createDto(article);
 
     }
 
     /**
-     *게시글 리스트 조회 서비스 로직
+     * [서비스 로직]
+     * 조건에 따라 게시글 리스트를 조회
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ArticleDetailResponseDto> 페이징된 응답 DTO
      */
+    public PagedResponseDto<ArticleDetailResponseDto> getAllArticles(SearchArticleCondDto condDto) {
 
-    /**
-     * 게시글 신고 서비스 로직
-     */
+        //페이징된 Article 리스트 조회
+        Page<Article> page = findAllByCond(condDto);
 
+        //게시글 리스트 응답 DTO 생성
+        List<ArticleDetailResponseDto> content = createArticleDetailResponseDto(page);
+
+        //페이징 응답 DTO 생성 + 반환
+        return createArticleDetailResponseDtoPagedResponseDto(content, page);
+
+    }
 
     /**
      * [조회]
@@ -309,6 +325,37 @@ public class ArticleService {
             //게시글 업데이트
             article.update(requestDto.getTitle(), requestDto.getContent(), articleImages);
 
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable() {
+        // 페이지 0, 10개씩 보여줌
+        return PageRequest.of(0, 10);
+    }
+
+    //==검색 조건에 따라 게시글 리스트 조회 + 페이징 하는 로직==//
+    private Page<Article> findAllByCond(SearchArticleCondDto condDto) {
+        Pageable pageable = createPageable();
+
+        return articleRepository.findAllByCond(condDto, pageable);
+    }
+
+    //==ArticleDetailResponseDto 리스트 생성 메서드==//
+    private List<ArticleDetailResponseDto> createArticleDetailResponseDto(Page<Article> page) {
+        return page.getContent().stream()
+                .map(ArticleDetailResponseDto::createDto)
+                .toList();
+    }
+
+    //==페이징 응답 DTO 생성 + 반환 메서드 ==//
+    private PagedResponseDto<ArticleDetailResponseDto> createArticleDetailResponseDtoPagedResponseDto(List<ArticleDetailResponseDto> content, Page<Article> page) {
+        return new PagedResponseDto<ArticleDetailResponseDto>(content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast());
     }
 
 }

@@ -1,9 +1,11 @@
 package gmart.gmart.controller;
 
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.article.ArticleResponseDto;
+import gmart.gmart.dto.article.ArticleDetailResponseDto;
 import gmart.gmart.dto.article.CreateArticleRequestDto;
+import gmart.gmart.dto.article.SearchArticleCondDto;
 import gmart.gmart.dto.article.UpdateArticleRequestDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.ArticleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +134,7 @@ public class ArticleController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> getArticle(@PathVariable("id")Long articleId) {
 
-        ArticleResponseDto responseDto = articleService.getArticleInfo(articleId);
+        ArticleDetailResponseDto responseDto = articleService.getArticleInfo(articleId);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
 
@@ -140,8 +142,20 @@ public class ArticleController {
 
 
     /**
-     *게시글 리스트 조회
+     * [컨트롤러]
+     * 조건에 따라 게시글 리스트 조회(+페이징)
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ArticleDetailResponseDto> 응답 DTO
      */
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllArticles(@RequestBody SearchArticleCondDto condDto) {
+
+        PagedResponseDto<ArticleDetailResponseDto> responseDto = articleService.getAllArticles(condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+
+    }
+
 
 
     //==필드에러가 있는지 확인하는 로직==//
