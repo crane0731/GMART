@@ -2,6 +2,7 @@ package gmart.gmart.service.admin;
 
 import gmart.gmart.domain.Article;
 import gmart.gmart.domain.ReportArticle;
+import gmart.gmart.dto.reportarticle.ReportArticleDetailResponseDto;
 import gmart.gmart.service.ArticleService;
 import gmart.gmart.service.MemberService;
 import gmart.gmart.service.report.ReportArticleService;
@@ -59,10 +60,20 @@ public class AdminReportArticleService {
 
     }
 
-
     /**
-     * 게시글 신고 단일  상세 조회
+     * [서비스 로직]
+     * 게시글 신고 단일 상세 조회
+     * @param reportArticleId 게시글 신고 아이디
+     * @return ReportArticleDetailResponseDto 응답 DTO
      */
+    public ReportArticleDetailResponseDto getReportArticleDetail(Long reportArticleId){
+
+        //게시글 신고 조회
+        ReportArticle reportArticle = reportArticleService.findById(reportArticleId);
+
+        //응답 DTO 생성 + 반환
+        return ReportArticleDetailResponseDto.createDto(reportArticle);
+    }
 
     /**
      * 게시글 신고 리스트 조회
