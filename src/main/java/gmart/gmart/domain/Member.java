@@ -114,6 +114,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<LikeArticle> likeArticles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<ReportArticle> reportArticles = new ArrayList<>();
+
 
     /**
      * 회원 생성 로직
@@ -145,10 +148,29 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    //==Address 생성==//
-    private static Address createAddress(AddressDto dto) {
-        return Address.createEntity(dto);
+    /**
+     *[비즈니스 로직]
+     *리스트에 값 추가
+     *신고 수 증가 +1
+     * @param reportArticle 게시글 신고 객체
+     */
+    protected void addReportArticle(ReportArticle reportArticle){
+        reportArticles.add(reportArticle);
+        reportedCount++;
     }
+
+
+
+    /**
+     * [비즈니스 로직]
+     * 신고수 감소 -1
+     */
+    protected void minusReportedCount(){
+        reportedCount--;
+    }
+
+
+
 
     /**
      * 연관관계편의메서드 - 프로필 이미지 등록
@@ -223,5 +245,10 @@ public class Member extends BaseTimeEntity {
         this.likeArticles.add(likeArticle);
         likeArticle.setMember(this);
 
+    }
+
+    //==Address 생성==//
+    private static Address createAddress(AddressDto dto) {
+        return Address.createEntity(dto);
     }
 }

@@ -31,7 +31,8 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_ARTICLE="게시글을 찾을 수 없습니다.";
     public static final String ALREADY_LIKE_ARTICLE="이미 좋아요한 게시글 입니다.";
-    public static final String NOT_FOUND_LIKE_ARTICLE="게시글 좋아요를 찾을 수 없습니다..";
+    public static final String NOT_FOUND_LIKE_ARTICLE="게시글 좋아요를 찾을 수 없습니다.";
+    public static final String NOT_FOUND_REPORT_ARTICLE="게시글 신고를 찾을 수 없습니다.";
 
 
 }

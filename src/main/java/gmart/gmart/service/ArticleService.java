@@ -146,9 +146,6 @@ public class ArticleService {
         //업데이트 + 이미지 사용 처리
         processingUpdateWithUploadImage(article,requestDto);
 
-
-
-
     }
 
 
@@ -158,10 +155,13 @@ public class ArticleService {
      * @param articleId 게시글 아이디
      * @return ArticleResponseDto 응답 DTO
      */
+    @Transactional
     public ArticleResponseDto getArticleInfo(Long articleId) {
 
         //게시글 조회
         Article article = findById(articleId);
+
+        article.addViewCount();
 
         return ArticleResponseDto.createDto(article);
 

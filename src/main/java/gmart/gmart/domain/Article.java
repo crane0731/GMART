@@ -71,6 +71,9 @@ public class Article extends BaseAuditingEntity {
     @OneToMany(mappedBy = "article")
     private List<LikeArticle> likeArticles=new ArrayList<>();
 
+    @OneToMany(mappedBy = "article")
+    private List<ReportArticle> reportArticles=new ArrayList<>();
+
     /**
      * [생성 메서드]
      */
@@ -161,6 +164,22 @@ public class Article extends BaseAuditingEntity {
         }
     }
 
+    /**
+     * [비즈니스 로직]
+     * 신고수 감소 -1
+     */
+    protected void minusReportedCount(){
+        reportedCount--;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 조회 수 증가 +1
+     */
+    public void addViewCount(){
+        this.viewCount++;
+    }
+
 
     /**
      * [연관관계 편의 메서드]
@@ -197,5 +216,26 @@ public class Article extends BaseAuditingEntity {
     private void deleteLikeArticle(LikeArticle likeArticle){
         this.likeArticles.remove(likeArticle);
         likeArticle.setArticle(null);
+    }
+
+    /**
+     *[비즈니스 로직]
+     *리스트에 값 추가
+     *신고 수 증가 +1
+     *게시글 신고 상태 -> REPORTED
+     * @param reportArticle
+     */
+    protected void addReportArticle(ReportArticle reportArticle){
+        reportArticles.add(reportArticle);
+        reportedCount++;
+        articleReportedStatus = ArticleReportedStatus.REPORTED;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 게시글의 신고 상태를 신고 안됨(NOT_REPORTED)로 변경
+     */
+    public void changeReportedStatusToNotReported(){
+        articleReportedStatus = ArticleReportedStatus.NOT_REPORTED;
     }
 }
