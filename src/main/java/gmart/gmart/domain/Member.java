@@ -149,13 +149,19 @@ public class Member extends BaseTimeEntity {
     }
 
     /**
-     *[비즈니스 로직]
+     *[Collection Setting]
      *리스트에 값 추가
-     *신고 수 증가 +1
      * @param reportArticle 게시글 신고 객체
      */
     protected void addReportArticle(ReportArticle reportArticle){
         reportArticles.add(reportArticle);
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 신고 수 증가 +1
+     */
+    public void plusReportedCount(){
         reportedCount++;
     }
 
@@ -166,7 +172,9 @@ public class Member extends BaseTimeEntity {
      * 신고수 감소 -1
      */
     protected void minusReportedCount(){
-        reportedCount--;
+        if(reportedCount>0) {
+            reportedCount--;
+        }
     }
 
 

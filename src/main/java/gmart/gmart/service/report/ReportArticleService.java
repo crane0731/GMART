@@ -92,6 +92,10 @@ public class ReportArticleService {
         //게시글 신고 객체 생성 + 양방향 연관관계 세팅
         ReportArticle reportArticle = ReportArticle.createEntity(member, article, requestDto.getReason());
 
+        //신고 당한 회원 조회 + 신고 당한 수 증가
+        Member reportedMember = reportArticle.getArticle().getMember();
+        reportedMember.plusReportedCount();
+
         //저장
         save(reportArticle);
     }

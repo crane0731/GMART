@@ -55,6 +55,7 @@ public class ReportArticle extends BaseAuditingEntity {
         reportArticle.reason = reason;
         reportArticle.status = ReportStatus.WAITING;
 
+
         return reportArticle;
     }
 
@@ -73,7 +74,7 @@ public class ReportArticle extends BaseAuditingEntity {
      */
     public void rejectReport() {
         this.status = ReportStatus.REJECTED;
-        this.member.minusReportedCount();
+        this.article.getMember().minusReportedCount();
     }
 
 
