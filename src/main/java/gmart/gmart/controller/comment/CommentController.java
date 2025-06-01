@@ -2,6 +2,7 @@ package gmart.gmart.controller.comment;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.comment.CreateCommentRequestDto;
+import gmart.gmart.dto.comment.UpdateCommentRequestDto;
 import gmart.gmart.service.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,8 +53,31 @@ public class CommentController {
 
 
     /**
+     * [컨트롤러]
      * 댓글 수정
+     * @param commentId 댓글 아이디
+     * @param requestDto 댓글 수정 요청 DTO
+     * @param bindingResult 에러 메시지를 바인딩할 객체
+     * @return 성공 메시지
      */
+    @PutMapping("/comment/{id}")
+    public ResponseEntity<ApiResponse<?>> updateComment(@PathVariable("id")Long commentId, @Valid @RequestBody UpdateCommentRequestDto requestDto, BindingResult bindingResult){
+
+        // 오류 메시지를 담을 Map
+        Map<String, String> errorMessages = new HashMap<>();
+
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        commentService.updateComment(commentId, requestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","댓글 수정 성공")));
+
+    }
+
 
     /**
      * 댓글 삭제

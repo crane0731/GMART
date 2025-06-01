@@ -5,6 +5,7 @@ import gmart.gmart.domain.Article;
 import gmart.gmart.domain.Comment;
 import gmart.gmart.domain.Member;
 import gmart.gmart.dto.comment.CreateCommentRequestDto;
+import gmart.gmart.dto.comment.UpdateCommentRequestDto;
 import gmart.gmart.exception.ArticleCustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.comment.CommentRepository;
@@ -57,8 +58,23 @@ public class CommentService {
     }
 
     /**
+     * [서비스 로직]
      * 댓글 수정
+     * @param commentId 댓글 아이디
+     * @param requestDto 댓글 수정 요청 DTO
      */
+    @Transactional
+    public void updateComment(Long commentId, UpdateCommentRequestDto requestDto){
+
+        //로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //수정할 댓글 조회
+        Comment comment = findById(commentId);
+
+        //댓글 수정
+        comment.update(requestDto.getContent());
+    }
 
     /**
      * 댓글 삭제

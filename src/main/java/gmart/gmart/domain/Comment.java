@@ -70,7 +70,15 @@ public class Comment extends BaseAuditingEntity {
 
     }
 
-
+    /**
+     * [생성 메서드]
+     * 대댓글
+     * @param parent 부모 댓글
+     * @param member 회원
+     * @param article 게시글
+     * @param content 댓글 내용
+     * @return Comment 엔티티
+     */
     public static Comment createChildComment(Comment parent,Member member, Article article,String content) {
         Comment comment = new Comment();
 
@@ -80,6 +88,10 @@ public class Comment extends BaseAuditingEntity {
         comment.content = content;
 
         return comment;
+    }
+
+    public void update(String content){
+        this.content = content;
     }
 
 
