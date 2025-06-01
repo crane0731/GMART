@@ -77,8 +77,22 @@ public class CommentService {
     }
 
     /**
-     * 댓글 삭제
+     * [서비스 로직]
+     * 댓글 삭제 처리
+     * 실제로 DB에서 엔티티를 삭제하는 것이 아니라 댓글 내용만 "삭제된 댓글입니다." 로 변경.
+     * @param commentId
      */
+    @Transactional
+    public void deleteComment(Long commentId){
+
+        //삭제처리 할 댓글 조회
+        Comment comment = findById(commentId);
+
+        //삭제 처리
+        comment.markAsDeleted();
+    }
+
+
 
     /**
      * 댓글 조회(리스트)

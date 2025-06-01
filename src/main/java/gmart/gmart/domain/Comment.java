@@ -90,8 +90,22 @@ public class Comment extends BaseAuditingEntity {
         return comment;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 댓글 업데이트
+     * @param content 변경할 댓글 내용
+     */
     public void update(String content){
         this.content = content;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 댓글 삭제 처리
+     * 실제로 삭제하는 것이 아닌 댓글 내용만 "삭제된 댓글입니다." 라고 변경
+     */
+    public void markAsDeleted(){
+        this.content = "삭제된 댓글입니다.";
     }
 
 
