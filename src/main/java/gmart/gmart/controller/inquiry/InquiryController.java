@@ -1,9 +1,9 @@
-package gmart.gmart.controller;
+package gmart.gmart.controller.inquiry;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.inquiry.*;
 import gmart.gmart.dto.page.PagedResponseDto;
-import gmart.gmart.service.InquiryService;
+import gmart.gmart.service.inquiry.InquiryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

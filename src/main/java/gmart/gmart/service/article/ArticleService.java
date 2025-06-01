@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.article;
 
 import gmart.gmart.domain.*;
 import gmart.gmart.dto.article.ArticleDetailResponseDto;
@@ -9,6 +9,7 @@ import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ArticleCustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.article.ArticleRepository;
+import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

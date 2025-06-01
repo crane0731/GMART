@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.member;
 
 import gmart.gmart.domain.*;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
@@ -13,6 +13,8 @@ import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.MemberRepository;
+import gmart.gmart.service.token.RefreshTokenService;
+import gmart.gmart.service.token.TokenService;
 import gmart.gmart.service.image.MemberProfileImageService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
 import gmart.gmart.service.redis.TokenBlackListService;

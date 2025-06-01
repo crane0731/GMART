@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.article;
 
 import gmart.gmart.domain.Article;
 import gmart.gmart.domain.LikeArticle;

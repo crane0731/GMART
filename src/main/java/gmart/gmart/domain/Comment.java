@@ -49,4 +49,69 @@ public class Comment extends BaseAuditingEntity {
     private String content;
 
 
+    /**
+     * [생성 메서드]
+     * 일반 댓글
+     * @param member 회원
+     * @param article 게시글
+     * @param content 댓글 내용
+     * @return Comment 엔티티
+     */
+    public static Comment createComment(Member member, Article article, String content) {
+
+        Comment comment = new Comment();
+
+        comment.setMember(member);
+        comment.setArticle(article);
+
+        comment.content = content;
+
+        return comment;
+
+    }
+
+
+    public static Comment createChildComment(Comment parent,Member member, Article article,String content) {
+        Comment comment = new Comment();
+
+        comment.setParent(parent);
+        comment.setMember(member);
+        comment.setArticle(article);
+        comment.content = content;
+
+        return comment;
+    }
+
+
+    /**
+     * [연관 관계 편의 메서드]
+     * Comment - Member
+     * @param member 회원
+     */
+    private void setMember(Member member) {
+        this.member = member;
+        member.getComments().add(this);
+    }
+
+    /**
+     * [연관 관계 편의 메서드]
+     * Comment - Article
+     * @param article 게시글
+     */
+    private void setArticle(Article article) {
+        this.article = article;
+        article.getComments().add(this);
+    }
+
+    /**
+     * [연관 관계 편의 메서드]
+     * Comment-Parent
+     * @param parent 부모 댓글
+     */
+    private void setParent(Comment parent) {
+        this.parent = parent;
+        parent.getChildren().add(this);
+    }
+
+
 }

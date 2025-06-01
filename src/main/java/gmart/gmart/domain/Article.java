@@ -65,7 +65,7 @@ public class Article extends BaseAuditingEntity {
     @OneToMany(mappedBy = "article",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticleImage> articleImages=new ArrayList<>();
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<gmart.gmart.domain.Comment> comments=new ArrayList<>();
 
     @OneToMany(mappedBy = "article")

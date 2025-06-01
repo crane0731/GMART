@@ -4,7 +4,7 @@ import gmart.gmart.domain.Inquiry;
 import gmart.gmart.dto.inquiry.InquiryAnswerRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.InquiryCustomException;
-import gmart.gmart.service.InquiryService;
+import gmart.gmart.service.inquiry.InquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

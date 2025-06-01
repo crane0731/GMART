@@ -2,7 +2,7 @@ package gmart.gmart.config;
 
 import gmart.gmart.config.jwt.TokenAuthenticationFilter;
 import gmart.gmart.config.jwt.TokenProvider;
-import gmart.gmart.service.CustomUserDetailService;
+import gmart.gmart.service.member.CustomUserDetailService;
 import gmart.gmart.service.redis.TokenBlackListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

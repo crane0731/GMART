@@ -1,11 +1,10 @@
-package gmart.gmart.controller;
+package gmart.gmart.controller.member;
 
-import gmart.gmart.domain.Member;
 import gmart.gmart.dto.LoginRequestDto;
 import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.token.TokenResponseDto;
-import gmart.gmart.service.MemberService;
+import gmart.gmart.service.member.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

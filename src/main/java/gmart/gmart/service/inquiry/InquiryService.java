@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.inquiry;
 
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
@@ -7,6 +7,7 @@ import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.InquiryCustomException;
 import gmart.gmart.repository.inquiry.InquiryRepository;
+import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

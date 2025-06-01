@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.member;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * CustomUserDetails를 생성하는 서비스 -> Spring Security에 필요

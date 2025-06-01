@@ -1,4 +1,4 @@
-package gmart.gmart.controller;
+package gmart.gmart.controller.article;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.article.ArticleDetailResponseDto;
@@ -6,7 +6,7 @@ import gmart.gmart.dto.article.CreateArticleRequestDto;
 import gmart.gmart.dto.article.SearchArticleCondDto;
 import gmart.gmart.dto.article.UpdateArticleRequestDto;
 import gmart.gmart.dto.page.PagedResponseDto;
-import gmart.gmart.service.ArticleService;
+import gmart.gmart.service.article.ArticleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package gmart.gmart.controller.token;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.token.CreateAccessTokenRequestDto;
 import gmart.gmart.dto.token.CreateAccessTokenResponseDto;
-import gmart.gmart.service.TokenService;
+import gmart.gmart.service.token.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.token;
 
 import gmart.gmart.config.jwt.TokenProvider;
 import gmart.gmart.domain.Member;

@@ -1,4 +1,4 @@
-package gmart.gmart.service;
+package gmart.gmart.service.member;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.MemberSuspension;

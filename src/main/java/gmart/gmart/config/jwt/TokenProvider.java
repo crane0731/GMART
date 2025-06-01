@@ -5,7 +5,7 @@ import gmart.gmart.domain.enums.TokenType;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.JwtCustomException;
-import gmart.gmart.service.CustomUserDetailService;
+import gmart.gmart.service.member.CustomUserDetailService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
