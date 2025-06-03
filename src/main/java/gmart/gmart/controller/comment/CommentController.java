@@ -1,6 +1,7 @@
 package gmart.gmart.controller.comment;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.comment.CommentResponseDto;
 import gmart.gmart.dto.comment.CreateCommentRequestDto;
 import gmart.gmart.dto.comment.UpdateCommentRequestDto;
 import gmart.gmart.service.comment.CommentService;
@@ -12,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,15 +98,26 @@ public class CommentController {
     }
 
 
-
     /**
-     * 댓글 조회(리스트)
+     * [컨트롤러]
+     * 특정 게시글의 댓글 조회
+     * @param articleId 게시글 아이디
+     * @return List<CommentResponseDto> 응답 DTO 리스트
      */
-    
+    @GetMapping("/{id}/comment")
+    public ResponseEntity<ApiResponse<?>> findAll(@PathVariable("id")Long articleId) {
+
+        List<CommentResponseDto> responseDtos = commentService.findAll(articleId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+
+    }
 
 
 
-    //==필드에러가 있는지 확인하는 로직==//
+
+
+        //==필드에러가 있는지 확인하는 로직==//
     private boolean errorCheck(BindingResult bindingResult, Map<String, String> errorMessages) {
         //유효성 검사에서 오류가 발생한 경우 모든 메시지를 Map에 추가
         if (bindingResult.hasErrors()) {

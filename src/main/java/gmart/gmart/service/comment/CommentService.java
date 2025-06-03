@@ -4,6 +4,7 @@ package gmart.gmart.service.comment;
 import gmart.gmart.domain.Article;
 import gmart.gmart.domain.Comment;
 import gmart.gmart.domain.Member;
+import gmart.gmart.dto.comment.CommentResponseDto;
 import gmart.gmart.dto.comment.CreateCommentRequestDto;
 import gmart.gmart.dto.comment.UpdateCommentRequestDto;
 import gmart.gmart.exception.ArticleCustomException;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 댓글 서비스
@@ -48,6 +51,7 @@ public class CommentService {
 
         //만약 부모 댓글이 있다면 (등록하려는 댓글이 대댓글 이라면)
         if(requestDto.getParentCommentId()!=null){
+
             //대댓글 등록
             saveChildComment(requestDto, member, article);
 
@@ -93,10 +97,17 @@ public class CommentService {
     }
 
 
-
     /**
-     * 댓글 조회(리스트)
+     * [서비스 로직]
+     * 특정 게시글의 댓글 리스트 전체 조회
+     * @param articleId 게시글 아이디
+     * @return
      */
+    public List<CommentResponseDto> findAll(Long articleId){
+        return commentRepository.findByArticleId(articleId).stream()
+                .map(CommentResponseDto::createDto)
+                .toList();
+    }
 
     /**
      * [저장]
@@ -136,11 +147,22 @@ public class CommentService {
         //부모댓글과 게시글이 일치하는지 확인
         validateParentInArticle(article, parent);
 
+        //부모 댓글이 이미 자식 댓글이면 예외 발생 (2단계 제한)
+        validateNotReplyToChildComment(parent);
+
         //대댓글 생성
         Comment child = Comment.createChildComment(parent, member, article, requestDto.getContent());
 
         //대댓글 저장
         commentRepository.save(child);
+    }
+
+    //==부모 댓글이 이미 자식 댓글인지 확인하는 메서드==//
+    //자식 댓글은 부모 댓글이 될 수 없음//
+    private void validateNotReplyToChildComment(Comment parent) {
+        if (parent.getParent() != null) {
+            throw new ArticleCustomException(ErrorMessage.CHILD_COMMENT_DEPTH_EXCEEDED);
+        }
     }
 
     //==부모댓글과 게시글이 일치하는지 확인 하는 메서드==//

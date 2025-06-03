@@ -37,5 +37,6 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_COMMENT="댓글을 찾을 수 없습니다.";
     public static final String PARENT_COMMENT_ARTICLE_MISMATCH = "부모 댓글과 게시글이 일치하지 않습니다.";
+    public static final String CHILD_COMMENT_DEPTH_EXCEEDED="자식 댓글에는 또 다른 자식 댓글을 작성할 수 없습니다.";
 
 }
