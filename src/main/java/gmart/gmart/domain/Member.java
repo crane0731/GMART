@@ -6,6 +6,8 @@ import gmart.gmart.domain.enums.MemberRole;
 import gmart.gmart.dto.AddressDto;
 import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.GMoneyCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -178,6 +180,29 @@ public class Member extends BaseTimeEntity {
     protected void minusReportedCount(){
         if(reportedCount>0) {
             reportedCount--;
+        }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 건머니 충전
+     * @param chargeMoney
+     */
+    public void chargeGMoney(Long chargeMoney){
+        this.gMoney+=chargeMoney;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 건머니 환불
+     * @param chargeMoney
+     */
+    public void refundGMoney(Long chargeMoney){
+
+        if(this.gMoney-chargeMoney<0){
+            throw new GMoneyCustomException(ErrorMessage.NOT_ENOUGH_GMONEY_TO_REFUND);
+        }else{
+            this.gMoney-=chargeMoney;
         }
     }
 

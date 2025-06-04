@@ -41,4 +41,9 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(GMoneyCustomException.class)
+    public ResponseEntity<Object> handleGMoneyCustomException(GMoneyCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
 }

@@ -44,4 +44,6 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_FAVORITE_GUNDAM="관심 건담을 찾을 수 없습니다.";
     public static final String ALREADY_FAVORITE_GUNDAM="이미 관심 등록한 건담 입니다.";
 
+    public static final String NOT_ENOUGH_GMONEY_TO_REFUND="환불 하려는 금액이 현재 가진 건머니 보다 많습니다.";
+
 }

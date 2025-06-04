@@ -1,8 +1,11 @@
 package gmart.gmart.domain.log;
 
 
+import gmart.gmart.domain.Member;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.ChargeType;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.GMoneyCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,5 +47,49 @@ public class GMoneyChargeLog extends BaseAuditingEntity {
     @Comment("충전 후 금액")
     @Column(name = "after_charge_money")
     private Long afterChargeMoney;
+
+    /**
+     * [생성 메서드]
+     * @param member 회원 엔티티
+     * @param beforeChargeMoney 충전 전 금액
+     * @param chargeMoney 충전한 금액
+     * @param chargeType 충전 타입
+     * @return GMoneyChargeLog 건머니 충전 로그 엔티티
+     */
+    public static GMoneyChargeLog create(Member member, Long beforeChargeMoney, Long chargeMoney, ChargeType chargeType) {
+        GMoneyChargeLog log = new GMoneyChargeLog();
+        log.memberId = member.getId();
+
+        log.chargeType = chargeType;
+
+        log.chargeAmount = chargeMoney;
+        log.beforeChargeMoney = beforeChargeMoney;
+
+        log.afterChargeMoney = getAfterChargeMoney(beforeChargeMoney, chargeMoney, chargeType);
+
+        return log;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 충전 후 금액 구하기
+     * 충전 : 충전 전 금액 + 충전한 금액
+     * 환불 : 환불 전 금액 - 환불한 금액
+     * @param beforeChargeMoney 충전 전 금액
+     * @param chargeMoney 충전한 금액
+     * @return Long 충전 후 금액
+     */
+    private static long getAfterChargeMoney(Long beforeChargeMoney, Long chargeMoney,ChargeType chargeType) {
+        if(chargeType.equals(ChargeType.REFUND)){
+
+            if(beforeChargeMoney-chargeMoney<0){
+                throw new GMoneyCustomException(ErrorMessage.NOT_ENOUGH_GMONEY_TO_REFUND);
+            }
+            return beforeChargeMoney - chargeMoney;
+        }
+        else {
+            return beforeChargeMoney + chargeMoney;
+        }
+    }
 
 }

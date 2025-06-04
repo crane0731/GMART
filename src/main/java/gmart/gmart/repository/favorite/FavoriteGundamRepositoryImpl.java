@@ -37,7 +37,7 @@ public class FavoriteGundamRepositoryImpl implements FavoriteGundamRepositoryCus
         builder.and(favoriteGundam.member.eq(member));
 
         if(cond.getName()!=null && !cond.getName().isBlank()){
-            builder.and(favoriteGundam.gundam.name.contains(cond.getName()));
+            builder.and(favoriteGundam.gundam.name.containsIgnoreCase(cond.getName()));
         }
 
         if(cond.getGrade()!=null){
