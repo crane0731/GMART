@@ -118,6 +118,10 @@ public class Member extends BaseTimeEntity {
     private List<ReportArticle> reportArticles = new ArrayList<>();
 
 
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteGundam> favoriteGundams = new ArrayList<>();
+
+
     /**
      * 회원 생성 로직
      */
