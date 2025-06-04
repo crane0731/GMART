@@ -3,6 +3,8 @@ package gmart.gmart.service.favorite;
 import gmart.gmart.domain.FavoriteGundam;
 import gmart.gmart.domain.Gundam;
 import gmart.gmart.domain.Member;
+import gmart.gmart.dto.favorite.FavoriteGundamListResponseDto;
+import gmart.gmart.dto.favorite.SearchFavoriteGundamCondDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.favorite.FavoriteGundamRepository;
@@ -12,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 회원 관심 건담 서비스
@@ -77,8 +81,19 @@ public class FavoriteGundamService {
 
 
     /**
-     * 회원 관심 건담 리스트 조회
+     * [서비스 로직]
+     * 검색 조건에 따라 로그인한 회원의 관심 건담 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<FavoriteGundamListResponseDto> 응답 DTO 리스트
      */
+    public List<FavoriteGundamListResponseDto> findAllByCond(SearchFavoriteGundamCondDto condDto){
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //로그인한 회원 + 검색 조건으로 리스트 조회 후 DTO 로 변경
+        return findFavoritesByCond(condDto, member);
+    }
 
     /**
      * [저장]
@@ -123,5 +138,12 @@ public class FavoriteGundamService {
         }
     }
 
+    //==로그인한 회원 + 검색 조건으로 리스트 조회 후 DTO 로 변경하는 메서드==//
+    private List<FavoriteGundamListResponseDto> findFavoritesByCond(SearchFavoriteGundamCondDto condDto, Member member) {
+        return favoriteGundamRepository.findAllByMemberAndCond(condDto, member)
+                .stream()
+                .map(FavoriteGundamListResponseDto::create)
+                .toList();
+    }
 
 }

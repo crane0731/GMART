@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 /**
  * 회원 관심 건담 레파지토리
  */
-public interface FavoriteGundamRepository extends JpaRepository<FavoriteGundam, Long> {
+public interface FavoriteGundamRepository extends JpaRepository<FavoriteGundam, Long>,FavoriteGundamRepositoryCustom {
 
     /**
      * 회원과 건담정보를 통해 회원 관심 건담이 이미 존재하는지 확인
