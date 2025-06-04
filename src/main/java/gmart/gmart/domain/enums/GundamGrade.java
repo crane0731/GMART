@@ -6,11 +6,12 @@ package gmart.gmart.domain.enums;
 
 public enum GundamGrade {
 
+    PERFECT_GRADE,
+    MASTER_GRADE,
+    REAL_GRADE,
+    HIGH_GRADE,
+    MEGASIZE,
     SD,
-    HG,
-    RG,
-    MG,
-    PG,
     ETC
 
 }

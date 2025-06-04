@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">  <!-- ✅ 이것이 인코딩 깨짐 방지 핵심 -->
+    <title>WebSocket STOMP 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<button onclick="connect()">연결</button>
+<button onclick="sendMessage()">메시지 보내기</button>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS("/ws");  // Spring 서버 WebSocket 엔드포인트
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function(frame) {
+            console.log("Connected: " + frame);
+            stompClient.subscribe("/user/queue/messages", function(message) {
+                console.log("수신한 메시지:", message.body);
+            });
+        });
+    }
+
+    function sendMessage() {
+        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
+            senderId: "userA",
+            receiverId: "userB",
+            content: "안녕!",
+            roomId: "room-1"
+        }));
+    }
+</script>
+</body>
+</html>
