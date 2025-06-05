@@ -77,7 +77,10 @@ public class GMoneyChargeService {
     }
 
     /**
-     * 건머니 충전 로그 목록 조회(리스트)
+     * [서비스 로직]
+     * 조건에 따라 건머니 충전로그 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
     public List<GMoneyChargeLogListResponseDto> findAllLogs(SearchGMoneyChargeLogCondDto condDto){
 
@@ -86,6 +89,20 @@ public class GMoneyChargeService {
 
         //현재 로그인한 회원의 건머니 충전 로그 조회 + 응답 DTO 리스트 생성
         return getChargeLogs(member,condDto);
+    }
+
+    /**
+     * [서비스 로직]
+     * 조건에 따라 건머니 충전로그를 조회하고 DTO 로 변환
+     * @param member 회원 엔티티
+     * @param condDto 검색 조건 DTO
+     * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
+     */
+    public List<GMoneyChargeLogListResponseDto> getChargeLogs(Member member,SearchGMoneyChargeLogCondDto condDto) {
+        return gMoneyChargeLogRepository.findAllByCond(member,condDto)
+                .stream()
+                .map(GMoneyChargeLogListResponseDto::create)
+                .toList();
     }
 
 
@@ -111,11 +128,5 @@ public class GMoneyChargeService {
 
 
     //==회원 아이디를 통해 건머니 충전 로그리스트를 조회하고 응답 DTO 리스트를 생성하는 메서드==//
-    private List<GMoneyChargeLogListResponseDto> getChargeLogs(Member member,SearchGMoneyChargeLogCondDto condDto) {
-        return gMoneyChargeLogRepository.findAllByCond(member,condDto)
-                .stream()
-                .map(GMoneyChargeLogListResponseDto::create)
-                .toList();
-    }
 
 }
