@@ -250,6 +250,15 @@ public class MemberService {
 
     }
 
+    /**
+     * [조회]
+     * 모든 회원 조회
+     * @return  List<Member> 회원 엔티티 리스트
+     */
+    public List<Member> findAll(){
+        return memberRepository.findAll();
+    }
+
     //==계정 정지당한 회원인지 확인하는 로직==//
     private void validateNotSuspended(Member member) {
         if (memberSuspensionService.isCurrentlySuspended(member)) {

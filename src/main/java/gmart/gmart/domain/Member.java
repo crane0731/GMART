@@ -206,6 +206,31 @@ public class Member extends BaseTimeEntity {
         }
     }
 
+    /**
+     * [비즈니스 로직]
+     * 건포인트 충전
+     * @param chargePoint 충전할 포인트
+     * @return Long 충전 후 포인트 금액
+     */
+    public Long chargeGPoint(Long chargePoint){
+        return this.gPoint+=chargePoint;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 건포인트 환불
+     * @param refundPoint 회수할 포인트
+     * @return Long 회수 후 포인트 금액
+     */
+    public Long refundGPoint(Long refundPoint){
+
+        if(this.gPoint-refundPoint<0){
+            return this.gPoint=0L;
+        }else{
+            return this.gPoint-=refundPoint;
+        }
+    }
+
 
 
 

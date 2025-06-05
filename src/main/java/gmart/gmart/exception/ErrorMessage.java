@@ -46,4 +46,5 @@ public final class ErrorMessage {
 
     public static final String NOT_ENOUGH_GMONEY_TO_REFUND="환불 하려는 금액이 현재 가진 건머니 보다 많습니다.";
 
+
 }
