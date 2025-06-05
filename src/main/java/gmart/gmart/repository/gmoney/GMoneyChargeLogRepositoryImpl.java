@@ -26,6 +26,7 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
 
 
     /**
+     * [동적 쿼리 메서드]
      * 회원과 검색 조건에 따라 건머니 충전 로그 리스트 조회
      * @param member 회원 엔티티
      * @param cond 검색 조건 DTO

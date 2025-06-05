@@ -35,7 +35,7 @@ public class AdminGMoneyChargeService {
      * @param condDto 검색 조건 DTO
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    public List<GMoneyChargeLogListResponseDto> findAllByCond(Long MemberId, SearchGMoneyChargeLogCondDto condDto) {
+    public List<GMoneyChargeLogListResponseDto> findAllLogs(Long MemberId, SearchGMoneyChargeLogCondDto condDto) {
 
         //회원 조회
         Member member = memberService.findById(MemberId);

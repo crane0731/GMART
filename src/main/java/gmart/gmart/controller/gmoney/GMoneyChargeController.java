@@ -81,7 +81,7 @@ public class GMoneyChargeController {
      * 현재 로그인한 회원의 건머니 충전 로그 목록 조회
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    @GetMapping("")
+    @PostMapping("")
     public ResponseEntity<ApiResponse<?>> getAllGMoneyCharges(@RequestBody SearchGMoneyChargeLogCondDto condDto) {
         List<GMoneyChargeLogListResponseDto> responseDtos = gMoneyChargeService.findAllLogs(condDto);
 

@@ -31,10 +31,10 @@ public class AdminGMoneyChargeController {
      * @param condDto 검색 조건 DTO
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    @GetMapping("/member/{id}")
+    @PostMapping("/member/{id}")
     public ResponseEntity<ApiResponse<?>> findAllLogs(@PathVariable("id") Long memberId, @RequestBody SearchGMoneyChargeLogCondDto condDto) {
 
-        List<GMoneyChargeLogListResponseDto> responseDtos = adminGMoneyChargeService.findAllByCond(memberId, condDto);
+        List<GMoneyChargeLogListResponseDto> responseDtos = adminGMoneyChargeService.findAllLogs(memberId, condDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
 

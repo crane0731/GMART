@@ -1,14 +1,17 @@
 package gmart.gmart.controller.admin;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.gpoint.GPointChargeLogListResponseDto;
 import gmart.gmart.dto.gpoint.GPointChargeRequestDto;
 import gmart.gmart.dto.gpoint.GPointRefundRequestDto;
+import gmart.gmart.dto.gpoint.SearchGPointChargeLogCondDto;
 import gmart.gmart.service.admin.AdminGPointChargeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,6 +85,18 @@ public class AdminGPointChargeController {
     }
 
     /**
-     * 관리자 특정 회원 건포인트 로그 조회
+     * [컨트롤러]
+     * 관리자 - 특정 회원의 건포인트 충전 로그 리스트 조회(검색 조건에 따라)
+     * @param memberId 회원 아이디
+     * @param condDto 검색 조건 DTO
+     * @return List<GPointChargeLogListResponseDto> 응답 DTO 리스트
      */
+    @PostMapping("/member/{id}")
+    public ResponseEntity<ApiResponse<?>> findAllLogs(@PathVariable("id") Long memberId, @RequestBody SearchGPointChargeLogCondDto condDto) {
+
+        List<GPointChargeLogListResponseDto> responseDtos = adminGPointChargeService.findAllByCond(memberId, condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+
+    }
 }
