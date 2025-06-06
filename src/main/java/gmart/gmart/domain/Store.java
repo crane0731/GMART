@@ -27,6 +27,11 @@ public class Store extends BaseAuditingEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @org.hibernate.annotations.Comment("상점 프로필 이미지 아이디")
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "store_profile_image_id")
+    private StoreProfileImage storeProfileImage;
+
     @org.hibernate.annotations.Comment("상점 이름")
     @Column(name = "name")
     private String name;
@@ -64,8 +69,28 @@ public class Store extends BaseAuditingEntity {
     @Column(name = "favorite_count")
     private Long favoriteCount;
 
-    @OneToOne(mappedBy = "store")
-    private StoreProfileImage profileImage=new StoreProfileImage();
 
+    /**
+     * [생성 메서드]
+     * @param name 상점 이름
+     * @param introduction 상점 소개
+     * @param storeProfileImage 상점 프로필 이미지
+     * @return Store 상점 엔티티
+     */
+    public static Store create(String name, String introduction,StoreProfileImage storeProfileImage){
+        Store store = new Store();
+        store.name = name;
+        store.introduction = introduction;
+        store.storeProfileImage = storeProfileImage;
+        store.status = StoreStatus.ACTIVE;
+        store.itemCount = 0L;
+        store.reportedCount = 0L;
+        store.totalVisitCount = 0L;
+        store.reviewedCount = 0L;
+        store.rating = 0L;
+        store.favoriteCount = 0L;
+        return store;
+
+    }
 
 }

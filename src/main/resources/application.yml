@@ -6,6 +6,8 @@ server:
 file:
   upload-profile-dir: ../ProfileImage
   upload-article-dir: ../ArticleImage
+  upload-store-dir: ../StoreImage
+
 
 storage:
   type: local

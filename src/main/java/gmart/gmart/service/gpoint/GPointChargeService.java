@@ -4,6 +4,8 @@ import gmart.gmart.domain.Member;
 import gmart.gmart.domain.log.GPointChargeLog;
 import gmart.gmart.dto.gpoint.GPointChargeLogListResponseDto;
 import gmart.gmart.dto.gpoint.SearchGPointChargeLogCondDto;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.GPointCustomException;
 import gmart.gmart.repository.gpoint.GPointChargeLogRepository;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,7 @@ public class GPointChargeService {
      * @return GPointChargeLog 건포인트 충전 로그 엔티티
      */
     public GPointChargeLog findById(long id) {
-        return gPointChargeLogRepository.findById(id).orElse(null);
+        return gPointChargeLogRepository.findById(id).orElseThrow(()->new GPointCustomException(ErrorMessage.NOT_FOUND_GPOINT_CHARGE_LOG));
     }
 
     /**

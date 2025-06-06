@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ProfileImageUrlResponseDto {
+public class ImageUrlResponseDto {
 
     private String imageUrl;
 
@@ -16,8 +16,8 @@ public class ProfileImageUrlResponseDto {
     /**
      * DTO 생성 메서드
      */
-    public static ProfileImageUrlResponseDto createDto(String imageUrl) {
-        ProfileImageUrlResponseDto dto = new ProfileImageUrlResponseDto();
+    public static ImageUrlResponseDto createDto(String imageUrl) {
+        ImageUrlResponseDto dto = new ImageUrlResponseDto();
         dto.imageUrl = imageUrl;
         return dto;
     }

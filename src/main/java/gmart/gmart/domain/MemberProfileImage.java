@@ -36,7 +36,6 @@ public class MemberProfileImage extends BaseTimeEntity {
     }
 
 
-
     /**
      * 이미지 URL 설정
      */

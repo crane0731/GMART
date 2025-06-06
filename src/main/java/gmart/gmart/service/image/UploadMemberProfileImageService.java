@@ -3,7 +3,7 @@
     import gmart.gmart.domain.UploadedImage;
     import gmart.gmart.domain.enums.ImageDefaultStatus;
     import gmart.gmart.domain.enums.UploadPurpose;
-    import gmart.gmart.dto.image.ProfileImageUrlResponseDto;
+    import gmart.gmart.dto.image.ImageUrlResponseDto;
     import gmart.gmart.exception.ErrorMessage;
     import gmart.gmart.exception.ImageCustomException;
     import gmart.gmart.repository.UploadedImageRepository;
@@ -40,7 +40,7 @@
          */
         public UploadedImage findByImageUrl(String imageUrl) {
             return uploadImageRepository.findByImageUrl(imageUrl)
-                    .orElseThrow(() -> new ImageCustomException(ErrorMessage.NOT_FOUND_FILE));
+                    .orElse(null);
         }
 
         /**
@@ -49,7 +49,7 @@
          * @return
          */
         @Transactional
-        public ProfileImageUrlResponseDto uploadProfileImage(MultipartFile file) {
+        public ImageUrlResponseDto uploadProfileImage(MultipartFile file) {
             //실제 파일 저장
             String imageUrl = storageService.uploadFile(file);
             String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
@@ -58,7 +58,7 @@
             UploadedImage uploadedImage = UploadedImage.createEntity(fileName, imageUrl, UploadPurpose.PROFILE);
             uploadImageRepository.save(uploadedImage);
 
-            return ProfileImageUrlResponseDto.createDto(imageUrl);
+            return ImageUrlResponseDto.createDto(imageUrl);
         }
 
         /**

@@ -21,13 +21,19 @@ public class StoreProfileImage extends BaseTimeEntity {
     @Column(name = "store_profile_image_id")
     private Long id;
 
-    @org.hibernate.annotations.Comment("상점 아이디")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private Store store;
-
     @org.hibernate.annotations.Comment("이미지 URL")
     @Column(name = "image_url")
     private String imageUrl;
+
+    /**
+     * [생성 메서드]
+     * @param imageUrl 이미지 URL
+     * @return StoreProfileImage 상점 프로필 이미지 엔티티
+     */
+    public static StoreProfileImage create(String imageUrl) {
+        StoreProfileImage storeProfileImage = new StoreProfileImage();
+        storeProfileImage.imageUrl = imageUrl;
+        return storeProfileImage;
+    }
 
 }

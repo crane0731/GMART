@@ -46,4 +46,14 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(GPointCustomException.class)
+    public ResponseEntity<Object> handleGPointCustomException(GPointCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(StoreCustomException.class)
+    public ResponseEntity<Object> handleStoreCustomException(StoreCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
 }

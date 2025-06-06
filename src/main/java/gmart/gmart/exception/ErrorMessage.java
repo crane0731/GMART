@@ -46,5 +46,13 @@ public final class ErrorMessage {
 
     public static final String NOT_ENOUGH_GMONEY_TO_REFUND="환불 하려는 금액이 현재 가진 건머니 보다 많습니다.";
 
+    public static final String NOT_FOUND_GPOINT_CHARGE_LOG="건포인트 충전 로그를 찾을 수 없습니다.";
+    public static final String NOT_FOUND_GMONEY_CHARGE_LOG="건머니 충전 로그를 찾을 수 없습니다.";
+
+    public static final String NOT_FOUND_STORE="상점을 찾을 수 없습니다.";
+
+
+
+
 
 }
