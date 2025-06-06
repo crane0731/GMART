@@ -77,11 +77,12 @@ public class Store extends BaseAuditingEntity {
      * @param storeProfileImage 상점 프로필 이미지
      * @return Store 상점 엔티티
      */
-    public static Store create(String name, String introduction,StoreProfileImage storeProfileImage){
+    public static Store create(Member member, String name, String introduction,StoreProfileImage storeProfileImage){
         Store store = new Store();
         store.name = name;
         store.introduction = introduction;
         store.storeProfileImage = storeProfileImage;
+        store.member=member;
         store.status = StoreStatus.ACTIVE;
         store.itemCount = 0L;
         store.reportedCount = 0L;
@@ -91,6 +92,18 @@ public class Store extends BaseAuditingEntity {
         store.favoriteCount = 0L;
         return store;
 
+    }
+
+    /**
+     * [업데이트 메서드]
+     * @param name 상점 이름
+     * @param introduction 상점 소개글
+     * @param storeProfileImage 상점 프로필 이미지 엔티티
+     */
+    public void update(String name, String introduction,StoreProfileImage storeProfileImage){
+        this.name = name;
+        this.introduction = introduction;
+        this.storeProfileImage = storeProfileImage;
     }
 
 }

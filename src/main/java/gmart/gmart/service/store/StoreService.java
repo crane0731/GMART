@@ -5,6 +5,7 @@ import gmart.gmart.domain.Store;
 import gmart.gmart.domain.StoreProfileImage;
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.dto.store.CreateStoreRequestDto;
+import gmart.gmart.dto.store.UpdateStoreRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ImageCustomException;
 import gmart.gmart.exception.StoreCustomException;
@@ -45,14 +46,32 @@ public class StoreService {
         UploadedImage uploadedImage = getUploadedImage(requestDto);
 
         //상점 등록 + 상점 프로필 이미지 등록
-        processSaveStoreWithProfileImage(requestDto, uploadedImage);
+        processSaveStoreWithProfileImage(member,requestDto, uploadedImage);
 
     }
 
-
     /**
-     * 상점 수정
+     * [서비스 로직]
+     * 상점 업데이트
+     * @param storeId 상점 아이디
+     * @param requestDto 상점 수정 요청 DTO
      */
+    @Transactional
+    public void updateStore(Long storeId,UpdateStoreRequestDto requestDto) {
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //수정할 상점 조회
+        Store store = findById(storeId);
+
+        //수정할 상점이 로그인한 회원의 상점인지 확인(회원의 것이 아니면 예외를 던짐)
+        validateStoreOwner(store, member);
+
+        //상점 업데이트 실행
+        processUpdate(requestDto, store);
+    }
+
 
     /**
      * 상점 상세 조회
@@ -95,12 +114,12 @@ public class StoreService {
     }
 
     //==상점 등록 + 상점 프로필 이미지 등록 메서드==//
-    private void processSaveStoreWithProfileImage(CreateStoreRequestDto requestDto, UploadedImage uploadedImage) {
+    private void processSaveStoreWithProfileImage(Member member,CreateStoreRequestDto requestDto, UploadedImage uploadedImage) {
         //상점 프로필 이미지 객체 생성
         StoreProfileImage storeProfileImage = StoreProfileImage.create(uploadedImage.getImageUrl());
 
         //상점 객체 생성 + 얀관관계 세팅
-        Store store = Store.create(requestDto.getName(), requestDto.getIntroduction(), storeProfileImage);
+        Store store = Store.create(member,requestDto.getName(), requestDto.getIntroduction(), storeProfileImage);
 
         //상점 저장
         save(store);
@@ -112,6 +131,9 @@ public class StoreService {
         //업로드 이미지 조회
         UploadedImage uploadedImage = uploadStoreProfileImageService.findByImageUrl(requestDto.getImageUrl());
 
+        //업로드 이미지 사용 처리
+        uploadedImage.usedTrue();
+
         //만약 업로드한 상점 이미지가 없다면 기본 이미지로 설정
         if(uploadedImage == null) {
             uploadedImage=uploadStoreProfileImageService.findDefaultProfileImage();
@@ -119,6 +141,52 @@ public class StoreService {
         return uploadedImage;
     }
 
+    //==수정할 상점이 로그인한 회원의 상점인지 확인(회원의 것이 아니면 예외를 던짐)하는 메서드==//
+    private void validateStoreOwner(Store store, Member member) {
+        if(!store.getMember().getId().equals(member.getId())) {
+            throw new StoreCustomException(ErrorMessage.NO_PERMISSION);
+        }
+    }
+
+    //==상점 업데이트 실행 로직 메서드==//
+    private void processUpdate(UpdateStoreRequestDto requestDto, Store store) {
+
+        //기존의 업로드 이미지(상점 프로필 이미지) 비사용 처리
+        oldStoreImageUsedFalse(store);
+
+        //새로운 업로드 이미지(상점 프로필 이미지) 사용 처리 + 반환
+        UploadedImage newUploadedImage = newStoreImageUsedTrueAndGet(requestDto);
+
+        //새로운 업로드 이미지 URL 로 상점 프로필 이미지 객체 생성
+        StoreProfileImage storeProfileImage = StoreProfileImage.create(newUploadedImage.getImageUrl());
+
+        //상점 업데이트
+        store.update(requestDto.getName(), requestDto.getIntroduction(), storeProfileImage);
+    }
+
+    //==새로운 업로드 이미지(상점 프로필 이미지) 사용 처리 + 반환 메서드==//
+    private UploadedImage newStoreImageUsedTrueAndGet(UpdateStoreRequestDto requestDto) {
+        //새로운 업로드 이미지 조회
+        UploadedImage newUploadedImage = uploadStoreProfileImageService.findByImageUrl(requestDto.getImageUrl());
+
+        //업로드 이미지 사용 처리
+        newUploadedImage.usedTrue();
+        return newUploadedImage;
+    }
+
+    //==기존의 업로드 이미지(상점 프로필 이미지) 비사용 처리 메서드==//
+    private void oldStoreImageUsedFalse(Store store) {
+        //기존의 업로드 이미지 조회
+        UploadedImage oldUploadedImage = uploadStoreProfileImageService.findByImageUrl(store.getStoreProfileImage().getImageUrl());
+
+        //기본(디폴트) 상점 이미지 조회
+        UploadedImage defaultStoreImage = uploadStoreProfileImageService.findDefaultProfileImage();
+
+        //기존의 업로드 이미지가 (기본)디폴트 이미지가 아니라면 이미지 비사용 처리
+        if(!oldUploadedImage.getImageUrl().equals(defaultStoreImage.getImageUrl())) {
+            oldUploadedImage.usedFalse();
+        }
+    }
 
 
 }
