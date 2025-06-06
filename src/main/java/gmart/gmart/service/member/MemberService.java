@@ -46,7 +46,6 @@ public class MemberService {
     private final MemberProfileImageService memberProfileImageService;
     private final MemberSuspensionService memberSuspensionService;
 
-    private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -302,7 +301,7 @@ public class MemberService {
             return uploadedImage;
         }else {
             //프로필 이미지가 null 일 경우 기본 프로필 이미지 사용
-            return profileImageService.findByImageUrl(DEFAULT_PROFILE_IMAGE_URL);
+            return profileImageService.findDefaultProfileImage();
         }
 
     }
@@ -423,6 +422,10 @@ public class MemberService {
 
     //==회원 정보 업데이트 로직==//
     private void processingUpdate(UpdateMemberInfoRequestDto dto, Member member) {
+
+        //기본 프로필 이미지 가져오기
+        UploadedImage defaultProfileImage = profileImageService.findDefaultProfileImage();
+
         //업로드된 이미지 조회
         UploadedImage uploadedImage = getUploadedImage(dto.getProfileImageUrl());
 
@@ -441,7 +444,7 @@ public class MemberService {
         memberProfileImageService.save(newMemberProfileImage);
 
         //기존 프로필 이미지가 기본이미지가 아니라면 삭제 ,예전 업로드 이미지 비활성화
-        if(!oldImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
+        if(!oldImage.getImageUrl().equals(defaultProfileImage.getImageUrl())) {
             memberProfileImageService.delete(oldImage);
 
             UploadedImage oldUploadImage = getUploadedImage(oldImage.getImageUrl());
@@ -464,11 +467,14 @@ public class MemberService {
     //==회원 삭제 로직==//
     private void processingDelete(HttpServletRequest request, Member member) {
 
+        //기본 프로필 이미지 가져오기
+        UploadedImage defaultProfileImage = profileImageService.findDefaultProfileImage();
+
         //회원 프로필 이미지 조회
         MemberProfileImage memberProfileImage = member.getMemberProfileImage();
 
         //프로필 이미지가 기본이미지가 아니라면 회원 프로필 이미지 삭제
-        if(!memberProfileImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
+        if(!memberProfileImage.getImageUrl().equals(defaultProfileImage.getImageUrl())) {
             memberProfileImageService.delete(memberProfileImage);
 
             //업로드된 이미지 조회

@@ -56,6 +56,7 @@ public class UploadedImage extends BaseTimeEntity {
         image.imageUrl = imageUrl;
         image.isUsed = false;
         image.purpose = purpose;
+        image.defaultStatus = ImageDefaultStatus.NOT_DEFAULT;
         return image;
     }
 

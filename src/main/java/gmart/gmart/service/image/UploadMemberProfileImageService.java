@@ -1,6 +1,7 @@
     package gmart.gmart.service.image;
 
     import gmart.gmart.domain.UploadedImage;
+    import gmart.gmart.domain.enums.ImageDefaultStatus;
     import gmart.gmart.domain.enums.UploadPurpose;
     import gmart.gmart.dto.image.ProfileImageUrlResponseDto;
     import gmart.gmart.exception.ErrorMessage;
@@ -67,6 +68,15 @@
         @Transactional
         public void deleteProfileImage(String imageUrl) {
             storageService.deleteImageFile(imageUrl);
+        }
+
+        /**
+         * [서비스 로직]
+         * 회원 프로필 기본(디폴트) 이미지 조회
+         * @return UploadedImage 업로드 이미지 엔티티
+         */
+        public UploadedImage findDefaultProfileImage() {
+            return uploadImageRepository.findDefaultMemberProfileImage(ImageDefaultStatus.DEFAULT,UploadPurpose.PROFILE).orElseThrow(() -> new ImageCustomException(ErrorMessage.NOT_FOUND_FILE));
         }
 
 
