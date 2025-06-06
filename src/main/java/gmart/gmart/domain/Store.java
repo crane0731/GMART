@@ -106,4 +106,12 @@ public class Store extends BaseAuditingEntity {
         this.storeProfileImage = storeProfileImage;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 방문수 증가
+     */
+    public void plusVisitedCount(){
+        this.totalVisitCount++;
+    }
+
 }

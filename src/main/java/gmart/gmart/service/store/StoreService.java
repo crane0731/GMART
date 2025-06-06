@@ -5,6 +5,7 @@ import gmart.gmart.domain.Store;
 import gmart.gmart.domain.StoreProfileImage;
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.dto.store.CreateStoreRequestDto;
+import gmart.gmart.dto.store.StoreResponseDto;
 import gmart.gmart.dto.store.UpdateStoreRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ImageCustomException;
@@ -74,14 +75,28 @@ public class StoreService {
 
 
     /**
-     * 상점 상세 조회
+     * [서비스 로직]
+     * 상점 정보 상세 조회
+     * @param storeId 상점 아이디
+     * @return StoreResponseDto 응답 DTO
      */
+    @Transactional
+    public StoreResponseDto getStoreDetails(Long storeId) {
+        //상점 엔티티 조회
+        Store store = findById(storeId);
+
+        //상점 총 방문수 증가
+        store.plusVisitedCount();
+
+        //상점 응답 DTO 생성 + 반환
+        return StoreResponseDto.create(store);
+    }
+
+
 
     /**
      * 상점 리스트 조회
      */
-
-
 
 
 

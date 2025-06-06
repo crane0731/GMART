@@ -2,6 +2,7 @@ package gmart.gmart.controller.store;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.store.CreateStoreRequestDto;
+import gmart.gmart.dto.store.StoreResponseDto;
 import gmart.gmart.dto.store.UpdateStoreRequestDto;
 import gmart.gmart.service.store.StoreService;
 import jakarta.validation.Valid;
@@ -73,6 +74,20 @@ public class StoreController {
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상점 수정 완료")));
 
+    }
+
+    /**
+     * [컨트롤러]
+     * 상점 정보 상세 조회
+     * @param storeId 상점 아이디
+     * @return StoreResponseDto 응답 DTO
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> getStoreDetails(@PathVariable("id") Long storeId) {
+
+        StoreResponseDto responseDto = storeService.getStoreDetails(storeId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
     }
 
 
