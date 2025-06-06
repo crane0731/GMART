@@ -1,6 +1,7 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.ImageDefaultStatus;
 import gmart.gmart.domain.enums.UploadPurpose;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,6 +41,11 @@ public class UploadedImage extends BaseTimeEntity {
     @Column(name = "purpose", nullable = false)
     @Enumerated(EnumType.STRING)
     private UploadPurpose purpose; // 예: PROFILE, POST 등
+
+    @Comment("디폴트 이미지 여부")
+    @Column(name = "default_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ImageDefaultStatus defaultStatus;
 
     /**
      * 엔티티 생성 메서드
