@@ -123,6 +123,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteGundam> favoriteGundams = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<LikeStore> likeStores = new ArrayList<>();
+
 
     /**
      * 회원 생성 로직
