@@ -61,9 +61,9 @@ public class Store extends BaseAuditingEntity {
     @Column(name = "reviewed_count")
     private Long reviewedCount;
 
-    @org.hibernate.annotations.Comment("점수")
-    @Column(name = "rating")
-    private Long rating;
+    @org.hibernate.annotations.Comment("좋아요 수")
+    @Column(name = "liked_count")
+    private Long likedCount;
 
     @org.hibernate.annotations.Comment("찜한 수")
     @Column(name = "favorite_count")
@@ -88,7 +88,7 @@ public class Store extends BaseAuditingEntity {
         store.reportedCount = 0L;
         store.totalVisitCount = 0L;
         store.reviewedCount = 0L;
-        store.rating = 0L;
+        store.likedCount = 0L;
         store.favoriteCount = 0L;
         return store;
 
@@ -114,4 +114,21 @@ public class Store extends BaseAuditingEntity {
         this.totalVisitCount++;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 좋아요 수 증가
+     */
+    public void plusLikedCount(){
+        this.likedCount++;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 좋아요 수 감소
+     */
+    public void minusLikeCount(){
+        if(this.likedCount > 0){
+            this.likedCount--;
+        }
+    }
 }

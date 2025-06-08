@@ -12,7 +12,7 @@ import lombok.Setter;
 public class SearchStoreCondDto {
 
     private String name; //상점 이름
-    private StoreSortType sortType; //정렬 조건 , [HIGH_REVIEW,HIGH_RATING]
+    private StoreSortType sortType; //정렬 조건 , [HIGH_REVIEW,HIGH_LIKED_COUNT]
 
 
     /**

@@ -126,6 +126,12 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<LikeStore> likeStores = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<FavoriteStore> favoriteStores=new ArrayList<>();
+
+
+
+
 
     /**
      * 회원 생성 로직

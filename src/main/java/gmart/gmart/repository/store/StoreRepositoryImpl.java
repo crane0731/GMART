@@ -42,11 +42,11 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         //정렬 타입 설정
         OrderSpecifier<?> sortOrder = null;
 
-        if(cond.getSortType()==null || cond.getSortType().equals(StoreSortType.HIGH_RATING)){
-            sortOrder=store.rating.desc();
+        if(cond.getSortType()==null || cond.getSortType().equals(StoreSortType.HIGH_LIKED_COUNT)){
+            sortOrder=store.likedCount.desc();
         }
         else if(cond.getSortType().equals(StoreSortType.HIGH_REVIEW)){
-            sortOrder=store.rating.desc();
+            sortOrder=store.reviewedCount.desc();
         }
 
         return query

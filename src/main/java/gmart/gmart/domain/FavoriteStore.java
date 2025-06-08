@@ -7,23 +7,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 상점 좋아요
+ * 회원 관심 상점
  */
 @Entity
 @Table(
-        name = "like_store",
+        name = "favorite_store",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_like_store_member_store",
+                        name = "uk_favorite_store_member_store",
                         columnNames = {"member_id", "store_id"}
                 )
         }
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LikeStore extends BaseTimeEntity {
+public class FavoriteStore extends BaseTimeEntity {
 
-    @org.hibernate.annotations.Comment("상점 좋아요 아이디")
+    @org.hibernate.annotations.Comment("관심 상점 아이디")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_store_id")
@@ -39,18 +39,6 @@ public class LikeStore extends BaseTimeEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    /**
-     * [생성 메서드]
-     * @param member 회원 엔티티
-     * @param store 상점 엔티티
-     * @return LikeStore 상점 좋아요 엔티티
-     */
-    public static LikeStore create(Member member, Store store) {
-        LikeStore likeStore = new LikeStore();
-        likeStore.setMember(member);
-        likeStore.store = store;
-        return likeStore;
-    }
 
     /**
      * [연관 관계 편의 메서드]
@@ -58,7 +46,6 @@ public class LikeStore extends BaseTimeEntity {
      */
     private void setMember(Member member) {
         this.member = member;
-        member.getLikeStores().add(this);
+        member.getFavoriteStores().add(this);
     }
-
 }
