@@ -26,7 +26,7 @@ public class FavoriteStore extends BaseTimeEntity {
     @org.hibernate.annotations.Comment("관심 상점 아이디")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_store_id")
+    @Column(name = "favorite_store_id")
     private Long id;
 
     @org.hibernate.annotations.Comment("회원 아이디")
@@ -38,6 +38,20 @@ public class FavoriteStore extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
+
+
+    /**
+     * [생성 메서드]
+     * @param member 회원 엔티티
+     * @param store 상점 엔티티
+     * @return  FavoriteStore 관심 상점 엔티티
+     */
+    public static FavoriteStore create(Member member, Store store) {
+        FavoriteStore favoriteStore = new FavoriteStore();
+        favoriteStore.setMember(member);
+        favoriteStore.store = store;
+        return favoriteStore;
+    }
 
 
     /**

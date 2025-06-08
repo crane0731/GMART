@@ -131,4 +131,22 @@ public class Store extends BaseAuditingEntity {
             this.likedCount--;
         }
     }
+
+    /**
+     * [비즈니스 로직]
+     * 관심 수 증가
+     */
+    public void plusFavoriteCount(){
+        this.favoriteCount++;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 관심 수 감소
+     */
+    public void minusFavoriteCount(){
+        if(this.favoriteCount > 0){
+            this.favoriteCount--;
+        }
+    }
 }

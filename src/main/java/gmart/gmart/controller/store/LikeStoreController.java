@@ -4,10 +4,7 @@ import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.service.store.LikeStoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -41,7 +38,7 @@ public class LikeStoreController {
      * @param storeId 상점 아이디
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/like-cancel")
+    @DeleteMapping("/{id}/like")
     public ResponseEntity<ApiResponse<?>> cancellikeStore(@PathVariable("id") Long storeId){
 
         likeStoreService.cancelLikeStore(storeId);

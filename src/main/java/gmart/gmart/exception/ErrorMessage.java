@@ -50,10 +50,15 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_GMONEY_CHARGE_LOG="건머니 충전 로그를 찾을 수 없습니다.";
 
     public static final String NOT_FOUND_STORE="상점을 찾을 수 없습니다.";
+
     public static final String NOT_FOUND_LIKE_STORE="상점 좋아요를 찾을 수 없습니다.";
-
-
     public static final String ALREADY_LIKE_STORE="이미 좋아요한 상점 입니다.";
+
+    public static final String NOT_FOUND_FAVORITE_STORE="관심 상점을 찾을 수 없습니다.";
+    public static final String ALREADY_FAVORITE_STORE="이미 관심등록한 상점 입니다.";
+
+
+
 
 
 
