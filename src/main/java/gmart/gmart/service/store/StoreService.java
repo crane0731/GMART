@@ -4,11 +4,8 @@ import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
 import gmart.gmart.domain.StoreProfileImage;
 import gmart.gmart.domain.UploadedImage;
-import gmart.gmart.dto.store.CreateStoreRequestDto;
-import gmart.gmart.dto.store.StoreResponseDto;
-import gmart.gmart.dto.store.UpdateStoreRequestDto;
+import gmart.gmart.dto.store.*;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.exception.ImageCustomException;
 import gmart.gmart.exception.StoreCustomException;
 import gmart.gmart.repository.store.StoreRepository;
 import gmart.gmart.service.image.UploadStoreProfileImageService;
@@ -16,6 +13,8 @@ import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 상점 서비스
@@ -93,10 +92,17 @@ public class StoreService {
     }
 
 
-
     /**
-     * 상점 리스트 조회
+     * [서비스 로직]
+     * 조건에 따라 상점 리스트 검색(상위 10개)
+     * @param condDto 검색 조건 DTO
+     * @return List<StoreListResponseDto> 응답 DTO 리스트
      */
+    public List<StoreListResponseDto> findAllByCond(SearchStoreCondDto condDto){
+        return storeRepository.findAllByCond(condDto).stream()
+                .map(StoreListResponseDto::create)
+                .toList();
+    }
 
 
 

@@ -1,9 +1,8 @@
 package gmart.gmart.controller.store;
 
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.store.CreateStoreRequestDto;
-import gmart.gmart.dto.store.StoreResponseDto;
-import gmart.gmart.dto.store.UpdateStoreRequestDto;
+import gmart.gmart.dto.enums.StoreSortType;
+import gmart.gmart.dto.store.*;
 import gmart.gmart.service.store.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +88,24 @@ public class StoreController {
         StoreResponseDto responseDto = storeService.getStoreDetails(storeId);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+    }
+
+    /**
+     * [컨트롤러]
+     * 검색 조건에 따라 상위 10개의 상점 리스트를 조회
+     * @param name 상점 이름
+     * @param sortType 정렬 타입
+     * @return List<StoreListResponseDto> 응답 DTO 리스트
+     */
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllStores(@RequestParam("name")String name, @RequestParam(value = "sortType" ,defaultValue = "HIGH_RATING")StoreSortType sortType) {
+
+        SearchStoreCondDto searchStoreCondDto = SearchStoreCondDto.create(name, sortType);
+
+        List<StoreListResponseDto> responseDtos = storeService.findAllByCond(searchStoreCondDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+
     }
 
 
