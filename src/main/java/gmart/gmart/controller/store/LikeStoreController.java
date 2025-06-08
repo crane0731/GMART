@@ -1,11 +1,14 @@
 package gmart.gmart.controller.store;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.store.LikeStoreListResponseDto;
+import gmart.gmart.dto.store.SearchLikeStoreCondDto;
 import gmart.gmart.service.store.LikeStoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,6 +47,23 @@ public class LikeStoreController {
         likeStoreService.cancelLikeStore(storeId);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상점 좋아요 취소 성공")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 검색 조건에 따라 회원이 좋아요 누른 상점 목록 조회
+     * @param name 상점 이름
+     * @return List<LikeStoreListResponseDto> 응답 DTO 리스트
+     */
+    @GetMapping("/like")
+    public ResponseEntity<ApiResponse<?>> getLikeStore(@RequestParam("name")String name){
+
+        SearchLikeStoreCondDto condDto = SearchLikeStoreCondDto.create(name);
+
+        List<LikeStoreListResponseDto> responseDtos = likeStoreService.findAllByCond(condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+
     }
 
 

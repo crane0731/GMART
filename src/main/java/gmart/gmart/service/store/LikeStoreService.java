@@ -3,6 +3,8 @@ package gmart.gmart.service.store;
 import gmart.gmart.domain.LikeStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
+import gmart.gmart.dto.store.LikeStoreListResponseDto;
+import gmart.gmart.dto.store.SearchLikeStoreCondDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.StoreCustomException;
 import gmart.gmart.repository.likestore.LikeStoreRepository;
@@ -10,6 +12,8 @@ import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 상점 좋아요 서비스
@@ -25,7 +29,9 @@ public class LikeStoreService {
     private final LikeStoreRepository likeStoreRepository; //상점 좋아요 레파지토리
 
     /**
+     * [서비스 로직]
      * 회원 상점 좋아요
+     * @param storeId 상점 아이디
      */
     @Transactional
     public void likeStore(Long storeId) {
@@ -44,7 +50,9 @@ public class LikeStoreService {
     }
 
     /**
+     * [서비스 로직]
      * 회원 상점 좋아요 취소
+     * @param storeId 상점 아이디
      */
     @Transactional
     public void cancelLikeStore(Long storeId) {
@@ -59,6 +67,28 @@ public class LikeStoreService {
         cancelLike(member, store);
 
     }
+
+    /**
+     * [서비스 로직]
+     * 검색 조건에 따라 현재 로그인한 회원의 좋아요한 상점 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<LikeStoreListResponseDto> 응답 DTO 리스트
+     */
+    public List<LikeStoreListResponseDto> findAllByCond(SearchLikeStoreCondDto condDto){
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //상점 좋아요 리스트 조회 + 응답 DTO 리스트 생성 + 반환
+        return likeStoreRepository.findAllByCond(member,condDto).stream()
+                .map(LikeStoreListResponseDto::create)
+                .toList();
+
+    }
+
+
+
+
 
     /**
      * [조회]

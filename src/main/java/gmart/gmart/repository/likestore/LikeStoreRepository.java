@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
      * 상점 좋아요 레파지토리
      */
-    public interface LikeStoreRepository extends JpaRepository<LikeStore, Long> {
+    public interface LikeStoreRepository extends JpaRepository<LikeStore, Long>,LikeStoreRepositoryCustom {
 
         /**
          * 회원과 상점으로 이미 상점 좋아요 테이블이 있는지 확인
