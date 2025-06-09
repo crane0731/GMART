@@ -1,8 +1,6 @@
 package gmart.gmart.service.image;
 
-
 import gmart.gmart.domain.UploadedImage;
-import gmart.gmart.domain.enums.ImageDefaultStatus;
 import gmart.gmart.domain.enums.UploadPurpose;
 import gmart.gmart.dto.image.ImageUrlResponseDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -14,29 +12,38 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 업로드 상점 프로필 이미지 서비스
+ * 업로드 상점 이미지 서비스
  */
 @Service
 @Transactional(readOnly = true)
-public class UploadStoreProfileImageService {
+public class UploadItemImageService {
 
     private final UploadedImageRepository uploadImageRepository;
 
     private final StorageService storageService;
 
-    public UploadStoreProfileImageService(
+    public UploadItemImageService(
             UploadedImageRepository uploadImageRepository,
-            @Qualifier("storeImageStorageService") StorageService storageService
+            @Qualifier("itemImageStorageService") StorageService storageService
     ) {
         this.uploadImageRepository = uploadImageRepository;
         this.storageService = storageService;
     }
 
 
+    /**
+     * ImageUrl로 업로드 이미지 조회
+     * @param imageUrl
+     * @return
+     */
+    public UploadedImage findByImageUrl(String imageUrl) {
+        return uploadImageRepository.findByImageUrl(imageUrl)
+                .orElseThrow(() -> new ImageCustomException(ErrorMessage.NOT_FOUND_FILE));
+    }
 
     /**
-     * 상점 프로필 이미지 업로드
-     * @param file 멀티파트 파일
+     * 프로필 이미지 업로드
+     * @param file
      * @return
      */
     @Transactional
@@ -46,40 +53,19 @@ public class UploadStoreProfileImageService {
         String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
 
         //DB 저장
-        UploadedImage uploadedImage = UploadedImage.createEntity(fileName, imageUrl, UploadPurpose.STORE);
+        UploadedImage uploadedImage = UploadedImage.createEntity(fileName, imageUrl, UploadPurpose.ITEM);
         uploadImageRepository.save(uploadedImage);
 
         return ImageUrlResponseDto.createDto(imageUrl);
     }
 
     /**
-     * [서비스 로직]
      * 이미지 파일 삭제
      * @param imageUrl 이미지 URL
      */
     @Transactional
     public void deleteImageFile(String imageUrl) {
         storageService.deleteImageFile(imageUrl);
-    }
-
-    /**
-     * [조회]
-     * ImageUrl로 업로드 이미지 조회
-     * @param imageUrl 이미지 URL
-     * @return  UploadedImage 업로드 이미지 엔티티
-     */
-    public UploadedImage findByImageUrl(String imageUrl) {
-        return uploadImageRepository.findByImageUrl(imageUrl)
-                .orElse(null);
-    }
-
-    /**
-     * [조회]
-     * 회원 프로필 기본(디폴트) 이미지 조회
-     * @return UploadedImage 업로드 이미지 엔티티
-     */
-    public UploadedImage findDefaultProfileImage() {
-        return uploadImageRepository.findDefaultMemberProfileImage(ImageDefaultStatus.DEFAULT, UploadPurpose.STORE).orElseThrow(() -> new ImageCustomException(ErrorMessage.NOT_FOUND_FILE));
     }
 
     /**
@@ -93,6 +79,4 @@ public class UploadStoreProfileImageService {
         deleteImageFile(imageUrl);
         uploadImageRepository.delete(uploadedImage);
     }
-
-
 }

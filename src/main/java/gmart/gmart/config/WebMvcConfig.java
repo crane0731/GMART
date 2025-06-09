@@ -20,5 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/store-images/**")
                 .addResourceLocations("file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/StoreImage/");
+
+        registry.addResourceHandler("/item-images/**")
+                .addResourceLocations("file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ItemImage/");
     }
 }

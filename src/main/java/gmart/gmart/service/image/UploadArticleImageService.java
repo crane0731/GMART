@@ -59,13 +59,29 @@ public class UploadArticleImageService {
         return ImageUrlResponseDto.createDto(imageUrl);
     }
 
+
+
     /**
-     * 프로필 이미지 업로드 취소
+     * [서비스 로직]
+     * 이미지 파일 삭제
      * @param imageUrl 이미지 URL
      */
     @Transactional
-    public void deleteArticleImage(String imageUrl) {
+    public void deleteImageFile(String imageUrl) {
         storageService.deleteImageFile(imageUrl);
+    }
+
+
+    /**
+     * [서비스 로직]
+     * 업로드 취소
+     * @param imageUrl 이미지 URL
+     */
+    @Transactional
+    public void cancelUploadImage(String imageUrl) {
+        UploadedImage uploadedImage = findByImageUrl(imageUrl);
+        deleteImageFile(imageUrl);
+        uploadImageRepository.delete(uploadedImage);
     }
 
 

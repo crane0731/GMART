@@ -20,6 +20,8 @@ public class UploadedImageCleanupService {
 
     private final UploadMemberProfileImageService uploadMemberProfileImageService; //회원 프로필 이미지 서비스
     private final UploadArticleImageService uploadArticleImageService; //게시글 이미지 서비스
+    private final UploadItemImageService uploadItemImageService;//상품 이미지 서비스
+    private final UploadStoreProfileImageService uploadStoreProfileImageService;//상점 이미지 서비스
 
     private final UploadedImageRepository uploadImageRepository; //업로드 이미지 레파지토리
 
@@ -36,16 +38,23 @@ public class UploadedImageCleanupService {
 
             try{
                 if(image.getPurpose()== UploadPurpose.PROFILE) {
-
                     //실제 파일 삭제
-                    uploadMemberProfileImageService.deleteProfileImage(image.getImageUrl());
+                    uploadMemberProfileImageService.deleteImageFile(image.getImageUrl());
+                }
+                else if(image.getPurpose()== UploadPurpose.ARTICLE){
+                    //실제 파일 삭제
+                    uploadArticleImageService.deleteImageFile(image.getImageUrl());
 
                 }
-                else{
+                else if(image.getPurpose()== UploadPurpose.ITEM){
                     //실제 파일 삭제
-                    uploadArticleImageService.deleteArticleImage(image.getImageUrl());
-
+                    uploadItemImageService.deleteImageFile(image.getImageUrl());
                 }
+                else if(image.getPurpose()== UploadPurpose.STORE){
+                    //실제 파일 삭제
+                    uploadStoreProfileImageService.deleteImageFile(image.getImageUrl());
+                }
+
                 //DB에서 삭제
                 uploadImageRepository.delete(image);
 

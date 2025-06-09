@@ -7,6 +7,7 @@ file:
   upload-profile-dir: ../ProfileImage
   upload-article-dir: ../ArticleImage
   upload-store-dir: ../StoreImage
+  upload-item-dir: ../ItemImage
 
 
 storage:

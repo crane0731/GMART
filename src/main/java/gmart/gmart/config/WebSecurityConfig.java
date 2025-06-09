@@ -66,8 +66,8 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 모드
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/image/profile","/api/gmart/image/store",
-                                "/api/gmart/image/article","/profile-images/**","/article-images/**","/store-images/**","/api/gmart/token",
+                        .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/image/profile","/api/gmart/image/store","/api/gmart/image/item",
+                                "/api/gmart/image/article","/profile-images/**","/article-images/**","/store-images/**","/item-images/**","/api/gmart/token",
                                 "/static/***","/test.html"
                                 )
                         .permitAll()

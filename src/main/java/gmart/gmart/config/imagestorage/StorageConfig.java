@@ -21,6 +21,9 @@ public class StorageConfig {
     @Value("${file.upload-store-dir}")
     private String storeDir;
 
+    @Value("${file.upload-item-dir}")
+    private String itemDir;
+
     @Bean
     public StorageService profileImageStorageService() {
         return new LocalStorageService(profileDir);
@@ -35,4 +38,11 @@ public class StorageConfig {
     public StorageService storeImageStorageService() {
         return new LocalStorageService(storeDir);
     }
+
+    @Bean
+    public StorageService itemImageStorageService() {
+        return new LocalStorageService(itemDir);
+    }
+
+
 }
