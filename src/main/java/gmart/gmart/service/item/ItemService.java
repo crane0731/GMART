@@ -67,20 +67,8 @@ public class ItemService {
         //상품을 등록하려는 상점이 현재 로그인한 회원의 상점인지 확인
         storeService.validateStoreOwner(store, member);
 
-        //상품 생성
-        Item item = Item.create(store, CommandMapper.createItemCommand(requestDto));
-
-        //상품 이미지를 생성하고 상품에 추가
-        addItemImages(requestDto.getItemImages(), item);
-
-        //상품 건담을 생성하고 상품에 추가
-        addItemGundam(requestDto.getGundamList(), item);
-
-        //상품 저장
-        save(item);
-
-        //상점의 상품수 증가
-        store.plusItemCount();
+        //상품 저장 로직
+        processSaveItem(requestDto, store);
     }
 
 
@@ -101,16 +89,12 @@ public class ItemService {
         //삭제할 상품 조회
         Item item = findById(itemId);
 
-        //상품 업로드 이미지 비 사용 처리
-        usedFalseUploadImage(item);
+        //삭제 할 상품이 현재 로그인한 회원이 등록한 상품인지 확인(아니라면 예외를 던짐)
+        validateItemOwner(item, member);
 
-        //상품 삭제
-        delete(item);
-
-        //상점의 상품수 감소
-        store.minusItemCount();
+        //상품 삭제 로직
+        processDeleteItem(item, store);
     }
-
 
     /**
      * [서비스 로직]
@@ -127,26 +111,15 @@ public class ItemService {
         //수정 할 상품 조회
         Item item = findById(itemId);
 
-        //기존 상품 업로드 이미지 비 사용 처리
-        usedFalseUploadImage(item);
+        //수정 할 상품이 회원의 것인지 확인(아닐 경우 예외를 던짐)
+        validateItemOwner(item, member);
 
-        //기존 상품 이미지 전부 삭제
-        item.removeAllItemImages();
+        //기존의 상품 이미지와 상품 건담 제거
+        removeOldItemImageAndItemGundam(item);
 
-        //새로운 상품 업로드 이미지 사용 처리
-        addItemImages(requestDto.getItemImages(), item);
-
-        //기존 상품 건담 전부 삭제
-        item.removeAllItemGundams();
-
-        //새로운 상품 건담 생성
-        addItemGundam(requestDto.getGundamList(), item);
-
-        //필드 값 업데이트
-        item.update(CommandMapper.updateItemCommand(requestDto));
+        //모두 업데이트(with 새로운 상품이미지, 새로운 상품 건담)
+        processUpdateAll(requestDto, item);
     }
-
-
 
     /**
      * 상품 조회
@@ -227,5 +200,66 @@ public class ItemService {
             //업로드 이미지 비사용 처리
             uploadedImage.usedFalse();
         }
+    }
+
+    //==기존의 상품 이미지와 상품 건담 제거 메서드==//
+    private void removeOldItemImageAndItemGundam(Item item) {
+        //기존 상품 업로드 이미지 비 사용 처리
+        usedFalseUploadImage(item);
+
+        //기존 상품 이미지 전부 삭제
+        item.removeAllItemImages();
+
+        //기존 상품 건담 전부 삭제
+        item.removeAllItemGundams();
+    }
+
+    //업데이트 로직 (with 새로운 상품이미지, 새로운 상품 건담) 메서드//
+    private void processUpdateAll(UpdateItemRequestDto requestDto, Item item) {
+        //새로운 상품 업로드 이미지 사용 처리
+        addItemImages(requestDto.getItemImages(), item);
+
+        //새로운 상품 건담 생성
+        addItemGundam(requestDto.getGundamList(), item);
+
+        //필드 값 업데이트
+        item.update(CommandMapper.updateItemCommand(requestDto));
+    }
+
+    //==상품이 회원의 것인지 확인하는 메서드==//
+    private void validateItemOwner(Item item, Member member) {
+        if(!item.getStore().getMember().getId().equals(member.getId())){
+            throw new ItemCustomException(ErrorMessage.NO_PERMISSION);
+        }
+    }
+
+    //==상품 저장 로직 메서드==//
+    private void processSaveItem(CreateItemRequestDto requestDto, Store store) {
+        //상품 엔티티 생성
+        Item item = Item.create(store, CommandMapper.createItemCommand(requestDto));
+
+        //상품 이미지를 생성하고 상품에 추가
+        addItemImages(requestDto.getItemImages(), item);
+
+        //상품 건담을 생성하고 상품에 추가
+        addItemGundam(requestDto.getGundamList(), item);
+
+        //상품 저장
+        save(item);
+
+        //상점의 상품수 증가
+        store.plusItemCount();
+    }
+
+    //==상품 삭제 로직 메서드==//
+    private void processDeleteItem(Item item, Store store) {
+        //상품 업로드 이미지 비 사용 처리
+        usedFalseUploadImage(item);
+
+        //상품 삭제
+        delete(item);
+
+        //상점의 상품수 감소
+        store.minusItemCount();
     }
 }
