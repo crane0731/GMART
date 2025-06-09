@@ -142,8 +142,6 @@ public class Item extends BaseAuditingEntity {
         return item;
     }
 
-
-
     /**
      * [연관관계 편의 메서드]
      * @param store 상점 엔티티
@@ -152,5 +150,15 @@ public class Item extends BaseAuditingEntity {
         this.store = store;
         store.getItems().add(this);
     }
+
+    /**
+     * [비즈니스 로직]
+     * 판매 상태 변경
+     */
+    public void changeSaleStatus(SaleStatus saleStatus){
+        this.saleStatus=saleStatus;
+    }
+
+
 
 }

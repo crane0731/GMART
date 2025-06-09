@@ -1,8 +1,8 @@
 package gmart.gmart.service.item;
 
 import gmart.gmart.command.CommandMapper;
-import gmart.gmart.command.CreateItemCommand;
 import gmart.gmart.domain.*;
+import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
 import gmart.gmart.dto.item.CreateItemRequestDto;
 import gmart.gmart.dto.item.ItemImageRequestDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -33,6 +33,22 @@ public class ItemService {
 
     private final ItemRepository itemRepository;//상품 레파지토리
 
+
+    /**
+     * [비즈니스 로직]
+     * 상품 판매 상태 변경
+     * @param itemId 상품 아이디
+     * @param requestDto 판매 상태 변경 요청 DTO
+     */
+    @Transactional
+    public void changeSaleStatus(Long itemId, ChangeSaleStatusRequestDto requestDto ) {
+        //상품 조회
+        Item item = findById(itemId);
+
+        //판매 완료
+        item.changeSaleStatus(requestDto.getSaleStatus());
+
+    }
 
     /**
      * [서비스 로직]
@@ -119,13 +135,7 @@ public class ItemService {
      * 상품 리스트 조회
      */
 
-    /**
-     * 판매 완료
-     */
 
-    /**
-     * 예약중
-     */
 
     /**
      * [저장]

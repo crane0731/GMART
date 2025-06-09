@@ -1,6 +1,7 @@
 package gmart.gmart.controller;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
 import gmart.gmart.dto.item.CreateItemRequestDto;
 import gmart.gmart.service.item.ItemService;
 import jakarta.validation.Valid;
@@ -50,7 +51,7 @@ public class ItemController {
     /**
      * [컨트롤러]
      * 상품 삭제
-     * @param itemId 상점 아이디
+     * @param itemId 상품 아이디
      * @return 성공 메시지
      */
     @DeleteMapping("/{id}")
@@ -60,6 +61,22 @@ public class ItemController {
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 삭제 성공")));
     }
+
+    /**
+     * [컨트롤러]
+     * 상품 판매상태 변경
+     * @param itemId 상품 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>>saleStatus(@PathVariable("id")Long itemId, @RequestBody ChangeSaleStatusRequestDto requestDto){
+
+        itemService.changeSaleStatus(itemId,requestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 판매중")));
+    }
+
+
 
 
 
