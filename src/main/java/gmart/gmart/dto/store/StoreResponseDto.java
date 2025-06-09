@@ -32,6 +32,7 @@ public class StoreResponseDto {
     private Long reviewedCount;
     private Long likedCount;
     private Long favoriteCount;
+    private Long tradeCount;
 
 
     /**
@@ -61,6 +62,7 @@ public class StoreResponseDto {
         dto.reviewedCount=store.getReviewedCount();
         dto.likedCount=store.getLikedCount();
         dto.favoriteCount=store.getFavoriteCount();
+        dto.tradeCount = store.getTradeCount();
 
         return dto;
 

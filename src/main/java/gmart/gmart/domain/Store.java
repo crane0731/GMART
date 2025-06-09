@@ -69,6 +69,10 @@ public class Store extends BaseAuditingEntity {
     @Column(name = "favorite_count")
     private Long favoriteCount;
 
+    @org.hibernate.annotations.Comment("거래 수")
+    @Column(name = "trade_count")
+    private Long tradeCount;
+
 
     /**
      * [생성 메서드]
@@ -90,6 +94,7 @@ public class Store extends BaseAuditingEntity {
         store.reviewedCount = 0L;
         store.likedCount = 0L;
         store.favoriteCount = 0L;
+        store.tradeCount = 0L;
         return store;
 
     }

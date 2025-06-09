@@ -17,6 +17,7 @@ public class StoreListResponseDto {
 
     private Long rating; //상점 점수
     private Long likedCount; //리뷰 받은 수
+    private Long itemCount; //상품 수
 
 
     /**
@@ -32,6 +33,7 @@ public class StoreListResponseDto {
 
         dto.setLikedCount(store.getLikedCount());
         dto.setLikedCount(store.getReviewedCount());
+        dto.setItemCount(store.getItemCount());
 
         return dto;
     }
