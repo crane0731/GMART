@@ -35,4 +35,30 @@ public class ItemImage extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_main")
     private IsMain isMain;
+
+
+    /**
+     * [생성 메서드]
+     * @param imageUrl 이미지 URL
+     * @param isMain 대표 이미지 여부
+     * @return ItemImage 상품이미지 엔티티
+     */
+    public static void create(Item item,String imageUrl, IsMain isMain) {
+        ItemImage itemImage = new ItemImage();
+
+        //연관관계 세팅
+        itemImage.setItem(item);
+
+        itemImage.imageUrl = imageUrl;
+        itemImage.isMain = isMain;
+    }
+
+    /**
+     * [연관 관계 편의 메서드]
+     * @param item 상품 엔티티
+     */
+    private void setItem(Item item) {
+        this.item = item;
+        item.getItemImages().add(this);
+    }
 }

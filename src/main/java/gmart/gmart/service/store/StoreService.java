@@ -162,8 +162,13 @@ public class StoreService {
         return uploadedImage;
     }
 
-    //==수정할 상점이 로그인한 회원의 상점인지 확인(회원의 것이 아니면 예외를 던짐)하는 메서드==//
-    private void validateStoreOwner(Store store, Member member) {
+    /**
+     * [서비스 로직]
+     * ==수정할 상점이 로그인한 회원의 상점인지 확인(회원의 것이 아니면 예외를 던짐)
+     * @param store 상점 엔티티
+     * @param member 회원 엔티티
+     */
+    public void validateStoreOwner(Store store, Member member) {
         if(!store.getMember().getId().equals(member.getId())) {
             throw new StoreCustomException(ErrorMessage.NO_PERMISSION);
         }

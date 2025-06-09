@@ -35,7 +35,7 @@ public class ArticleImage {
     /**
      * [생성 메서드]
      * @param imageUrl 이미지URL
-     * @return ArticleImage 엔티티 객체
+     * @return ArticleImage 게시글 이미지 엔티티
      */
     public static ArticleImage createEntity(String imageUrl){
         ArticleImage articleImage = new ArticleImage();

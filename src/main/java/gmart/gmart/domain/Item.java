@@ -1,7 +1,9 @@
 package gmart.gmart.domain;
 
+import gmart.gmart.command.CreateItemCommand;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.*;
+import gmart.gmart.dto.item.CreateItemRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -93,13 +95,14 @@ public class Item extends BaseAuditingEntity {
     //신고 상태
     @org.hibernate.annotations.Comment("신고 상태 ")
     @Enumerated(EnumType.STRING)
-    private ReportStatus reportStatus;
+    @Column(name = "reported_status")
+    private ItemReportedStatus reportedStatus;
 
     //거래 방법
-    @org.hibernate.annotations.Comment("신고 상태 ")
+    @org.hibernate.annotations.Comment("거래 타입")
     @Enumerated(EnumType.STRING)
+    @Column(name = "deal_type")
     private DealType dealType;
-
 
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemGundam> itemGundams = new ArrayList<>();
@@ -107,6 +110,47 @@ public class Item extends BaseAuditingEntity {
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ItemImage> itemImages = new ArrayList<>();
 
+    /**
+     * [생성 메서드]
+     * @param store 상점 엔티티
+     * @param command 상품 엔티티 생성 커맨드
+     * @return Item 상품 엔티티
+     */
+    public static Item create(Store store, CreateItemCommand command){
+        Item item = new Item();
 
+        item.setStore(store);
+        item.title = command.getTitle();
+        item.content = command.getContent();
+        item.itemPrice = command.getItemPrice();
+        item.deliveryPrice = command.getDeliveryPrice();
+        item.location = command.getLocation();
+
+        item.assemblyStatus=command.getAssemblyStatus();
+        item.boxStatus=command.getBoxStatus();
+        item.paintStatus=command.getPaintStatus();
+        item.dealType=command.getDealType();
+
+        item.saleStatus=SaleStatus.SALE;
+        item.reportedStatus=ItemReportedStatus.NOT_REPORTED;
+
+        item.viewCount=0L;
+        item.favoriteCount=0L;
+        item.chattingCount=0L;
+        item.reportedCount=0L;
+
+        return item;
+    }
+
+
+
+    /**
+     * [연관관계 편의 메서드]
+     * @param store 상점 엔티티
+     */
+    private void setStore(Store store) {
+        this.store = store;
+        store.getItems().add(this);
+    }
 
 }

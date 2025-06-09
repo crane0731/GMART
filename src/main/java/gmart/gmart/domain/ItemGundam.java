@@ -35,4 +35,25 @@ public class ItemGundam extends BaseTimeEntity {
     @Column(name = "count")
     private Long count;
 
+    /**
+     * [생성 메서드]
+     * @param item 상품 엔티티
+     * @param gundam 건담 엔티티
+     * @return ItemGundam 상품 건담 엔티티
+     */
+    public static void create(Item item, Gundam gundam) {
+        ItemGundam itemGundam = new ItemGundam();
+        itemGundam.setItem(item);
+        itemGundam.gundam = gundam;
+    }
+
+    /**
+     * [연관 관계 편의 메서드]
+     * @param item 상품 엔티티
+     */
+    private void setItem(Item item) {
+        this.item = item;
+        item.getItemGundams().add(this);
+    }
+
 }

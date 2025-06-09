@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class GundamListResponseDto {
 
+    private Long gundamId;//건담 아이디
+
     private String name; //이름
 
     private String grade; //등급
@@ -25,6 +27,7 @@ public class GundamListResponseDto {
      */
     public static GundamListResponseDto createDto(Gundam gundam) {
         GundamListResponseDto dto = new GundamListResponseDto();
+        dto.setGundamId(gundam.getId());
         dto.setName(gundam.getName());
         dto.setGrade(gundam.getGrade().toString());
         dto.setImageUrl(gundam.getImageUrl());

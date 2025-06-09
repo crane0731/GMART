@@ -7,6 +7,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 상점
  */
@@ -72,6 +75,9 @@ public class Store extends BaseAuditingEntity {
     @org.hibernate.annotations.Comment("거래 수")
     @Column(name = "trade_count")
     private Long tradeCount;
+
+    @OneToMany(mappedBy = "store")
+    private List<Item> items = new ArrayList<>();
 
 
     /**
@@ -152,6 +158,24 @@ public class Store extends BaseAuditingEntity {
     public void minusFavoriteCount(){
         if(this.favoriteCount > 0){
             this.favoriteCount--;
+        }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 상품 수 증가
+     */
+    public void plusItemCount(){
+        this.itemCount++;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 상품 수 감소
+     */
+    public void minusItemCount(){
+        if(this.itemCount > 0){
+            this.itemCount--;
         }
     }
 }
