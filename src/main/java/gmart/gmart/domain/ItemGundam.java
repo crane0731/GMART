@@ -56,4 +56,12 @@ public class ItemGundam extends BaseTimeEntity {
         item.getItemGundams().add(this);
     }
 
+    /**
+     * [연관 관계 편의 메서드]
+     */
+    protected void removeItem() {
+        this.item.getItemGundams().remove(this);
+        this.item = null;
+    }
+
 }

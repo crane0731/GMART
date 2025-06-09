@@ -3,6 +3,7 @@ package gmart.gmart.controller;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
 import gmart.gmart.dto.item.CreateItemRequestDto;
+import gmart.gmart.dto.item.UpdateItemRequestDto;
 import gmart.gmart.service.item.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,12 @@ public class ItemController {
     /**
      * [컨트롤러]
      * 상품 생성
-     * @param storeId 상점 아이디
      * @param requestDto 요청 DTO
      * @param bindingResult  에러 메시지를 바인딩할 객체
      * @return 성공 메시지
      */
-    @PostMapping("/store/{id}")
-    public ResponseEntity<ApiResponse<?>> createItem(@PathVariable("id")Long storeId, @Valid @RequestBody CreateItemRequestDto requestDto, BindingResult bindingResult) {
+    @PostMapping("")
+    public ResponseEntity<ApiResponse<?>> createItem( @Valid @RequestBody CreateItemRequestDto requestDto, BindingResult bindingResult) {
 
         // 오류 메시지를 담을 Map
         Map<String, String> errorMessages = new HashMap<>();
@@ -43,7 +43,7 @@ public class ItemController {
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
         }
 
-        itemService.createItem(storeId, requestDto);
+        itemService.createItem(requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 등록 성공")));
     }
@@ -74,6 +74,32 @@ public class ItemController {
         itemService.changeSaleStatus(itemId,requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 판매중")));
+    }
+
+
+    /**
+     * [컨트롤러]
+     * 상품 업데이트
+     * @param itemId 상품 아이디
+     * @param requestDto 상품 업데이트 요청 DTO
+     * @param bindingResult 에러 메시지를 바인딩할 객체
+     * @return 성공 메시지
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> updateItem(@PathVariable("id")Long itemId, @Valid @RequestBody UpdateItemRequestDto requestDto, BindingResult bindingResult ) {
+
+        // 오류 메시지를 담을 Map
+        Map<String, String> errorMessages = new HashMap<>();
+
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        itemService.updateItem(itemId,requestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 업데이트 성공")));
     }
 
 

@@ -43,7 +43,7 @@ public class ItemImage extends BaseTimeEntity {
      * @param isMain 대표 이미지 여부
      * @return ItemImage 상품이미지 엔티티
      */
-    public static void create(Item item,String imageUrl, IsMain isMain) {
+    public static ItemImage create(Item item,String imageUrl, IsMain isMain) {
         ItemImage itemImage = new ItemImage();
 
         //연관관계 세팅
@@ -51,6 +51,8 @@ public class ItemImage extends BaseTimeEntity {
 
         itemImage.imageUrl = imageUrl;
         itemImage.isMain = isMain;
+
+        return itemImage;
     }
 
     /**
@@ -60,5 +62,13 @@ public class ItemImage extends BaseTimeEntity {
     private void setItem(Item item) {
         this.item = item;
         item.getItemImages().add(this);
+    }
+
+    /**
+     * [연관 관계 편의 메서드]
+     */
+    public void removeItem() {
+        this.item.getItemImages().remove(this);
+        this.item = null;
     }
 }

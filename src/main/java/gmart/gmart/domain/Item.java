@@ -1,6 +1,7 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.command.CreateItemCommand;
+import gmart.gmart.command.UpdateItemCommand;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.item.CreateItemRequestDto;
@@ -142,6 +143,25 @@ public class Item extends BaseAuditingEntity {
         return item;
     }
 
+
+    /**
+     * [업데이트 메서드]
+     * @param command 업데이트 커맨드
+     */
+    public void update(UpdateItemCommand command){
+
+        this.title = command.getTitle();
+        this.content = command.getContent();
+        this.itemPrice = command.getItemPrice();
+        this.deliveryPrice = command.getDeliveryPrice();
+        this.location = command.getLocation();
+        this.assemblyStatus = command.getAssemblyStatus();
+        this.boxStatus = command.getBoxStatus();
+        this.paintStatus = command.getPaintStatus();
+        this.dealType =command.getDealType();
+
+    }
+
     /**
      * [연관관계 편의 메서드]
      * @param store 상점 엔티티
@@ -157,6 +177,28 @@ public class Item extends BaseAuditingEntity {
      */
     public void changeSaleStatus(SaleStatus saleStatus){
         this.saleStatus=saleStatus;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 모든 상품 이미지 제거
+     */
+    public void removeAllItemImages(){
+        List<ItemImage> copy = new ArrayList<>(itemImages);
+        for (ItemImage itemImage : copy) {
+            itemImage.removeItem();
+        }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 모든 상품 건담 제거
+     */
+    public void removeAllItemGundams(){
+        List<ItemGundam> copy = new ArrayList<>(itemGundams);
+        for (ItemGundam itemGundam : copy) {
+            itemGundam.removeItem();
+        }
     }
 
 

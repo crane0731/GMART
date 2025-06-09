@@ -5,6 +5,7 @@ import gmart.gmart.domain.*;
 import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
 import gmart.gmart.dto.item.CreateItemRequestDto;
 import gmart.gmart.dto.item.ItemImageRequestDto;
+import gmart.gmart.dto.item.UpdateItemRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ItemCustomException;
 import gmart.gmart.repository.item.ItemRepository;
@@ -52,17 +53,16 @@ public class ItemService {
 
     /**
      * [서비스 로직]
-     * @param storeId 상점 아이디
      * @param requestDto 상품 생성 요청 DTO
      */
     @Transactional
-    public void createItem(Long storeId, CreateItemRequestDto requestDto) {
+    public void createItem( CreateItemRequestDto requestDto) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //상점 조회
-        Store store = storeService.findById(storeId);
+        Store store = member.getStore();
 
         //상품을 등록하려는 상점이 현재 로그인한 회원의 상점인지 확인
         storeService.validateStoreOwner(store, member);
@@ -111,21 +111,42 @@ public class ItemService {
         store.minusItemCount();
     }
 
-    //==상품 업로드 이미지 비사용 처리 메서드==//
-    private void usedFalseUploadImage(Item item) {
-        List<ItemImage> itemImages = item.getItemImages();
-        for (ItemImage itemImage : itemImages) {
-
-            UploadedImage uploadedImage = uploadItemImageService.findByImageUrl(itemImage.getImageUrl());
-
-            //업로드 이미지 비사용 처리
-            uploadedImage.usedFalse();
-        }
-    }
 
     /**
-     * 상품 수정
+     * [서비스 로직]
+     * 상품 업데이트
+     * @param itemId 상품 아이디
+     * @param requestDto 상품 업데이트 요청 DTO
      */
+    @Transactional
+    public void updateItem(Long itemId, UpdateItemRequestDto requestDto){
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //수정 할 상품 조회
+        Item item = findById(itemId);
+
+        //기존 상품 업로드 이미지 비 사용 처리
+        usedFalseUploadImage(item);
+
+        //기존 상품 이미지 전부 삭제
+        item.removeAllItemImages();
+
+        //새로운 상품 업로드 이미지 사용 처리
+        addItemImages(requestDto.getItemImages(), item);
+
+        //기존 상품 건담 전부 삭제
+        item.removeAllItemGundams();
+
+        //새로운 상품 건담 생성
+        addItemGundam(requestDto.getGundamList(), item);
+
+        //필드 값 업데이트
+        item.update(CommandMapper.updateItemCommand(requestDto));
+    }
+
+
 
     /**
      * 상품 조회
@@ -193,6 +214,18 @@ public class ItemService {
                 //상품 건담 생성
                 ItemGundam.create(item, gundam);
             }
+        }
+    }
+
+    //==상품 업로드 이미지 비사용 처리 메서드==//
+    private void usedFalseUploadImage(Item item) {
+        List<ItemImage> itemImages = item.getItemImages();
+        for (ItemImage itemImage : itemImages) {
+
+            UploadedImage uploadedImage = uploadItemImageService.findByImageUrl(itemImage.getImageUrl());
+
+            //업로드 이미지 비사용 처리
+            uploadedImage.usedFalse();
         }
     }
 }
