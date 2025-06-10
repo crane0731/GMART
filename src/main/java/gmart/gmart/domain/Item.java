@@ -41,6 +41,11 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "content")
     private String content;
 
+    @org.hibernate.annotations.Comment("건담 등급")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "grade")
+    private GundamGrade grade;
+
     @org.hibernate.annotations.Comment("상품 가격")
     @Column(name = "item_price")
     private Long itemPrice;
@@ -126,6 +131,7 @@ public class Item extends BaseAuditingEntity {
         item.itemPrice = command.getItemPrice();
         item.deliveryPrice = command.getDeliveryPrice();
         item.location = command.getLocation();
+        item.grade= command.getGundamGrade();
 
         item.assemblyStatus=command.getAssemblyStatus();
         item.boxStatus=command.getBoxStatus();
@@ -159,6 +165,7 @@ public class Item extends BaseAuditingEntity {
         this.boxStatus = command.getBoxStatus();
         this.paintStatus = command.getPaintStatus();
         this.dealType =command.getDealType();
+        this.grade=command.getGundamGrade();
 
     }
 
@@ -199,6 +206,14 @@ public class Item extends BaseAuditingEntity {
         for (ItemGundam itemGundam : copy) {
             itemGundam.removeItem();
         }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 조회수 증가
+     */
+    public void plusViewCount(){
+        this.viewCount++;
     }
 
 

@@ -1,9 +1,6 @@
 package gmart.gmart.dto.item;
 
-import gmart.gmart.domain.enums.AssemblyStatus;
-import gmart.gmart.domain.enums.BoxStatus;
-import gmart.gmart.domain.enums.DealType;
-import gmart.gmart.domain.enums.PaintStatus;
+import gmart.gmart.domain.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,6 +29,8 @@ public class UpdateItemRequestDto {
 
     @NotNull(message = "거래장소를 입력하세요.")
     private String location; //거래 장소
+
+    private GundamGrade grade;//건담 등급
 
     @NotNull(message = "조립 상태를 입력하세요.")
     private AssemblyStatus assemblyStatus; //조립 상태

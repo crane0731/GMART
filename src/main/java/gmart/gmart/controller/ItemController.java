@@ -1,10 +1,9 @@
 package gmart.gmart.controller;
 
+import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
-import gmart.gmart.dto.item.CreateItemRequestDto;
-import gmart.gmart.dto.item.ItemDetailsResponseDto;
-import gmart.gmart.dto.item.UpdateItemRequestDto;
+import gmart.gmart.dto.enums.ItemSortType;
+import gmart.gmart.dto.item.*;
 import gmart.gmart.service.item.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,6 +114,35 @@ public class ItemController {
 
         ItemDetailsResponseDto responseDto = itemService.getItemDetails(itemId);
 
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+
+    }
+
+    /**
+     * [컨트롤러]
+     * 검색 조건에 따라 상품 목록 조회
+     * @param title 상품 이름
+     * @param gundamId 건담 아이디
+     * @param gundamGrade 건담 등급
+     * @param boxStatus 박스 상태
+     * @param paintStatus 도색 상태
+     * @param dealType 거래 타입
+     * @param saleStatus 판매 상태
+     * @param sortType 정렬 타입
+     * @return List<ItemListResponseDto> 응답 DTO 리스트
+     */
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllItems(@RequestParam(value = "title",required = false) String title,
+                                                      @RequestParam(value = "gundamId",required = false) Long gundamId,
+                                                      @RequestParam(value = "gundamGrade",required = false) GundamGrade gundamGrade,
+                                                      @RequestParam(value = "boxStatus",required = false) BoxStatus boxStatus,
+                                                      @RequestParam(value = "paintStatus",required = false)PaintStatus paintStatus,
+                                                      @RequestParam(value = "dealType",required = false)DealType dealType,
+                                                      @RequestParam(value = "saleStatus",required = false) SaleStatus saleStatus,
+                                                      @RequestParam(value = "sortType",required = false) ItemSortType sortType) {
+
+        SearchItemCondDto condDto = SearchItemCondDto.create(title, gundamId, gundamGrade, boxStatus, paintStatus, dealType, saleStatus, sortType);
+        List<ItemListResponseDto> responseDto = itemService.getAllItems(condDto);
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
 
     }

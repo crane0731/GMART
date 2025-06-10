@@ -1,9 +1,6 @@
 package gmart.gmart.command;
 
-import gmart.gmart.domain.enums.AssemblyStatus;
-import gmart.gmart.domain.enums.BoxStatus;
-import gmart.gmart.domain.enums.DealType;
-import gmart.gmart.domain.enums.PaintStatus;
+import gmart.gmart.domain.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,15 +14,16 @@ import lombok.Getter;
 @Getter
 public class CreateItemCommand {
 
-    private final String title;
-    private final String content;
-    private final Long itemPrice;
-    private final Long deliveryPrice;
-    private final String location;
+    private  String title;
+    private  String content;
+    private  Long itemPrice;
+    private  Long deliveryPrice;
+    private  String location;
+    private GundamGrade gundamGrade;
 
-    private final AssemblyStatus assemblyStatus;
-    private final PaintStatus paintStatus;
-    private final BoxStatus boxStatus;
-    private final DealType dealType;
+    private  AssemblyStatus assemblyStatus;
+    private  PaintStatus paintStatus;
+    private  BoxStatus boxStatus;
+    private  DealType dealType;
 
 }

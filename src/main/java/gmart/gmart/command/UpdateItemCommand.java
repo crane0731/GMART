@@ -1,9 +1,6 @@
 package gmart.gmart.command;
 
-import gmart.gmart.domain.enums.AssemblyStatus;
-import gmart.gmart.domain.enums.BoxStatus;
-import gmart.gmart.domain.enums.DealType;
-import gmart.gmart.domain.enums.PaintStatus;
+import gmart.gmart.domain.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +20,7 @@ public class UpdateItemCommand {
     private Long itemPrice; //상품 가격
     private Long deliveryPrice; //배송비
     private String location; //거래 장소
+    private GundamGrade gundamGrade;//건담 등급
     private AssemblyStatus assemblyStatus; //조립 상태
     private BoxStatus boxStatus; //박스 상태
     private PaintStatus paintStatus; //도색 상태

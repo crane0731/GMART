@@ -11,6 +11,9 @@ import gmart.gmart.service.image.UploadItemImageService;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.store.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,18 +127,36 @@ public class ItemService {
      * @param itemId 상품 아이디
      * @return ItemDetailsResponseDto 응답 DTO
      */
+    @Transactional
     public ItemDetailsResponseDto getItemDetails(Long itemId) {
 
         //상품 엔티티 조회
         Item item = findById(itemId);
+
+        item.plusViewCount();
 
         //상품 상세 조회 응답 DTO 생성 + 반환
         return ItemDetailsResponseDto.create(item);
     }
 
     /**
-     * 상품 리스트 조회
+     * [서비스 로직]
+     * 검색 조건에 따라 상품 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<ItemListResponseDto> 응답 DTO 리스트
      */
+    public List<ItemListResponseDto> getAllItems(SearchItemCondDto condDto) {
+
+        return itemRepository.findAllByCond(condDto, createPageable()).getContent().stream()
+                .map(ItemListResponseDto::create)
+                .toList();
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable() {
+        // 페이지 0, 10개씩 보여줌
+        return PageRequest.of(0, 10);
+    }
 
 
 
