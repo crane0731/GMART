@@ -2,10 +2,7 @@ package gmart.gmart.service.item;
 
 import gmart.gmart.command.CommandMapper;
 import gmart.gmart.domain.*;
-import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
-import gmart.gmart.dto.item.CreateItemRequestDto;
-import gmart.gmart.dto.item.ItemImageRequestDto;
-import gmart.gmart.dto.item.UpdateItemRequestDto;
+import gmart.gmart.dto.item.*;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ItemCustomException;
 import gmart.gmart.repository.item.ItemRepository;
@@ -122,8 +119,19 @@ public class ItemService {
     }
 
     /**
-     * 상품 조회
+     * [서비스 로직]
+     * 상품 정보 상세 조회
+     * @param itemId 상품 아이디
+     * @return ItemDetailsResponseDto 응답 DTO
      */
+    public ItemDetailsResponseDto getItemDetails(Long itemId) {
+
+        //상품 엔티티 조회
+        Item item = findById(itemId);
+
+        //상품 상세 조회 응답 DTO 생성 + 반환
+        return ItemDetailsResponseDto.create(item);
+    }
 
     /**
      * 상품 리스트 조회

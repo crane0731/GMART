@@ -3,6 +3,7 @@ package gmart.gmart.controller;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.item.ChangeSaleStatusRequestDto;
 import gmart.gmart.dto.item.CreateItemRequestDto;
+import gmart.gmart.dto.item.ItemDetailsResponseDto;
 import gmart.gmart.dto.item.UpdateItemRequestDto;
 import gmart.gmart.service.item.ItemService;
 import jakarta.validation.Valid;
@@ -100,6 +101,21 @@ public class ItemController {
         itemService.updateItem(itemId,requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상품 업데이트 성공")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 상품 정보 상세 조회
+     * @param itemId 상품 아이디
+     * @return ItemDetailsResponseDto 응답 DTO
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> getItemDetails(@PathVariable("id")Long itemId) {
+
+        ItemDetailsResponseDto responseDto = itemService.getItemDetails(itemId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+
     }
 
 

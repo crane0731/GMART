@@ -31,9 +31,6 @@ public class ItemGundam extends BaseTimeEntity {
     @JoinColumn(name = "gundam_id")
     private Gundam gundam;
 
-    @org.hibernate.annotations.Comment("수량")
-    @Column(name = "count")
-    private Long count;
 
     /**
      * [생성 메서드]
