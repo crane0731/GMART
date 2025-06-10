@@ -3,6 +3,7 @@ package gmart.gmart.domain;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
+import gmart.gmart.domain.enums.ReportStatus;
 import gmart.gmart.dto.AddressDto;
 import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
@@ -118,6 +119,9 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<ReportArticle> reportArticles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ReportItem> reportItems= new ArrayList<>();
 
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)

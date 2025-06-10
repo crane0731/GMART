@@ -121,6 +121,9 @@ public class Item extends BaseAuditingEntity {
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ItemImage> itemImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item")
+    private List<ReportItem> reportItems = new ArrayList<>();
+
     /**
      * [생성 메서드]
      * @param store 상점 엔티티
