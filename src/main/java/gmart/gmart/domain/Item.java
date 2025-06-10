@@ -110,6 +110,11 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "deal_type")
     private DealType dealType;
 
+    @org.hibernate.annotations.Comment("상품 활성화 여부")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "active_status")
+    private ItemActiveStatus activeStatus;
+
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemGundam> itemGundams = new ArrayList<>();
 
@@ -145,6 +150,8 @@ public class Item extends BaseAuditingEntity {
         item.favoriteCount=0L;
         item.chattingCount=0L;
         item.reportedCount=0L;
+
+        item.activeStatus=ItemActiveStatus.ACTIVE;
 
         return item;
     }
@@ -216,6 +223,13 @@ public class Item extends BaseAuditingEntity {
         this.viewCount++;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 상품 삭제(비활성화) 처리
+     */
+    public void inActive(){
+        this.activeStatus=ItemActiveStatus.INACTIVE;
+    }
 
 
 }

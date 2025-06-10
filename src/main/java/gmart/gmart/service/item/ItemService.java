@@ -11,7 +11,6 @@ import gmart.gmart.service.image.UploadItemImageService;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.store.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -75,6 +74,7 @@ public class ItemService {
     /**
      * [서비스 로직]
      * 상품 삭제
+     * 실제로 상품 엔티티를 삭제하는 것이 아닌 상품 활성화 상태만 비활성으로 변경 처리함
      * @param itemId 상품 아이디
      */
     @Transactional
@@ -282,11 +282,13 @@ public class ItemService {
 
     //==상품 삭제 로직 메서드==//
     private void processDeleteItem(Item item, Store store) {
-        //상품 업로드 이미지 비 사용 처리
-        usedFalseUploadImage(item);
 
-        //상품 삭제
-        delete(item);
+        //상품 업로드 이미지 비 사용 처리
+        //usedFalseUploadImage(item);
+
+        //상품 삭제(비활성화 처리)
+        item.inActive();
+//      delete(item);
 
         //상점의 상품수 감소
         store.minusItemCount();
