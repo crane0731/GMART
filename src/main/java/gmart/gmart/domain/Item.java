@@ -25,7 +25,7 @@ public class Item extends BaseAuditingEntity {
     @org.hibernate.annotations.Comment("상품 아이디")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "article_id")
+    @Column(name = "item_id")
     private Long id;
 
     @org.hibernate.annotations.Comment("상점 아이디")

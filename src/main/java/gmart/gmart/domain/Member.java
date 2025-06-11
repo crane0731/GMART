@@ -137,7 +137,7 @@ public class Member extends BaseTimeEntity {
     private List<FavoriteItem> favoriteItems=new ArrayList<>();
 
     @OneToOne(mappedBy = "member")
-    private Store store= new Store();
+    private Store store;
 
     @OneToMany(mappedBy="buyer")
     private List<Order> buyOrders = new ArrayList<>();

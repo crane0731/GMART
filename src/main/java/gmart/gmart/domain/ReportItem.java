@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * 상품 신고
  */
 @Entity
-@Table(name = "report_article")
+@Table(name = "report_item")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReportItem extends BaseAuditingEntity {

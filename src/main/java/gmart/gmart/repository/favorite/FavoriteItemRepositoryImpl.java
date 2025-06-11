@@ -7,12 +7,16 @@ import gmart.gmart.domain.Member;
 import gmart.gmart.domain.QFavoriteItem;
 import gmart.gmart.domain.enums.DeleteStatus;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+
+import static gmart.gmart.domain.QItemImage.itemImage;
 
 /**
  * 커스텀 관심 상품 레파지토리 구현체 클래스
  */
+@Slf4j
 public class FavoriteItemRepositoryImpl implements FavoriteItemRepositoryCustom{
 
     private final EntityManager em;
@@ -43,13 +47,16 @@ public class FavoriteItemRepositoryImpl implements FavoriteItemRepositoryCustom{
             builder.and(favoriteItem.item.title.containsIgnoreCase(itemTitle));
         }
 
-        return query
+        List<FavoriteItem> fetch = query
                 .select(favoriteItem)
                 .from(favoriteItem)
+                    .join(favoriteItem.item).fetchJoin()
+                    .leftJoin(favoriteItem.item.itemImages, itemImage).fetchJoin()
                 .where(builder)
                 .orderBy(favoriteItem.createdDate.asc())
                 .fetch();
 
+        return fetch;
     }
 
 }

@@ -28,7 +28,7 @@ public class FavoriteItem extends BaseTimeEntity {
     @org.hibernate.annotations.Comment("관심 상품 아이디")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_item_id")
+    @Column(name = "favorite_item_id")
     private Long id;
 
     @org.hibernate.annotations.Comment("회원 아이디")
