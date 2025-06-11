@@ -59,6 +59,9 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_ITEM="상품을 찾을 수 없습니다.";
 
+    public static final String NOT_FOUND_FAVORITE_ITEM="관심 상품을 찾을 수 없습니다.";
+    public static final String ALREADY_FAVORITE_ITEM="이미 관심등록한 상품 입니다.";
+
 
 
 
