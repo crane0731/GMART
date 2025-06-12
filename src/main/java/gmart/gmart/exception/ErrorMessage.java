@@ -32,8 +32,9 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_ARTICLE="게시글을 찾을 수 없습니다.";
     public static final String ALREADY_LIKE_ARTICLE="이미 좋아요한 게시글 입니다.";
     public static final String NOT_FOUND_LIKE_ARTICLE="게시글 좋아요를 찾을 수 없습니다.";
+
     public static final String NOT_FOUND_REPORT_ARTICLE="게시글 신고를 찾을 수 없습니다.";
-    public static final String SELF_REPORT_NOT_ALLOWED = "자신의 글은 신고할 수 없습니다.";
+    public static final String SELF_REPORT_NOT_ALLOWED = "자신은 신고할 수 없습니다.";
 
     public static final String NOT_FOUND_COMMENT="댓글을 찾을 수 없습니다.";
     public static final String PARENT_COMMENT_ARTICLE_MISMATCH = "부모 댓글과 게시글이 일치하지 않습니다.";
@@ -61,6 +62,8 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_FAVORITE_ITEM="관심 상품을 찾을 수 없습니다.";
     public static final String ALREADY_FAVORITE_ITEM="이미 관심등록한 상품 입니다.";
+
+    public static final String NOT_FOUND_REPORT_ITEM="상품 신고를 찾을 수 없습니다.";
 
 
 
