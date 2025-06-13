@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ReportRepository extends JpaRepository<Report, Long> {
+public interface ReportRepository extends JpaRepository<Report, Long> ,ReportRepositoryCustom{
 
     /**
      * 다음 조홥으로 신고 엔티티가 확인

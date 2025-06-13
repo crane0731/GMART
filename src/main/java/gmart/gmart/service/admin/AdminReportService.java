@@ -2,12 +2,20 @@ package gmart.gmart.service.admin;
 
 import gmart.gmart.domain.Report;
 import gmart.gmart.dto.enums.AdminReportAcceptStatus;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.dto.report.AdminAcceptReportRequestDto;
 import gmart.gmart.dto.report.ReportDetailsResponseDto;
+import gmart.gmart.dto.report.ReportListResponseDto;
+import gmart.gmart.dto.report.SearchReportCondDto;
 import gmart.gmart.service.report.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 관리자 - 신고 관리 서비스
@@ -57,8 +65,45 @@ public class AdminReportService {
     }
 
     /**
-     * 관리자가 신고를 리스트로 조회
+     * [서비스 로직]
+     * 관리자가 검색조건을 통해 신고 목록을 조회 + 페이징
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ReportListResponseDto> 페이징 응답 DTO
      */
+    public PagedResponseDto<ReportListResponseDto> getAllReports(SearchReportCondDto condDto){
+
+        Page<Report> page = reportService.findAllByCond(condDto, createPageable());
+
+        List<ReportListResponseDto> content = page.getContent()
+                .stream()
+                .map(ReportListResponseDto::create)
+                .toList();
+
+        return createPagedResponseDto(content,page);
+
+    }
+
+
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable() {
+        // 페이지 0, 10개씩 보여줌
+        return PageRequest.of(0, 10);
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<ReportListResponseDto> createPagedResponseDto(List<ReportListResponseDto> content, Page<Report> page) {
+        return PagedResponseDto.<ReportListResponseDto>builder()
+                .content(content)
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .build();
+
+    }
 
 
 }

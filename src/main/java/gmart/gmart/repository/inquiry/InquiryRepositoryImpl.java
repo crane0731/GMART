@@ -5,7 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.QInquiry;
-import gmart.gmart.dto.enums.CreateDateSortType;
+import gmart.gmart.dto.enums.CreatedDateSortType;
 import gmart.gmart.dto.inquiry.SearchInquiryCondDto;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -53,7 +53,7 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
         }
 
         OrderSpecifier<LocalDateTime> order =
-                cond.getCreateSortType() == CreateDateSortType.CREATE_DATE_ASC ? inquiry.createdDate.asc() : inquiry.createdDate.desc();
+                cond.getCreateSortType() == CreatedDateSortType.CREATE_DATE_ASC ? inquiry.createdDate.asc() : inquiry.createdDate.desc();
 
         //실제 페이지 데이터 조회
         List<Inquiry> content = query

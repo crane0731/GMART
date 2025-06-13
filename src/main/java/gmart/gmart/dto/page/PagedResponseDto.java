@@ -1,6 +1,7 @@
 package gmart.gmart.dto.page;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  * @param <T>
  */
 @Getter
+@Builder
 @AllArgsConstructor
 public class PagedResponseDto<T> {
 

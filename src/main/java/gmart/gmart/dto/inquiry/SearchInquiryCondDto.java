@@ -1,7 +1,7 @@
 package gmart.gmart.dto.inquiry;
 
 import gmart.gmart.domain.enums.AnswerStatus;
-import gmart.gmart.dto.enums.CreateDateSortType;
+import gmart.gmart.dto.enums.CreatedDateSortType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +16,6 @@ public class SearchInquiryCondDto {
 
     private AnswerStatus answerStatus; //  답변 상태 -> [UNANSWERED,ANSWERED]
 
-    private CreateDateSortType createSortType; //최신순, 과거순 ->[CREATE_DATE_ASC, CREATE_DATE_DESC]
+    private CreatedDateSortType createSortType; //최신순, 과거순 ->[CREATE_DATE_ASC, CREATE_DATE_DESC]
 
 }

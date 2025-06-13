@@ -5,6 +5,8 @@ import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Report;
 import gmart.gmart.domain.enums.ReporterRole;
 import gmart.gmart.dto.report.CreateReportRequestDto;
+import gmart.gmart.dto.report.ReportListResponseDto;
+import gmart.gmart.dto.report.SearchReportCondDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ItemCustomException;
 import gmart.gmart.exception.ReportCustomException;
@@ -12,8 +14,13 @@ import gmart.gmart.repository.report.ReportRepository;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.MergedAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 상품 신고 서비스
@@ -81,6 +88,19 @@ public class ReportService {
      */
     public Report findById(Long id) {
         return reportRepository.findById(id).orElseThrow(()-> new ItemCustomException(ErrorMessage.NOT_FOUND_REPORT));
+    }
+
+
+    /**
+     * [조회]
+     * 검색 조건에 따라 신고 목록 조회
+     * @param cond 검색 조건 DTO
+     * @param pageable 페이징
+     * @return List<ReportListResponseDto> 응답 DTO 리스트
+     */
+    public Page<Report> findAllByCond(SearchReportCondDto cond, Pageable pageable){
+        return reportRepository.findAllByCond(cond, pageable);
+
     }
 
     //==검증 로직==//
