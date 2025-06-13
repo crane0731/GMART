@@ -1,12 +1,11 @@
 package gmart.gmart;
 
 
-import gmart.gmart.domain.Address;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.enums.MemberRole;
 import gmart.gmart.dto.AddressDto;
 import gmart.gmart.dto.SignUpRequestDto;
-import gmart.gmart.repository.MemberRepository;
+import gmart.gmart.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

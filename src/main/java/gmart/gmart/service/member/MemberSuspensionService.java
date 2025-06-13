@@ -2,7 +2,7 @@ package gmart.gmart.service.member;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.MemberSuspension;
-import gmart.gmart.repository.MemberSuspensionRepository;
+import gmart.gmart.repository.suspension.MemberSuspensionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

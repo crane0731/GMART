@@ -1,4 +1,4 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.suspension;
 
 import gmart.gmart.domain.MemberSuspension;
 import org.springframework.data.jpa.repository.JpaRepository;

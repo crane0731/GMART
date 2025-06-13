@@ -12,7 +12,7 @@ import gmart.gmart.dto.password.ChangePasswordRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.MemberRepository;
+import gmart.gmart.repository.member.MemberRepository;
 import gmart.gmart.service.token.RefreshTokenService;
 import gmart.gmart.service.token.TokenService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;

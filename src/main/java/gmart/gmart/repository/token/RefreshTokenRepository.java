@@ -1,4 +1,4 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.token;
 
 import gmart.gmart.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;

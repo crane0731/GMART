@@ -7,7 +7,7 @@ import gmart.gmart.domain.enums.UploadPurpose;
 import gmart.gmart.dto.image.ImageUrlResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ImageCustomException;
-import gmart.gmart.repository.UploadedImageRepository;
+import gmart.gmart.repository.image.UploadedImageRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -3,7 +3,7 @@ package gmart.gmart.service.member;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.MemberRepository;
+import gmart.gmart.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

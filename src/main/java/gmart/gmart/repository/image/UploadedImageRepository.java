@@ -1,4 +1,4 @@
-package gmart.gmart.repository;
+package gmart.gmart.repository.image;
 
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.domain.enums.ImageDefaultStatus;

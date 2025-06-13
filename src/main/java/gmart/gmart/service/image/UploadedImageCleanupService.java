@@ -2,7 +2,7 @@ package gmart.gmart.service.image;
 
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.domain.enums.UploadPurpose;
-import gmart.gmart.repository.UploadedImageRepository;
+import gmart.gmart.repository.image.UploadedImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
