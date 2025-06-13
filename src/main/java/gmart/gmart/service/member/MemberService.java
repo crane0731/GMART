@@ -88,6 +88,8 @@ public class MemberService {
         //회원정보 업데이트
         processingUpdate(dto, member);
 
+        
+
     }
 
 
