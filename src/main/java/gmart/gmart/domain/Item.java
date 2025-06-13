@@ -255,7 +255,7 @@ public class Item extends BaseAuditingEntity {
      * [비즈니스 로직]
      * 신고받은 수 증가
      */
-    private void plusReportCount(){
+    public void plusReportCount(){
         this.reportedCount++;
     }
 
@@ -263,7 +263,7 @@ public class Item extends BaseAuditingEntity {
      * [비즈니스 로직]
      * 신고받은 수 감소
      */
-    private void minusReportCount(){
+    public void minusReportCount(){
         if(reportedCount>0){
             this.reportedCount--;
         }

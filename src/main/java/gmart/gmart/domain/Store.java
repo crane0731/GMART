@@ -52,9 +52,6 @@ public class Store extends BaseAuditingEntity {
     @Column(name = "item_count")
     private Long itemCount;
 
-    @org.hibernate.annotations.Comment("신고 받은 수")
-    @Column(name = "reported_count")
-    private Long reportedCount;
 
     @org.hibernate.annotations.Comment("총 방문 수")
     @Column(name = "total_visit_count")
@@ -95,7 +92,6 @@ public class Store extends BaseAuditingEntity {
         store.member=member;
         store.status = StoreStatus.ACTIVE;
         store.itemCount = 0L;
-        store.reportedCount = 0L;
         store.totalVisitCount = 0L;
         store.reviewedCount = 0L;
         store.likedCount = 0L;

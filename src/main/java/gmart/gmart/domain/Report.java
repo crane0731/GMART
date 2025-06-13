@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 /**
  * 신고 테이블
@@ -80,6 +81,34 @@ public class Report extends BaseAuditingEntity {
 
         return reportItem;
 
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 관리자가 신고 수락
+     */
+    public void accept() {
+        if(this.reportStatus!=ReportStatus.ACCEPTED){
+            this.reportStatus=ReportStatus.ACCEPTED;
+        }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 관리자가 신고 거절
+     * 만약 신고자가 구매자면 -> 상품의 신고수 내림 + 피신고자의 신고수 내림
+     * 만약 신고자가 판매자면 -> 피신고자의 신고수만 내림
+     */
+    public void reject() {
+        if( this.reportStatus!=ReportStatus.REJECTED){
+            this.reportStatus=ReportStatus.REJECTED;
+
+            this.reportedMember.minusReportedCount();
+
+            if (this.reporterRole==ReporterRole.BUYER) {
+                this.item.minusReportCount();
+            }
+        }
     }
 
 }

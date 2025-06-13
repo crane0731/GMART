@@ -27,7 +27,6 @@ public class StoreResponseDto {
     private String storeProfileImageUrl;
     private String storeStatus;
     private Long itemCount;
-    private Long reportedCount;
     private Long totalVisitCount;
     private Long reviewedCount;
     private Long likedCount;
@@ -57,7 +56,6 @@ public class StoreResponseDto {
         dto.storeProfileImageUrl=store.getStoreProfileImage().getImageUrl();
         dto.storeStatus=store.getStatus().toString();
         dto.itemCount=store.getItemCount();
-        dto.reportedCount=store.getReportedCount();
         dto.totalVisitCount=store.getTotalVisitCount();
         dto.reviewedCount=store.getReviewedCount();
         dto.likedCount=store.getLikedCount();
