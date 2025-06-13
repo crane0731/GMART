@@ -36,8 +36,17 @@ public class AdminReportController {
     }
 
     /**
-     * 관리자가 신고를 상세 조회
+     * [컨트롤러]
+     * 관리자가 신고 내역을 상세 조회
+     * @param reportId 신고 아이디
+     * @return ReportDetailsResponseDto 응답 DTO
      */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> getReportDetails(@PathVariable("id")Long reportId) {
+
+        return ResponseEntity.ok().body(ApiResponse.success(adminReportService.getReportDetails(reportId)));
+    }
+
 
     /**
      * 관리자가 신고를 리스트로 조회
