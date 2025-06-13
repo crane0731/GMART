@@ -2,11 +2,14 @@ package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.DeleteStatus;
+import gmart.gmart.domain.enums.EscrowStatus;
 import gmart.gmart.domain.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.time.LocalDateTime;
 
@@ -81,5 +84,16 @@ public class Order extends BaseTimeEntity {
     @org.hibernate.annotations.Comment("취소,환불 처리 완료 일자")
     @Column(name = "cancel_completed_date")
     private LocalDateTime cancelCompletedAt;
+
+    @org.hibernate.annotations.Comment("에스크로 상태")
+    @Column(name = "escrow_status")
+    @Enumerated(EnumType.STRING)
+    private EscrowStatus escrowStatus;
+
+
+    @org.hibernate.annotations.Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
 
 }
