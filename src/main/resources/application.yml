@@ -5,7 +5,6 @@ server:
 #파일 업로드 디렉토리 설정
 file:
   upload-profile-dir: ../ProfileImage
-  upload-article-dir: ../ArticleImage
   upload-store-dir: ../StoreImage
   upload-item-dir: ../ItemImage
 

@@ -19,7 +19,6 @@ import java.util.List;
 public class UploadedImageCleanupService {
 
     private final UploadMemberProfileImageService uploadMemberProfileImageService; //회원 프로필 이미지 서비스
-    private final UploadArticleImageService uploadArticleImageService; //게시글 이미지 서비스
     private final UploadItemImageService uploadItemImageService;//상품 이미지 서비스
     private final UploadStoreProfileImageService uploadStoreProfileImageService;//상점 이미지 서비스
 
@@ -40,11 +39,6 @@ public class UploadedImageCleanupService {
                 if(image.getPurpose()== UploadPurpose.PROFILE) {
                     //실제 파일 삭제
                     uploadMemberProfileImageService.deleteImageFile(image.getImageUrl());
-                }
-                else if(image.getPurpose()== UploadPurpose.ARTICLE){
-                    //실제 파일 삭제
-                    uploadArticleImageService.deleteImageFile(image.getImageUrl());
-
                 }
                 else if(image.getPurpose()== UploadPurpose.ITEM){
                     //실제 파일 삭제

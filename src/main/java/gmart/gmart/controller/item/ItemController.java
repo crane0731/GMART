@@ -1,4 +1,4 @@
-package gmart.gmart.controller;
+package gmart.gmart.controller.item;
 
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.api.ApiResponse;

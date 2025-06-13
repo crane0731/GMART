@@ -108,17 +108,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member",cascade = CascadeType.PERSIST)
     private List<Inquiry> inquiries = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
-    private List<Article> articles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
-    private List<gmart.gmart.domain.Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<LikeArticle> likeArticles = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<ReportArticle> reportArticles = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteGundam> favoriteGundams = new ArrayList<>();
@@ -175,14 +165,6 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    /**
-     *[Collection Setting]
-     *리스트에 값 추가
-     * @param reportArticle 게시글 신고 객체
-     */
-    protected void addReportArticle(ReportArticle reportArticle){
-        reportArticles.add(reportArticle);
-    }
 
     /**
      * [비즈니스 로직]
@@ -321,14 +303,7 @@ public class Member extends BaseTimeEntity {
         this.suspensionCount++;
     }
 
-    /**
-     * [연관관계 편의 메서드]
-     */
-    public void addLikeArticle(LikeArticle likeArticle){
-        this.likeArticles.add(likeArticle);
-        likeArticle.setMember(this);
 
-    }
 
     //==Address 생성==//
     private static Address createAddress(AddressDto dto) {

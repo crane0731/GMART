@@ -6,7 +6,6 @@ package gmart.gmart.domain.enums;
 public enum UploadPurpose {
 
     PROFILE,//프로필 이미지
-    ARTICLE, //게시글 이미지
     STORE, //상점 이미지
     ITEM //상품 이미지
 }

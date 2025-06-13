@@ -15,9 +15,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/profile-images/**")
                 .addResourceLocations("file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ProfileImage/");
 
-        registry.addResourceHandler("/article-images/**")
-                .addResourceLocations("file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/ArticleImage/");
-
         registry.addResourceHandler("/store-images/**")
                 .addResourceLocations("file:///C:/Users/dlwns/crane/PROJECT_GMART/Spring Boot/StoreImage/");
 
