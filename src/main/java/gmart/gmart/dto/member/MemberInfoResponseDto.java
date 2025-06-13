@@ -58,7 +58,7 @@ public class MemberInfoResponseDto {
         dto.setNickname(member.getNickname());
         dto.setPhone(member.getPhoneNumber());
         dto.setAddress(addressDto);
-        dto.setProfileImageUrl(member.getMemberProfileImage().getImageUrl());
+        dto.setProfileImageUrl(member.getProfileImageUrl());
 
         dto.setGMoney(member.getGMoney());
         dto.setGPoint(member.getGPoint());

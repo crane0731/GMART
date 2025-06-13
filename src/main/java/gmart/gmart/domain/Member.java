@@ -95,9 +95,9 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_role",nullable = false)
     private MemberRole memberRole;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_profile_image_id")
-    private MemberProfileImage memberProfileImage;
+    @Comment("회원 프로필 이미지")
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
@@ -107,8 +107,6 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.PERSIST)
     private List<Inquiry> inquiries = new ArrayList<>();
-
-
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteGundam> favoriteGundams = new ArrayList<>();
@@ -149,7 +147,7 @@ public class Member extends BaseTimeEntity {
         member.name = dto.getName();
         member.nickname = dto.getNickname();
         member.phoneNumber = dto.getPhone();
-        member.memberProfileImage=null;
+        member.profileImageUrl= dto.getProfileImageUrl();
         member.address = address;
         member.gMoney=0L;
         member.gPoint=0L;
@@ -237,13 +235,13 @@ public class Member extends BaseTimeEntity {
 
 
 
-    /**
-     * 연관관계편의메서드 - 프로필 이미지 등록
-     */
-    public void addProfileImage(MemberProfileImage memberProfileImage) {
-        this.memberProfileImage = memberProfileImage;
-//        memberProfileImage.setMember(this);
-    }
+//    /**
+//     * 연관관계편의메서드 - 프로필 이미지 등록
+//     */
+//    public void addProfileImage(MemberProfileImage memberProfileImage) {
+//        this.memberProfileImage = memberProfileImage;
+////        memberProfileImage.setMember(this);
+//    }
 
 
     /**
@@ -266,24 +264,9 @@ public class Member extends BaseTimeEntity {
         this.password=newPassword;
     }
 
-    /**
-     * 회원 정보 수정 (프로필 이미지 포함)
-     */
-    public void updateWithProfileImage(UpdateMemberInfoRequestDto dto,MemberProfileImage memberProfileImage){
-
-        //주소 객체 생성
-        Address address = createAddress(dto.getAddress());
-
-        this.nickname=dto.getNickname();
-        this.name = dto.getName();
-        this.phoneNumber = dto.getPhone();
-        this.address = address;
-        this.memberProfileImage=memberProfileImage;
-
-    }
 
     /**
-     * 회원 정보 수정(프로필 이미지 미포함)
+     * 회원 정보 수정
      */
     public void update(UpdateMemberInfoRequestDto dto){
         //주소 객체 생성
@@ -293,6 +276,7 @@ public class Member extends BaseTimeEntity {
         this.name = dto.getName();
         this.phoneNumber = dto.getPhone();
         this.address = address;
+        this.profileImageUrl= dto.getProfileImageUrl();
     }
 
     /**

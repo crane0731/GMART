@@ -1,9 +1,9 @@
 package gmart.gmart.service.admin;
 
 import gmart.gmart.domain.Member;
-import gmart.gmart.domain.MemberProfileImage;
 import gmart.gmart.domain.MemberSuspension;
 import gmart.gmart.domain.UploadedImage;
+import gmart.gmart.domain.enums.ImageDefaultStatus;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.MemberSuspensionRequestDto;
 import gmart.gmart.dto.mybatis.MemberListResponseDto;
@@ -14,7 +14,6 @@ import gmart.gmart.repository.mybatis.MybatisMemberRepository;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.member.MemberSuspensionService;
 import gmart.gmart.service.token.RefreshTokenService;
-import gmart.gmart.service.image.MemberProfileImageService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +32,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class AdminMemberService {
 
-    private final String DEFAULT_PROFILE_IMAGE_URL = "/2a566036-d5b7-4996-b040-aa43253191dc.png";
-
     private final MemberService memberService;
-    private final MemberProfileImageService memberProfileImageService;
     private final UploadMemberProfileImageService profileImageService;
     private final RefreshTokenService refreshTokenService;
     private final MemberSuspensionService memberSuspensionService;
@@ -137,11 +133,15 @@ public class AdminMemberService {
 
     //==회원 삭제 로직==//
     private void processingDelete(Member member) {
-        //회원 프로필 이미지 조회
-        MemberProfileImage memberProfileImage = member.getMemberProfileImage();
 
-        //회원 사용자 프로필 이미지 삭제
-        deleteProfileImageIfNotDefault(memberProfileImage);
+
+        UploadedImage uploadedImage = profileImageService.findByImageUrl(member.getProfileImageUrl());
+
+        //만약 회원 프로필 이미지가 기본 프로필 이미지가 아니라면
+        if(!uploadedImage.getDefaultStatus().equals(ImageDefaultStatus.DEFAULT)){
+            //이미지 미사용 처리
+            uploadedImage.usedFalse();
+        }
 
         //회원 삭제
         memberService.delete(member);
@@ -150,20 +150,5 @@ public class AdminMemberService {
         refreshTokenService.delete(member);
     }
 
-
-    //==사용자 프로필 이미지 삭제==//
-    private void deleteProfileImageIfNotDefault(MemberProfileImage memberProfileImage) {
-
-        //프로필 이미지가 기본이미지가 아니라면 회원 프로필 이미지 삭제
-        //프로필 이미지가 기본이미지라면 그냥 회원만 삭제
-        if(!memberProfileImage.getImageUrl().equals(DEFAULT_PROFILE_IMAGE_URL)) {
-            memberProfileImageService.delete(memberProfileImage);
-
-            //업로드된 이미지 조회
-            UploadedImage uploadedImage = profileImageService.findByImageUrl(memberProfileImage.getImageUrl());
-
-            uploadedImage.usedFalse();
-        }
-    }
 
 }

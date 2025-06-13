@@ -47,7 +47,7 @@ public class StoreResponseDto {
         dto.memberPhone = store.getMember().getPhoneNumber();
         dto.memberMannerGrade=store.getMember().getMannerGrade().toString();
         dto.memberRole=store.getMember().getMemberRole().toString();
-        dto.memberProfileImageUrl=store.getMember().getMemberProfileImage().getImageUrl();
+        dto.memberProfileImageUrl=store.getMember().getProfileImageUrl();
         dto.memberSuspensionCount=store.getMember().getSuspensionCount();
 
         dto.storeId = store.getId();
