@@ -31,11 +31,6 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
-    @ExceptionHandler(ArticleCustomException.class)
-    public ResponseEntity<Object> handleArticleCustomException(ArticleCustomException ex) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
-    }
-
     @ExceptionHandler(GundamCustomException.class)
     public ResponseEntity<Object> handleGundamCustomException(GundamCustomException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
@@ -58,6 +53,11 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(ItemCustomException.class)
     public ResponseEntity<Object> handleItemCustomException(ItemCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportCustomException.class)
+    public ResponseEntity<Object> handleReportCustomException(ReportCustomException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 }

@@ -29,16 +29,6 @@ public final class ErrorMessage {
     public static final String ALREADY_ANSWER ="이미 답변을 완료했습니다.";
     public static final String NOT_FOUND_ANSWER="답변을 찾을 수 없습니다.";
 
-    public static final String NOT_FOUND_ARTICLE="게시글을 찾을 수 없습니다.";
-    public static final String ALREADY_LIKE_ARTICLE="이미 좋아요한 게시글 입니다.";
-    public static final String NOT_FOUND_LIKE_ARTICLE="게시글 좋아요를 찾을 수 없습니다.";
-
-    public static final String NOT_FOUND_REPORT_ARTICLE="게시글 신고를 찾을 수 없습니다.";
-    public static final String SELF_REPORT_NOT_ALLOWED = "자신은 신고할 수 없습니다.";
-
-    public static final String NOT_FOUND_COMMENT="댓글을 찾을 수 없습니다.";
-    public static final String PARENT_COMMENT_ARTICLE_MISMATCH = "부모 댓글과 게시글이 일치하지 않습니다.";
-    public static final String CHILD_COMMENT_DEPTH_EXCEEDED="자식 댓글에는 또 다른 자식 댓글을 작성할 수 없습니다.";
 
     public static final String NOT_FOUND_GUNDAM="건담 정보를 찾을 수 없습니다.";
 
@@ -63,8 +53,11 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_FAVORITE_ITEM="관심 상품을 찾을 수 없습니다.";
     public static final String ALREADY_FAVORITE_ITEM="이미 관심등록한 상품 입니다.";
 
-    public static final String NOT_FOUND_REPORT_ITEM="상품 신고를 찾을 수 없습니다.";
 
+    public static final String NOT_ITEM_SELLER="해당 상품의 판매자가 아닙니다.";
+    public static final String NOT_FOUND_REPORT ="신고를 찾을 수 없습니다";
+    public static final String ALREADY_REPORT="이미 신고등록이 되었습니다.";
+    public static final String SELF_REPORT_NOT_ALLOWED = "자신은 신고할 수 없습니다.";
 
 
 

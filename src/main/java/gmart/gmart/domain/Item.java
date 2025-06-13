@@ -4,7 +4,6 @@ import gmart.gmart.command.CreateItemCommand;
 import gmart.gmart.command.UpdateItemCommand;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.*;
-import gmart.gmart.dto.item.CreateItemRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -122,7 +121,7 @@ public class Item extends BaseAuditingEntity {
     private List<ItemImage> itemImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "item")
-    private List<ReportItem> reportItems = new ArrayList<>();
+    private List<Report> reportItems = new ArrayList<>();
 
     /**
      * [생성 메서드]

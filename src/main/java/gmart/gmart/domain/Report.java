@@ -3,24 +3,25 @@ package gmart.gmart.domain;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.ReportStatus;
+import gmart.gmart.domain.enums.ReporterRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 상품 신고
+ * 신고 테이블
  */
 @Entity
-@Table(name = "report_item")
+@Table(name = "report")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReportItem extends BaseAuditingEntity {
+public class Report extends BaseAuditingEntity {
 
-    @org.hibernate.annotations.Comment("상품 신고 아이디")
+    @org.hibernate.annotations.Comment("신고 아이디")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_item_id")
+    @Column(name = "report_id")
     private Long id;
 
     @org.hibernate.annotations.Comment("신고자 아이디")
@@ -32,7 +33,6 @@ public class ReportItem extends BaseAuditingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_member_id")
     private Member reportedMember;
-
 
     @org.hibernate.annotations.Comment("상품 아이디")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,6 +48,12 @@ public class ReportItem extends BaseAuditingEntity {
     @Column(name = "report_status",nullable = false)
     private ReportStatus reportStatus;
 
+    @org.hibernate.annotations.Comment("신고자 역할")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reporter_role")
+    private ReporterRole reporterRole;
+
+
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
@@ -62,14 +68,16 @@ public class ReportItem extends BaseAuditingEntity {
      * @param reason 신고사유
      * @return ReportItem 상품 신고 엔티티
      */
-    public static ReportItem create(Member reporter, Member reportedMember, Item item, String reason) {
-        ReportItem reportItem = new ReportItem();
+    public static Report create(ReporterRole reporterRole,Member reporter, Member reportedMember, Item item, String reason) {
+        Report reportItem = new Report();
         reportItem.reporter = reporter;
         reportItem.reportedMember = reportedMember;
         reportItem.item = item;
         reportItem.reason = reason;
         reportItem.reportStatus=ReportStatus.WAITING;
+        reportItem.reporterRole=reporterRole;
         reportItem.deleteStatus=DeleteStatus.UNDELETED;
+
         return reportItem;
 
     }
