@@ -67,8 +67,7 @@ public class AdminReportController {
                                                         @RequestParam(value = "reporterRole",required = false)ReporterRole reporterRole,
                                                         @RequestParam(value = "createdDateSortType") CreatedDateSortType createdDateSortType
                                                         ) {
-
-
+        
         SearchReportCondDto condDto = SearchReportCondDto.create(status, reporterRole, createdDateSortType);
         PagedResponseDto<ReportListResponseDto> responseDtos = adminReportService.getAllReports(condDto);
 
