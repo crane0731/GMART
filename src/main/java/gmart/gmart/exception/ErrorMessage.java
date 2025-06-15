@@ -59,6 +59,7 @@ public final class ErrorMessage {
     public static final String ALREADY_REPORT="이미 신고등록이 되었습니다.";
     public static final String SELF_REPORT_NOT_ALLOWED = "자신은 신고할 수 없습니다.";
 
+    public static final String NOT_FOUND_ADMIN_MESSAGE="관리자 메시지를 찾을 수 없습니다.";
 
 
 

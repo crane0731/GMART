@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * 관리자 메시지 레파지토리
  */
-public interface AdminMessageRepository extends JpaRepository<AdminMessage, Long> {
+public interface AdminMessageRepository extends JpaRepository<AdminMessage, Long> , AdminMessageRepositoryCustom{
 }

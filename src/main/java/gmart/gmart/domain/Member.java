@@ -89,6 +89,10 @@ public class Member extends BaseTimeEntity {
     @Column(name = "reviewed_count",nullable = false)
     private Long reviewedCount=0L;
 
+    @Comment("받은 관리자 메시지 수")
+    @Column(name = "adminMessage_count",nullable = false)
+    private Long adminMessageCount=0L;
+
     @Setter
     @Comment("회원 권환")
     @Enumerated(EnumType.STRING)
@@ -160,10 +164,29 @@ public class Member extends BaseTimeEntity {
         member.reportedCount = 0L;
         member.reviewedCount = 0L;
         member.suspensionCount=0L;
+        member.adminMessageCount=0L;
         member.memberRole = MemberRole.MEMBER;
 
 
         return member;
+    }
+    /**
+     * [비즈니스 로직]
+     * 받은 관리자 메시지 수 증가 +1
+     */
+    public void plusAdminMessageCount(){
+        this.adminMessageCount++;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 받은 관리자 메시지 수 감소 -1
+     */
+    public void minusAdminMessageCount(){
+
+        if (this.adminMessageCount>0) {
+            this.adminMessageCount--;
+        }
     }
 
 

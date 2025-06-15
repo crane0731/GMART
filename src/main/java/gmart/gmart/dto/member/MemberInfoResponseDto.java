@@ -35,6 +35,7 @@ public class MemberInfoResponseDto {
     private Long totalSpent; //총 사용 금액
     private Long reportedCount; //신고당한 횟수
     private Long reviewedCount; //리뷰받은 횟수
+    private Long adminMessageCount; //관리자 메시지 받은 횟수
     private String memberRole; //권한
 
     private List<MemberPreferredGundamGradeDto> preferredGundamGrades; //회원이 선호하는 건담 등급들
@@ -68,6 +69,7 @@ public class MemberInfoResponseDto {
         dto.setTotalSpent(member.getTotalSpent());
         dto.setReportedCount(member.getReportedCount());
         dto.setReviewedCount(member.getReviewedCount());
+        dto.setAdminMessageCount(member.getAdminMessageCount());
         dto.setMemberRole(member.getMemberRole().toString());
 
         dto.setPreferredGundamGrades(memberPreferredGundamGradesDtos);
