@@ -1,10 +1,12 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.AdminMessageType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 /**
  * 관리자 메시지
@@ -29,6 +31,11 @@ public class AdminMessage extends BaseTimeEntity {
     @org.hibernate.annotations.Comment("내용")
     @Column(name = "content")
     private String content;
+
+    @org.hibernate.annotations.Comment("메시지 타입")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "message_type")
+    private AdminMessageType messageType;
 
 
 

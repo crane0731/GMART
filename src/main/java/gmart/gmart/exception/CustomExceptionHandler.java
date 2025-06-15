@@ -60,4 +60,9 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> handleReportCustomException(ReportCustomException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
+
+    @ExceptionHandler(AdminMessageCustomException.class)
+    public ResponseEntity<Object> handleAdminMessageCustomException(AdminMessageCustomException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
 }
