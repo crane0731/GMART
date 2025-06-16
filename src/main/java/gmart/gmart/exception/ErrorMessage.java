@@ -61,7 +61,11 @@ public final class ErrorMessage {
 
     public static final String NOT_FOUND_ADMIN_MESSAGE="관리자 메시지를 찾을 수 없습니다.";
 
-
+    public static final String POINT_MINIMUM_REQUIRED="포인트는 1000원 이상 부터 사용 가능합니다.";
+    public static final String POINT_EXCEEDS_TOTAL ="사용하려는 포인트가 결제 금액보다 많습니다.";
+    public static final String NOT_FOUND_ORDER ="주문을 찾을 수 없습니다.";
+    public static final String CANNOT_PURCHASE_OWN_ITEM ="자신이 등록한 상품은 구매할 수 없습니다.";
+    public static final String ALREADY_RESERVED_ORDER = "이미 예약한 주문이 있습니다.";
 
 
 

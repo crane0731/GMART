@@ -75,4 +75,33 @@ public class Delivery extends BaseTimeEntity {
     @OneToOne(mappedBy = "delivery")
     private Order order;
 
+
+    /**
+     * [생성 메서드]
+     * @param sender 보내는 회원
+     * @param receiver 받는 회원
+     * @param refundStatus 환불 상태
+     * @return Delivery 배송 엔티티
+     */
+    public static Delivery create(Member sender , Member receiver,RefundStatus refundStatus) {
+
+        Delivery delivery = new Delivery();
+
+        delivery.senderName=sender.getName();
+        delivery.senderPhone= sender.getPhoneNumber();
+        delivery.senderAddress=sender.getAddress();
+
+        delivery.receiverName=receiver.getName();
+        delivery.receiverPhone= receiver.getPhoneNumber();
+        delivery.receiverAddress=receiver.getAddress();
+
+        delivery.deliveryStatus=DeliveryStatus.DELIVERED;
+
+        delivery.refundStatus=refundStatus;
+
+        delivery.deleteStatus=DeleteStatus.UNDELETED;
+
+        return delivery;
+    }
+
 }

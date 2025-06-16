@@ -19,4 +19,18 @@ public class CreateAdminMessageRequestDto {
     @NotNull(message = "메시지 타입을 입력해주세요")
     private AdminMessageType messageType;
 
+
+    /**
+     * [생성 메서드]
+     * @param content 메시지 내용
+     * @param messageType 메시지 타입
+     * @return CreateAdminMessageRequestDto 요청 DTO
+     */
+    public static CreateAdminMessageRequestDto create(String content, AdminMessageType messageType) {
+        CreateAdminMessageRequestDto dto = new CreateAdminMessageRequestDto();
+        dto.content = content;
+        dto.messageType = messageType;
+        return dto;
+    }
+
 }

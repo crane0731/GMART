@@ -5,6 +5,8 @@ import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.EscrowStatus;
 import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.OrderCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -90,10 +92,91 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private EscrowStatus escrowStatus;
 
-
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
     private DeleteStatus deleteStatus;
+
+
+    /**
+     * [생성 메서드]
+     * @param buyer 구매자 엔티티
+     * @param seller 판매자 엔티티
+     * @param item 상품 엔티티
+     * @param itemPrice 상품 가격
+     * @param deliveryPrice 배송비
+     * @param usedPoint 사용 포인트
+     * @return Order 주문 엔티티
+     */
+    public static Order create(Member buyer , Member seller , Item item, Long usedPoint){
+        Order order = new Order();
+
+        order.setBuyer(buyer);
+        order.setSeller(seller);
+
+        order.item = item;
+
+        order.orderStatus=OrderStatus.RESERVED;
+
+        order.itemPrice = item.getItemPrice();
+        order.deliveryPrice = item.getDeliveryPrice();
+        order.usedPoint = usedPoint;
+        Long total = order.setTotalPrice(item.getItemPrice(), item.getDeliveryPrice());
+        order.setPaidPrice(total,usedPoint);
+
+        order.escrowStatus= EscrowStatus.NONE;
+        order.deleteStatus = DeleteStatus.UNDELETED;
+
+        return order;
+    }
+
+    /**
+     * [총 가격 계산]
+     * @param itemPrice 상품 가격
+     * @param deliveryPrice 배송비
+     * @return Long 총 가격
+     */
+    public Long setTotalPrice(Long itemPrice, Long deliveryPrice){
+        this.totalPrice= itemPrice+deliveryPrice;
+        return this.totalPrice;
+    }
+
+
+    /**
+     * [결제 가격 계산]
+     * @param totalPrice 총 가격
+     * @param usedPoint 사용 포인트
+     * @return Long 결제 가격
+     */
+    public void setPaidPrice(Long totalPrice, Long usedPoint){
+        if(usedPoint<1000){
+            throw new OrderCustomException(ErrorMessage.POINT_MINIMUM_REQUIRED);
+        } else if (usedPoint>totalPrice) {
+            throw new OrderCustomException(ErrorMessage.POINT_EXCEEDS_TOTAL);
+        } else {
+            this.paidPrice= totalPrice-usedPoint;
+        }
+    }
+
+
+    /**
+     * [연관관계 편의 메서드]
+     * @param buyer
+     */
+    public void setBuyer(Member buyer) {
+        this.buyer = buyer;
+        buyer.getBuyOrders().add(this);
+    }
+
+    /**
+     * [연관관계 편의 메서드]
+     * @param seller
+     */
+    public void setSeller(Member seller) {
+        this.seller = seller;
+        seller.getSaleOrders().add(this);
+    }
+
+
 
 }

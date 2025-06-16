@@ -1,6 +1,17 @@
 package gmart.gmart.service.order;
 
+import gmart.gmart.domain.Item;
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
+import gmart.gmart.domain.enums.AdminMessageType;
+import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
+import gmart.gmart.dto.order.CreateOrderRequestDto;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.OrderCustomException;
 import gmart.gmart.repository.order.OrderRepository;
+import gmart.gmart.service.admin.AdminMemberService;
+import gmart.gmart.service.admin.AdminMessageService;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +28,39 @@ public class OrderService {
 
     private final ItemService itemService;//상품 서비스
     private final MemberService memberService;//회원 서비스
+    private final AdminMessageService adminMessageService;//관리자 메시지 서비스
 
     private final OrderRepository orderRepository; //주문 레파지토리
 
 
-    // 개발 해야할 비즈니스 로직들
+
 
     /**
+     * [서비스 로직]
      * 주문 신청(구매자가 상품 구매 버튼을 누름 -> 상품 구매 신청)
      * 메시지 생성
+     * @param itemId 상품 아이디
+     * @param requestDto 요청 DTO
      */
+    @Transactional
+    public void createOrder(Long itemId, CreateOrderRequestDto requestDto) {
+
+        //현재 로그인한 회원 조회(구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //구매를 원하는 상품 조회
+        Item item = itemService.findById(itemId);
+
+        //판매자 조회
+        Member seller = item.getStore().getMember();
+
+        //주문 검증
+        validateOrder(buyer, seller, item);
+
+        //주문 처리
+        processOrder(requestDto, buyer, seller, item);
+
+    }
 
     /**
      * 주문 수락(판매자가 주문 신청을 승낙함)
@@ -67,6 +101,72 @@ public class OrderService {
      * 메시지 생성
      */
 
+    /**
+     * [생성]
+     * @param order 주문 엔티티
+     */
+    @Transactional
+    public void save(Order order) {
+        orderRepository.save(order);
+    }
+
+    /**
+     * [조회]
+     * ID(PK) 값으로 단건 조회
+     * @param orderId 주문 아이디
+     * @return Order 주문 엔티티
+     */
+    public Order findById(Long orderId) {
+        return orderRepository.findById(orderId).orElseThrow(()-> new OrderCustomException(ErrorMessage.NOT_FOUND_ORDER));
+    }
+
+    //==주문 처리 로직==//
+    private void processOrder(CreateOrderRequestDto requestDto, Member buyer, Member seller, Item item) {
+        //주문 생성
+        Order order = Order.create(buyer, seller, item, requestDto.getUsedPoint());
+
+        //주문 저장
+        save(order);
+
+        //메시지 생성
+        createMessage(buyer, seller);
+    }
+
+    //==메시지 생성 로직==//
+    private void createMessage(Member buyer, Member seller) {
+        //메시지 생성(구매자)
+        adminMessageService.createMessage(buyer.getId(),
+                CreateAdminMessageRequestDto.create(seller.getNickname() + " 에게 구매 요청을 보냈습니다.", AdminMessageType.TRADE));
+
+        //메시지 생성(판매자)
+        adminMessageService.createMessage(seller.getId(),
+                CreateAdminMessageRequestDto.create(buyer.getNickname()+" 님이 구매를 요쳥했습니다.",AdminMessageType.TRADE));
+    }
+
+    //==주문을 위한 검증 로직==//
+    private void validateOrder(Member buyer, Member seller, Item item) {
+        //판매자는 자신의 아이템을 구매할 수 없음
+        validateItemOwner(buyer, seller);
+
+        //이미 대기중인 주문 신청이 있다면 (RESERVED 상태) 재 주문 불가
+        validateExistsReservedOrder(buyer, item);
+    }
+
+    //==이미 대기중인 주문신청이 있는지 확인하는 로직==//
+    private void validateExistsReservedOrder(Member buyer, Item item) {
+        Order exists = orderRepository.findByBuyerAndItem(buyer, item, OrderStatus.RESERVED).orElse(null);
+        if(exists != null) {
+            throw new OrderCustomException(ErrorMessage.ALREADY_RESERVED_ORDER);
+        }
+    }
+
+
+    //==구매자의 상품인지 확인 하는 로직 ==//
+    private void validateItemOwner(Member buyer, Member seller) {
+        if(buyer.getId().equals(seller.getId())) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_PURCHASE_OWN_ITEM);
+        }
+    }
 
 
 
