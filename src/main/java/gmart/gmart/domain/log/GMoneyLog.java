@@ -1,6 +1,8 @@
 package gmart.gmart.domain.log;
 
-import gmart.gmart.domain.baseentity.BaseAuditingEntity;
+import gmart.gmart.command.CreateGMoneyLogCommand;
+import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.GMoneyDeltaType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,7 +18,7 @@ import org.hibernate.annotations.Comment;
 @Table(name = "g_money_log")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GMoneyLog extends BaseAuditingEntity {
+public class GMoneyLog extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +29,6 @@ public class GMoneyLog extends BaseAuditingEntity {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
-    @Comment("결제 아이디")
-    @Column(name = "payment_id", nullable = false)
-    private Long paymentId;
-
     @Comment("주문 아이디")
     @Column(name = "order_id" , nullable = false)
     private Long orderId;
@@ -38,7 +36,7 @@ public class GMoneyLog extends BaseAuditingEntity {
     @Comment("건머니 변화 타입")
     @Column(name = "g_money_delta_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private GMoneyDeltaType gMoneydeltaType;
+    private GMoneyDeltaType gMoneyDeltaType;
 
     @Comment("건머니 사용 내역")
     @Column(name = "descrption")
@@ -57,6 +55,28 @@ public class GMoneyLog extends BaseAuditingEntity {
     private Long afterGMoney;
 
 
+    @org.hibernate.annotations.Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
 
 
+    /**
+     * [생성 메서드]
+     * @param command 생성 커맨드
+     * @return GMoneyLog 건머니 거래 로그 엔티티
+     */
+    public static GMoneyLog create(CreateGMoneyLogCommand command) {
+
+        GMoneyLog gMoneyLog = new GMoneyLog();
+        gMoneyLog.memberId = command.getMemberId();
+        gMoneyLog.orderId = command.getOrderId();
+        gMoneyLog.gMoneyDeltaType = command.getGMoneydeltaType();
+        gMoneyLog.description = command.getDescription();
+        gMoneyLog.deltaGMoney = command.getDeltaGMoney();
+        gMoneyLog.beforeGMoney = command.getBeforeGMoney();
+        gMoneyLog.afterGMoney = command.getAfterGMoney();
+        gMoneyLog.deleteStatus=DeleteStatus.UNDELETED;
+        return gMoneyLog;
+    }
 }

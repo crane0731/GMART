@@ -4,14 +4,17 @@ import gmart.gmart.domain.Item;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.AdminMessageType;
+import gmart.gmart.domain.enums.GMoneyDeltaType;
+import gmart.gmart.domain.enums.GPointDeltaType;
 import gmart.gmart.domain.enums.OrderStatus;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
 import gmart.gmart.repository.order.OrderRepository;
-import gmart.gmart.service.admin.AdminMemberService;
 import gmart.gmart.service.admin.AdminMessageService;
+import gmart.gmart.service.gmoney.GMoneyLogService;
+import gmart.gmart.service.gpoint.GPointLogService;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ public class OrderService {
     private final ItemService itemService;//상품 서비스
     private final MemberService memberService;//회원 서비스
     private final AdminMessageService adminMessageService;//관리자 메시지 서비스
+    private final GMoneyLogService gMoneyLogService; //건머니 거래 로그 서비스
+    private final GPointLogService gPointLogService; //건포인트 거래 로그 서비스
 
     private final OrderRepository orderRepository; //주문 레파지토리
 
@@ -62,10 +67,37 @@ public class OrderService {
 
     }
 
+
     /**
-     * 주문 수락(판매자가 주문 신청을 승낙함)
-     * 주문 거절(판매자가 주문 신청을 거절함)
+     * [서비스 로직]
+     * 판매자가 구매자의 구매 신청을 구매확인 처리함(판매자가 구매확인 버튼을 누름)
      * 메시지 생성
+     * 건머니 로그 생성
+     * 건포이느 로그 생성
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void confirmOrder(Long orderId) {
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //주문확인 처리 로직
+        processConfirm(buyer, order, seller);
+
+    }
+
+    /**
+     * 판매자가 구매 요청을 거절함(CANCEL)
      */
 
     /**
@@ -129,18 +161,20 @@ public class OrderService {
         save(order);
 
         //메시지 생성
-        createMessage(buyer, seller);
+        String buyerMessage=seller.getNickname() + " 에게 구매 요청을 보냈습니다.";
+        String sellerMessage=buyer.getNickname()+" 님이 구매를 요쳥했습니다.";
+        createMessage(buyer,buyerMessage,seller,sellerMessage);
     }
 
     //==메시지 생성 로직==//
-    private void createMessage(Member buyer, Member seller) {
+    private void createMessage(Member buyer,String buyerMessage ,Member seller, String sellerMessage) {
         //메시지 생성(구매자)
         adminMessageService.createMessage(buyer.getId(),
-                CreateAdminMessageRequestDto.create(seller.getNickname() + " 에게 구매 요청을 보냈습니다.", AdminMessageType.TRADE));
+                CreateAdminMessageRequestDto.create(buyerMessage, AdminMessageType.TRADE));
 
         //메시지 생성(판매자)
         adminMessageService.createMessage(seller.getId(),
-                CreateAdminMessageRequestDto.create(buyer.getNickname()+" 님이 구매를 요쳥했습니다.",AdminMessageType.TRADE));
+                CreateAdminMessageRequestDto.create(sellerMessage,AdminMessageType.TRADE));
     }
 
     //==주문을 위한 검증 로직==//
@@ -166,6 +200,49 @@ public class OrderService {
         if(buyer.getId().equals(seller.getId())) {
             throw new OrderCustomException(ErrorMessage.CANNOT_PURCHASE_OWN_ITEM);
         }
+    }
+
+    //==로그 생성 로직==//
+    private void createLog(Member buyer, Order order, Long beforeGMoney, Long afterGMoney, Long beforeGPoint, Long afterGPoint) {
+        String description = "상품 구매";
+
+        //건머니 로그 생성
+        gMoneyLogService.createLog(buyer.getId(), order.getId(),
+                GMoneyDeltaType.PURCHASE,description, order.getPaidPrice(), beforeGMoney, afterGMoney);
+
+
+        //건포인트 로그 생성
+        gPointLogService.createLog(buyer.getId(), order.getId(),
+                GPointDeltaType.PURCHASE,description, order.getUsedPoint(), beforeGPoint, afterGPoint);
+    }
+
+    //==현재 로그인한 회원이 주문의 판매자인지 확인 하는 로직==//
+    private void validateOrderSeller(Member seller, Order order) {
+        if(!seller.getId().equals(order.getSeller().getId())) {
+            throw new OrderCustomException(ErrorMessage.NO_PERMISSION);
+        }
+    }
+
+    //==주문확인 처리 로직==//
+    private void processConfirm(Member buyer, Order order, Member seller) {
+        //구매자의 구매 전 건머니,건포인트 금액
+        Long beforeGMoney = buyer.getGMoney();
+        Long beforeGPoint = buyer.getGPoint();
+
+        //주문 확인 처리 + 구매자의 건머니, 건포인트 차감
+        order.confirmOrder();
+
+        //구매자의 구매 후 건머니,건포인트 금액
+        Long afterGMoney = buyer.getGMoney();
+        Long afterGPoint = buyer.getGPoint();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 구매 확인 처리를 했습니다.";
+        String sellerMessage= buyer.getNickname()+" 에게 구매 확인 메시지를 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //로그 생성
+        createLog(buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
     }
 
 

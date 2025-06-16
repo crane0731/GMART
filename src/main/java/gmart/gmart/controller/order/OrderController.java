@@ -48,6 +48,18 @@ public class OrderController {
 
     }
 
+    /**
+     * [컨트롤러]
+     * 주문확인 처리
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<ApiResponse<?>> confirmOrder(@PathVariable("id")Long orderId){
+        orderService.confirmOrder(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 확인 완료")));
+    }
+
 
 
     //==필드에러가 있는지 확인하는 로직==//

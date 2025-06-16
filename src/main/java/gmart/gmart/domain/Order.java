@@ -103,8 +103,6 @@ public class Order extends BaseTimeEntity {
      * @param buyer 구매자 엔티티
      * @param seller 판매자 엔티티
      * @param item 상품 엔티티
-     * @param itemPrice 상품 가격
-     * @param deliveryPrice 배송비
      * @param usedPoint 사용 포인트
      * @return Order 주문 엔티티
      */
@@ -120,9 +118,19 @@ public class Order extends BaseTimeEntity {
 
         order.itemPrice = item.getItemPrice();
         order.deliveryPrice = item.getDeliveryPrice();
+
+        if(usedPoint>order.buyer.getGPoint()){
+            throw new OrderCustomException(ErrorMessage.NOT_ENOUGH_GPOINT);
+        }
+
         order.usedPoint = usedPoint;
+
         Long total = order.setTotalPrice(item.getItemPrice(), item.getDeliveryPrice());
-        order.setPaidPrice(total,usedPoint);
+        Long paid = order.setPaidPrice(total, usedPoint);
+
+        if (paid>order.buyer.getGMoney()){
+            throw new OrderCustomException(ErrorMessage.NOT_ENOUGH_GMONEY);
+        }
 
         order.escrowStatus= EscrowStatus.NONE;
         order.deleteStatus = DeleteStatus.UNDELETED;
@@ -148,13 +156,15 @@ public class Order extends BaseTimeEntity {
      * @param usedPoint 사용 포인트
      * @return Long 결제 가격
      */
-    public void setPaidPrice(Long totalPrice, Long usedPoint){
+    public Long setPaidPrice(Long totalPrice, Long usedPoint){
         if(usedPoint<1000){
             throw new OrderCustomException(ErrorMessage.POINT_MINIMUM_REQUIRED);
         } else if (usedPoint>totalPrice) {
             throw new OrderCustomException(ErrorMessage.POINT_EXCEEDS_TOTAL);
         } else {
             this.paidPrice= totalPrice-usedPoint;
+            return this.paidPrice;
+
         }
     }
 
@@ -177,6 +187,58 @@ public class Order extends BaseTimeEntity {
         seller.getSaleOrders().add(this);
     }
 
+    /**
+     * [비즈니스 로직]
+     * 판매자가 주문 수락 처리
+     */
+    public void confirmOrder(){
+        //검증 로직
+        validateConfirmable();
+        
+        //구매자의 결제 금액 처리
+        deductBuyerPayment();
 
+        //구매 확인 상태 처리
+        markConfirmed();
+    }
+
+
+    /**
+     * [비즈니스 로직]
+     * 판매자가 주문 거절 처리
+     */
+    public void cancelOrder(){
+        if (this.orderStatus.equals(OrderStatus.RESERVED)) {
+            this.orderStatus=OrderStatus.CANCELLED;
+        }
+    }
+
+    //==주문 확인 처리 검증 로직==//
+    private void validateConfirmable() {
+        if (!this.orderStatus.equals(OrderStatus.RESERVED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_CONFIRM_ORDER);
+        }
+    }
+
+    //==구매자 금액 처리로직==//
+    private void deductBuyerPayment() {
+        //구매자의 건머니 차감
+        this.buyer.deductGMoney(this.paidPrice);
+
+        //구매자의 건포인트 차감
+        this.buyer.deductGPoint(this.usedPoint);
+    }
+
+    //==구매 확인 상태 처리 로직==//
+    private void markConfirmed() {
+        //주문 상태 변경 (주문 확인)
+        this.orderStatus=OrderStatus.CONFIRMED;
+
+        //에스크로 상태 홀딩 처리 -> 구매자의 돈이 빠져나가고 에스크로에 묶여있는 상태.
+        this.escrowStatus=EscrowStatus.HOLDING;
+
+        //상품 주문 상태 -> 예약중
+        this.item.reservedSaleStatus();
+    }
 
 }

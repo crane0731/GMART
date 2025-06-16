@@ -6,9 +6,11 @@ package gmart.gmart.domain.enums;
  *     PURCHASE : 구매
  *     SALE : 판매
  *     REFUND : 환불
+ *     CANCEL: 취소
  */
 public enum GMoneyDeltaType {
     PURCHASE,       // 구매
     SALE,           // 판매
     REFUND,         // 환불
+    CANCEL,         //취소
 }

@@ -278,4 +278,11 @@ public class Item extends BaseAuditingEntity {
         plusReportCount();
     }
 
+    /**
+     * [비즈니스 로직]
+     * 판매상태 변경 -> 예약중
+     */
+    public void reservedSaleStatus(){
+        this.saleStatus=SaleStatus.RESERVED;
+    }
 }

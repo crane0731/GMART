@@ -1,6 +1,9 @@
 package gmart.gmart.domain.log;
 
-import gmart.gmart.domain.baseentity.BaseAuditingEntity;
+import gmart.gmart.command.CreateGMoneyLogCommand;
+import gmart.gmart.command.CreateGPointLogCommand;
+import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.GPointDeltaType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,7 +19,7 @@ import org.hibernate.annotations.Comment;
 @Table(name = "g_point_log")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GPointLog extends BaseAuditingEntity {
+public class GPointLog extends BaseTimeEntity {
 
 
     @Id
@@ -27,10 +30,6 @@ public class GPointLog extends BaseAuditingEntity {
     @Comment("회원 아이디")
     @Column(name = "member_id", nullable = false)
     private Long memberId;
-
-    @Comment("결제 아이디")
-    @Column(name = "payment_id", nullable = false)
-    private Long paymentId;
 
     @Comment("주문 아이디")
     @Column(name = "order_id" , nullable = false)
@@ -58,4 +57,27 @@ public class GPointLog extends BaseAuditingEntity {
     private Long afterGPoint;
 
 
+    @org.hibernate.annotations.Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
+    /**
+     * [생성 메서드]
+     * @param command 생성 커맨드
+     * @return GMoneyLog 건포인트 거래 로그 엔티티
+     */
+    public static GPointLog create(CreateGPointLogCommand command) {
+
+        GPointLog gPointLog = new GPointLog();
+        gPointLog.memberId = command.getMemberId();
+        gPointLog.orderId = command.getOrderId();
+        gPointLog.gPointDeltaType = command.getGPointDeltaType();
+        gPointLog.description = command.getDescription();
+        gPointLog.deltaGPoint = command.getDeltaGPoint();
+        gPointLog.beforeGPoint = command.getBeforeGPoint();
+        gPointLog.afterGPoint = command.getAfterGPoint();
+        gPointLog.deleteStatus=DeleteStatus.UNDELETED;
+        return gPointLog;
+    }
 }

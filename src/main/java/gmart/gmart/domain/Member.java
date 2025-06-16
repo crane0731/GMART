@@ -9,6 +9,7 @@ import gmart.gmart.dto.SignUpRequestDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.GMoneyCustomException;
+import gmart.gmart.exception.OrderCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -137,9 +138,6 @@ public class Member extends BaseTimeEntity {
     private List<AdminMessage> adminMessages = new ArrayList<>();
 
 
-
-
-
     /**
      * 회원 생성 로직
      */
@@ -259,17 +257,6 @@ public class Member extends BaseTimeEntity {
     }
 
 
-
-
-//    /**
-//     * 연관관계편의메서드 - 프로필 이미지 등록
-//     */
-//    public void addProfileImage(MemberProfileImage memberProfileImage) {
-//        this.memberProfileImage = memberProfileImage;
-////        memberProfileImage.setMember(this);
-//    }
-
-
     /**
      * 연관관계편의메서드 - 선호 건담 등급 등록
      */
@@ -313,6 +300,40 @@ public class Member extends BaseTimeEntity {
         this.suspensionCount++;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 건머니 차감
+     * @param paidGMoney 결제금액
+     */
+    public void deductGMoney(Long paidGMoney){
+
+        if (paidGMoney<0){
+            throw new OrderCustomException(ErrorMessage.INVALID_GMONEY_DEDUCTION_AMOUNT);
+        }
+
+        if(this.gMoney-paidGMoney<0){
+            throw new OrderCustomException(ErrorMessage.NOT_ENOUGH_GMONEY);
+        }
+
+        this.gMoney-=paidGMoney;
+
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 건포인트 차감
+     * @param usedGPoint
+     */
+    public void deductGPoint(Long usedGPoint){
+
+        if (usedGPoint<1000){
+            throw new OrderCustomException(ErrorMessage.POINT_MINIMUM_REQUIRED);
+        }
+        if(this.gPoint-usedGPoint<0){
+            throw new OrderCustomException(ErrorMessage.NOT_ENOUGH_GPOINT);
+        }
+        this.gPoint-=usedGPoint;
+    }
 
 
     //==Address 생성==//
