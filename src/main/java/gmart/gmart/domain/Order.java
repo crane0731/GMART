@@ -5,6 +5,7 @@ import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.EscrowStatus;
 import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.domain.enums.SaleStatus;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
 import jakarta.persistence.*;
@@ -171,7 +172,7 @@ public class Order extends BaseTimeEntity {
 
     /**
      * [연관관계 편의 메서드]
-     * @param buyer
+     * @param buyer 구매자 엔티티
      */
     public void setBuyer(Member buyer) {
         this.buyer = buyer;
@@ -180,7 +181,7 @@ public class Order extends BaseTimeEntity {
 
     /**
      * [연관관계 편의 메서드]
-     * @param seller
+     * @param seller 판매자 엔티티
      */
     public void setSeller(Member seller) {
         this.seller = seller;
@@ -202,16 +203,51 @@ public class Order extends BaseTimeEntity {
         markConfirmed();
     }
 
-
     /**
      * [비즈니스 로직]
      * 판매자가 주문 거절 처리
      */
     public void cancelOrder(){
-        if (this.orderStatus.equals(OrderStatus.RESERVED)) {
-            this.orderStatus=OrderStatus.CANCELLED;
+
+        //검증 로직
+        validateCancel();
+
+        //만약 주문 상태가 주문 확인 처리 상태였다면 다시 복구
+        if(this.orderStatus.equals(OrderStatus.CONFIRMED)){
+
+            //구매자의 결제 데이터 복구
+            recoveryBuyerPayment();
+
+            //구매 취소 상태 처리
+            markCanceled();
+
+        }
+        //주문 캔슬
+        this.orderStatus=OrderStatus.CANCELLED;
+
+    }
+
+    //==구매자의 결제 데이터 복구 로직==//
+    private void markCanceled() {
+        this.escrowStatus=EscrowStatus.CANCELED;
+
+        this.item.changeSaleStatus(SaleStatus.SALE);
+    }
+
+    //==구매 취소 상태 처리==//
+    private void recoveryBuyerPayment() {
+        this.buyer.chargeGMoney(this.paidPrice);
+
+        this.buyer.chargeGPoint(this.usedPoint);
+    }
+
+    //==취소 검증 로직==//
+    private void validateCancel() {
+        if (this.orderStatus.equals(OrderStatus.CANCELLED)) {
+            throw new OrderCustomException(ErrorMessage.ALREADY_CANCEL_ORDER);
         }
     }
+
 
     //==주문 확인 처리 검증 로직==//
     private void validateConfirmable() {
@@ -238,7 +274,7 @@ public class Order extends BaseTimeEntity {
         this.escrowStatus=EscrowStatus.HOLDING;
 
         //상품 주문 상태 -> 예약중
-        this.item.reservedSaleStatus();
+        this.item.changeSaleStatus(SaleStatus.RESERVED);
     }
 
 }

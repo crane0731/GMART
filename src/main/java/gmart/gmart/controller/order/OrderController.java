@@ -60,6 +60,18 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 확인 완료")));
     }
 
+    /**
+     * [컨트롤러]
+     * 주문 취소 처리 -> 판매자가 거절
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<?>> cancelOrder(@PathVariable("id")Long orderId){
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
+    }
+
 
 
     //==필드에러가 있는지 확인하는 로직==//

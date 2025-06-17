@@ -97,8 +97,32 @@ public class OrderService {
     }
 
     /**
-     * 판매자가 구매 요청을 거절함(CANCEL)
+     * [서비스 로직]
+     * 판매자가 구매 요청을 거절(CANCEL)
+     * 메시지 생성
+     * @param orderId 주문 아이디
      */
+    @Transactional
+    public void cancelOrder(Long orderId) {
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //주문 거절 처리 로직
+        processCancel(order, seller, buyer);
+
+    }
+
+
 
     /**
      * 판매자가 상품 배송 상태로 변경(취소도 가능)
@@ -203,8 +227,8 @@ public class OrderService {
     }
 
     //==로그 생성 로직==//
-    private void createLog(Member buyer, Order order, Long beforeGMoney, Long afterGMoney, Long beforeGPoint, Long afterGPoint) {
-        String description = "상품 구매";
+    private void createLog(String description,Member buyer, Order order, Long beforeGMoney, Long afterGMoney, Long beforeGPoint, Long afterGPoint) {
+
 
         //건머니 로그 생성
         gMoneyLogService.createLog(buyer.getId(), order.getId(),
@@ -242,7 +266,29 @@ public class OrderService {
         createMessage(buyer,buyerMessage, seller,sellerMessage);
 
         //로그 생성
-        createLog(buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
+        createLog("상품 구매",buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
+    }
+
+    //==주문 거절 처리 로직==//
+    private void processCancel(Order order, Member seller, Member buyer) {
+
+        //구매자의 주문 거절 전 건머니와 건포인트
+        Long beforeGMoney = buyer.getGMoney();
+        Long beforeGPoint = buyer.getGPoint();
+
+        order.cancelOrder();
+
+        //구매자의 주문 거절 흐 건머니와 건포인트
+        Long afterGMoney = buyer.getGMoney();
+        Long afterGPoint = buyer.getGPoint();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 구매 요청을 거절하셨습니다.";
+        String sellerMessage= buyer.getNickname()+" 님의 구매 요청을 거절하셨습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //로그 생성
+        createLog("주문 취소",buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
     }
 
 

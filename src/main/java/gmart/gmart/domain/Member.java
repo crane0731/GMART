@@ -335,7 +335,6 @@ public class Member extends BaseTimeEntity {
         this.gPoint-=usedGPoint;
     }
 
-
     //==Address 생성==//
     private static Address createAddress(AddressDto dto) {
         return Address.createEntity(dto);
