@@ -50,7 +50,34 @@ public class OrderController {
 
     /**
      * [컨트롤러]
-     * 주문확인 처리
+     * 구매자가 판매자에게 주문 신청 취소를 요청함
+     * 주문 상태가 아직 주문확인 상태 즉,판매자가 주문 확인을 하고 아직 상품을 배송하기 전인 상태 만 가능
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/cancel-request")
+    public ResponseEntity<ApiResponse<?>> revokeOrder(@PathVariable("id")Long orderId) {
+        orderService.cancelRequestByBuyer(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 요청 완료")));
+    }
+
+
+    /**
+     * [컨트롤러]
+     * 구매자가 주문 취소 처리
+     * 아직 판매자가 주문을 확인하기 전 상태에서만 가능 (주문 예약 상태)
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/buyer-cancel")
+    public ResponseEntity<ApiResponse<?>> cancelOrderByBuyer(@PathVariable("id")Long orderId) {
+        orderService.cancelOrderByBuyer(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 판매자가 주문확인 처리
      * @param orderId 주문 아이디
      * @return 성공 메시지
      */
@@ -66,8 +93,8 @@ public class OrderController {
      * @param orderId 주문 아이디
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<ApiResponse<?>> cancelOrder(@PathVariable("id")Long orderId){
+    @PostMapping("/{id}/seller-cancel")
+    public ResponseEntity<ApiResponse<?>> cancelOrderBySeller(@PathVariable("id")Long orderId){
         orderService.cancelOrder(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
     }

@@ -18,6 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o " +
             "FROM Order o " +
-            "WHERE o.buyer=:buyer and o.item=:item and o.orderStatus=:orderStatus")
-    Optional<Order>findByBuyerAndItem(@Param("buyer") Member buyer, @Param("item") Item item, @Param("orderStatus") OrderStatus orderStatus);
+            "WHERE o.buyer=:buyer and o.item=:item and " +
+            "(o.orderStatus=:reservedStatus or o.orderStatus=:cancelRequestStatus)")
+    Optional<Order>findByBuyerAndItem(@Param("buyer") Member buyer, @Param("item") Item item, @Param("reservedStatus") OrderStatus reservedStatus, @Param("cancelRequestStatus") OrderStatus cancelRequestStatus);
 }

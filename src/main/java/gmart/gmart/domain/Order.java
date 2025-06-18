@@ -227,6 +227,30 @@ public class Order extends BaseTimeEntity {
 
     }
 
+    /**
+     * [비즈니스 로직]
+     * 구매자가 주문을 취소함 , 단 주문의 상태가 주문 예약 상태일때만 가능
+     */
+    public void cancelOrderByBuyer(){
+
+        //검증 로직
+        validateCancelOrderByBuyer();
+
+        //주문 캔슬
+        this.orderStatus=OrderStatus.CANCELLED;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 구매자가 주문을 취소요청 함, 단 주문의 상태가 주문확인을 한 상태여야함(아직 상품을 배송하기 전)
+     */
+    public void cancelRequestByBuyer(){
+        //(구매자가)주문 취소 검증
+        validateCancelRequestByBuyer();
+
+        this.orderStatus = OrderStatus.CANCEL_REQUESTED;
+    }
+
     //==구매자의 결제 데이터 복구 로직==//
     private void markCanceled() {
         this.escrowStatus=EscrowStatus.CANCELED;
@@ -275,6 +299,22 @@ public class Order extends BaseTimeEntity {
 
         //상품 주문 상태 -> 예약중
         this.item.changeSaleStatus(SaleStatus.RESERVED);
+    }
+
+    //== (구매자가)주문 취소 검증로직 ==//
+    private void validateCancelRequestByBuyer() {
+        if(!this.orderStatus.equals(OrderStatus.CONFIRMED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+    }
+
+    //==구매자 주문 취소 검증 로직==//
+    private void validateCancelOrderByBuyer() {
+        validateCancel();
+
+        if(!this.orderStatus.equals(OrderStatus.RESERVED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
     }
 
 }

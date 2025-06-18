@@ -70,6 +70,57 @@ public class OrderService {
 
     /**
      * [서비스 로직]
+     * 구매자가 주문 취소함
+     * 아직 판매자가 주문을 확인하기 전 상태에서만 가능 (주문 예약 상태)
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void cancelOrderByBuyer(Long orderId) {
+
+        //현재 로그인한 회원 조회 (구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //판매자는 자신의 아이템을 주문취소 요청 할 수 없음
+        validateItemOwner(buyer, seller);
+
+        //판매자 주문 취소 로직
+        processOrderCancelByBuyer(order, seller, buyer);
+    }
+
+    /**
+     * [서비스 로직]
+     * 구매자가 판매자에게 주문 취소를 요청함
+     * 주문 상태가 아직 주문확인 상태 즉,판매자가 주문 확인을 하고 아직 상품을 배송하기 전인 상태 만 가능
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void cancelRequestByBuyer(Long orderId){
+
+        //현재 로그인한 회원 조회 (구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //판매자는 자신의 아이템을 주문취소 요청 할 수 없음
+        validateItemOwner(buyer, seller);
+
+        //구매자 주문 취소 요청 로직
+        processCancelRequestByBuyer(order, seller, buyer);
+
+    }
+
+    /**
+     * [서비스 로직]
      * 판매자가 구매자의 구매 신청을 구매확인 처리함(판매자가 구매확인 버튼을 누름)
      * 메시지 생성
      * 건머니 로그 생성
@@ -121,8 +172,6 @@ public class OrderService {
         processCancel(order, seller, buyer);
 
     }
-
-
 
     /**
      * 판매자가 상품 배송 상태로 변경(취소도 가능)
@@ -206,13 +255,14 @@ public class OrderService {
         //판매자는 자신의 아이템을 구매할 수 없음
         validateItemOwner(buyer, seller);
 
-        //이미 대기중인 주문 신청이 있다면 (RESERVED 상태) 재 주문 불가
+        //이미 대기중인 주문 신청이 있다면 (RESERVED 또는 CANCEL_REQUESTED 상태) 재 주문 불가
         validateExistsReservedOrder(buyer, item);
+
     }
 
     //==이미 대기중인 주문신청이 있는지 확인하는 로직==//
     private void validateExistsReservedOrder(Member buyer, Item item) {
-        Order exists = orderRepository.findByBuyerAndItem(buyer, item, OrderStatus.RESERVED).orElse(null);
+        Order exists = orderRepository.findByBuyerAndItem(buyer, item, OrderStatus.RESERVED,OrderStatus.CANCEL_REQUESTED).orElse(null);
         if(exists != null) {
             throw new OrderCustomException(ErrorMessage.ALREADY_RESERVED_ORDER);
         }
@@ -291,8 +341,25 @@ public class OrderService {
         createLog("주문 취소",buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
     }
 
+    //==구매자 구매 취소 요청 로직==//
+    private void processCancelRequestByBuyer(Order order, Member seller, Member buyer) {
+        //구매 취소 요청  로직
+        order.cancelRequestByBuyer();
 
+        String buyerMessage= seller.getNickname() + " 님에게 구매 취소를 요쳥했습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 구매 취소 요청을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
 
+    //==판매자 주문 취소 로직==//
+    private void processOrderCancelByBuyer(Order order, Member seller, Member buyer) {
+        //주문 취소
+        order.cancelOrderByBuyer();
+
+        String buyerMessage= seller.getNickname() + " 님의 상품 구매를 취소했습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 구매를 취소했습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
 
 
 
