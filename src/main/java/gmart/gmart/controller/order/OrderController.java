@@ -1,6 +1,7 @@
 package gmart.gmart.controller.order;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.service.order.OrderService;
 import jakarta.validation.Valid;
@@ -55,9 +56,16 @@ public class OrderController {
      * @param orderId 주문 아이디
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/cancel-request")
-    public ResponseEntity<ApiResponse<?>> revokeOrder(@PathVariable("id")Long orderId) {
-        orderService.cancelRequestByBuyer(orderId);
+    @PostMapping("/{id}/buyer-cancel-request")
+    public ResponseEntity<ApiResponse<?>> revokeOrder(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult) {
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+        orderService.cancelRequestByBuyer(orderId,requestDto);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 요청 완료")));
     }
 
@@ -70,8 +78,16 @@ public class OrderController {
      * @return 성공 메시지
      */
     @PostMapping("/{id}/buyer-cancel")
-    public ResponseEntity<ApiResponse<?>> cancelOrderByBuyer(@PathVariable("id")Long orderId) {
-        orderService.cancelOrderByBuyer(orderId);
+    public ResponseEntity<ApiResponse<?>> cancelOrderByBuyer(@PathVariable("id")Long orderId, @Valid @RequestBody CancelOrderRequestDto requestDto,BindingResult bindingResult) {
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        orderService.cancelOrderByBuyer(orderId, requestDto);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
     }
 
@@ -94,8 +110,28 @@ public class OrderController {
      * @return 성공 메시지
      */
     @PostMapping("/{id}/seller-cancel")
-    public ResponseEntity<ApiResponse<?>> cancelOrderBySeller(@PathVariable("id")Long orderId){
-        orderService.cancelOrder(orderId);
+    public ResponseEntity<ApiResponse<?>> cancelOrderBySeller(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult) {
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        orderService.cancelOrder(orderId,requestDto);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 판매자가 구매자의 주문 취소 요청을 승인 -> 주문 취소 처리
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/buyer-cancel/seller-accept")
+    public ResponseEntity<ApiResponse<?>> acceptCancelOrderBySeller(@PathVariable("id")Long orderId){
+        orderService.acceptCancelOrderRequestBySeller(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
     }
 

@@ -8,6 +8,7 @@ import gmart.gmart.domain.enums.GMoneyDeltaType;
 import gmart.gmart.domain.enums.GPointDeltaType;
 import gmart.gmart.domain.enums.OrderStatus;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
+import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
@@ -73,9 +74,10 @@ public class OrderService {
      * 구매자가 주문 취소함
      * 아직 판매자가 주문을 확인하기 전 상태에서만 가능 (주문 예약 상태)
      * @param orderId 주문 아이디
+     * @param requestDto 주문 취소 요청 DTO
      */
     @Transactional
-    public void cancelOrderByBuyer(Long orderId) {
+    public void cancelOrderByBuyer(Long orderId , CancelOrderRequestDto requestDto) {
 
         //현재 로그인한 회원 조회 (구매자)
         Member buyer = memberService.findBySecurityContextHolder();
@@ -90,7 +92,7 @@ public class OrderService {
         validateItemOwner(buyer, seller);
 
         //판매자 주문 취소 로직
-        processOrderCancelByBuyer(order, seller, buyer);
+        processOrderCancelByBuyer(order, seller, buyer,requestDto);
     }
 
     /**
@@ -100,7 +102,7 @@ public class OrderService {
      * @param orderId 주문 아이디
      */
     @Transactional
-    public void cancelRequestByBuyer(Long orderId){
+    public void cancelRequestByBuyer(Long orderId,CancelOrderRequestDto requestDto) {
 
         //현재 로그인한 회원 조회 (구매자)
         Member buyer = memberService.findBySecurityContextHolder();
@@ -115,7 +117,7 @@ public class OrderService {
         validateItemOwner(buyer, seller);
 
         //구매자 주문 취소 요청 로직
-        processCancelRequestByBuyer(order, seller, buyer);
+        processCancelRequestByBuyer(order, seller, buyer,requestDto);
 
     }
 
@@ -154,7 +156,7 @@ public class OrderService {
      * @param orderId 주문 아이디
      */
     @Transactional
-    public void cancelOrder(Long orderId) {
+    public void cancelOrder(Long orderId,CancelOrderRequestDto requestDto) {
 
         //현재 로그인한 회원 조회(판매자)
         Member seller = memberService.findBySecurityContextHolder();
@@ -169,8 +171,35 @@ public class OrderService {
         Member buyer = order.getBuyer();
 
         //주문 거절 처리 로직
-        processCancel(order, seller, buyer);
+        processCancel(order, seller, buyer,requestDto);
 
+    }
+
+    /**
+     * [서비스 로직]
+     * 판매자가 구매자의 주문 취소 요청을 승인
+     * 메시지 생성
+     * 건머니 로그 생성
+     * 건포인트 로그 생성
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void acceptCancelOrderRequestBySeller(Long orderId){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //취소 요청 승인 + 주문 취소 처리
+        processAcceptCancelOrderRequestBySeller(buyer, order, seller);
     }
 
     /**
@@ -320,13 +349,13 @@ public class OrderService {
     }
 
     //==주문 거절 처리 로직==//
-    private void processCancel(Order order, Member seller, Member buyer) {
+    private void processCancel(Order order, Member seller, Member buyer,CancelOrderRequestDto requestDto) {
 
         //구매자의 주문 거절 전 건머니와 건포인트
         Long beforeGMoney = buyer.getGMoney();
         Long beforeGPoint = buyer.getGPoint();
 
-        order.cancelOrder();
+        order.cancelOrderBySeller(requestDto.getCancelReason());
 
         //구매자의 주문 거절 흐 건머니와 건포인트
         Long afterGMoney = buyer.getGMoney();
@@ -342,9 +371,9 @@ public class OrderService {
     }
 
     //==구매자 구매 취소 요청 로직==//
-    private void processCancelRequestByBuyer(Order order, Member seller, Member buyer) {
+    private void processCancelRequestByBuyer(Order order, Member seller, Member buyer,CancelOrderRequestDto requestDto) {
         //구매 취소 요청  로직
-        order.cancelRequestByBuyer();
+        order.cancelRequestByBuyer(requestDto.getCancelReason());
 
         String buyerMessage= seller.getNickname() + " 님에게 구매 취소를 요쳥했습니다.";
         String sellerMessage= buyer.getNickname()+" 님이 구매 취소 요청을 보냈습니다.";
@@ -352,13 +381,35 @@ public class OrderService {
     }
 
     //==판매자 주문 취소 로직==//
-    private void processOrderCancelByBuyer(Order order, Member seller, Member buyer) {
+    private void processOrderCancelByBuyer(Order order, Member seller, Member buyer,CancelOrderRequestDto requestDto) {
         //주문 취소
-        order.cancelOrderByBuyer();
+        order.cancelOrderByBuyer(requestDto.getCancelReason());
 
         String buyerMessage= seller.getNickname() + " 님의 상품 구매를 취소했습니다.";
         String sellerMessage= buyer.getNickname()+" 님이 구매를 취소했습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==취소 요청 승인 + 주문 취소 처리 로직 ==//
+    private void processAcceptCancelOrderRequestBySeller(Member buyer, Order order, Member seller) {
+        //구매자의 주문 거절 전 건머니와 건포인트
+        Long beforeGMoney = buyer.getGMoney();
+        Long beforeGPoint = buyer.getGPoint();
+
+        //취소 요청 승인 + 주문 취소 처리
+        order.acceptCancelRequestBySeller();
+
+        //구매자의 주문 거절 흐 건머니와 건포인트
+        Long afterGMoney = buyer.getGMoney();
+        Long afterGPoint = buyer.getGPoint();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 주문 취소 요청을 승인하였습니다.";
+        String sellerMessage= buyer.getNickname()+" 님의 주문 취소 요청을 승인하였습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //로그 생성
+        createLog("주문 취소", buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
     }
 
 

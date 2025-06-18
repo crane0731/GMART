@@ -2,10 +2,7 @@ package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
-import gmart.gmart.domain.enums.DeleteStatus;
-import gmart.gmart.domain.enums.EscrowStatus;
-import gmart.gmart.domain.enums.OrderStatus;
-import gmart.gmart.domain.enums.SaleStatus;
+import gmart.gmart.domain.enums.*;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
 import jakarta.persistence.*;
@@ -80,13 +77,18 @@ public class Order extends BaseTimeEntity {
     @Column(name = "cancel_reason")
     private String cancelReason;
 
+    @Comment("취소/환불 사유 작성자 역할 (BUYER / SELLER)")
+    @Column(name = "cancel_reason_writer")
+    @Enumerated(EnumType.STRING)
+    private OrderRole cancelReasonWriter;
+
     @org.hibernate.annotations.Comment("취소,환불 요청 일자")
     @Column(name = "cancel_requested_date")
     private LocalDateTime cancelRequestedDate;
 
     @org.hibernate.annotations.Comment("취소,환불 처리 완료 일자")
     @Column(name = "cancel_completed_date")
-    private LocalDateTime cancelCompletedAt;
+    private LocalDateTime cancelCompletedDate;
 
     @org.hibernate.annotations.Comment("에스크로 상태")
     @Column(name = "escrow_status")
@@ -205,15 +207,36 @@ public class Order extends BaseTimeEntity {
 
     /**
      * [비즈니스 로직]
+     * 판매자가 구매자의 주문 취소 요청을 수락
+     */
+    public void acceptCancelRequestBySeller(){
+        //검증 로직
+        validateAcceptCancelRequestBySeller();
+
+        //구매자의 결제 데이터 복구
+        recoveryBuyerPayment();
+
+        //구매 취소 상태 처리
+        markCanceled();
+
+        //주문 캔슬
+        this.orderStatus = OrderStatus.CANCELLED;
+
+        this.cancelCompletedDate = LocalDateTime.now();
+
+    }
+
+    /**
+     * [비즈니스 로직]
      * 판매자가 주문 거절 처리
      */
-    public void cancelOrder(){
+    public void cancelOrderBySeller(String cancelReason){
 
         //검증 로직
         validateCancel();
 
         //만약 주문 상태가 주문 확인 처리 상태였다면 다시 복구
-        if(this.orderStatus.equals(OrderStatus.CONFIRMED)){
+        if(this.orderStatus.equals(OrderStatus.CONFIRMED)) {
 
             //구매자의 결제 데이터 복구
             recoveryBuyerPayment();
@@ -225,30 +248,59 @@ public class Order extends BaseTimeEntity {
         //주문 캔슬
         this.orderStatus=OrderStatus.CANCELLED;
 
+        this.cancelReason = cancelReason;
+
+        this.cancelReasonWriter=OrderRole.SELLER;
+
+        this.cancelRequestedDate = LocalDateTime.now();
+
+        this.cancelCompletedDate = LocalDateTime.now();
+
     }
 
     /**
      * [비즈니스 로직]
      * 구매자가 주문을 취소함 , 단 주문의 상태가 주문 예약 상태일때만 가능
      */
-    public void cancelOrderByBuyer(){
+    public void cancelOrderByBuyer(String cancelReason){
 
         //검증 로직
         validateCancelOrderByBuyer();
 
         //주문 캔슬
         this.orderStatus=OrderStatus.CANCELLED;
+
+        //취소한 사람 : 구매자
+        this.cancelReasonWriter=OrderRole.BUYER;
+
+        //취소 사유
+        this.cancelReason=cancelReason;
+
+        //취소 요청 날짜
+        this.cancelRequestedDate=LocalDateTime.now();
+
+        //취소 완료 날짜
+        this.cancelCompletedDate=LocalDateTime.now();
     }
 
     /**
      * [비즈니스 로직]
      * 구매자가 주문을 취소요청 함, 단 주문의 상태가 주문확인을 한 상태여야함(아직 상품을 배송하기 전)
      */
-    public void cancelRequestByBuyer(){
+    public void cancelRequestByBuyer(String cancelReason){
         //(구매자가)주문 취소 검증
         validateCancelRequestByBuyer();
 
         this.orderStatus = OrderStatus.CANCEL_REQUESTED;
+
+        //취소한 사람 : 구매자
+        this.cancelReasonWriter=OrderRole.BUYER;
+
+        //취소 사유
+        this.cancelReason=cancelReason;
+
+        //취소 요청 날짜
+        this.cancelRequestedDate=LocalDateTime.now();
     }
 
     //==구매자의 결제 데이터 복구 로직==//
@@ -313,6 +365,15 @@ public class Order extends BaseTimeEntity {
         validateCancel();
 
         if(!this.orderStatus.equals(OrderStatus.RESERVED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+    }
+
+    //==판매자의 주문 취소 요청 승낙 검증 로직==//
+    private void validateAcceptCancelRequestBySeller() {
+        validateCancel();
+
+        if(!this.orderStatus.equals(OrderStatus.CANCEL_REQUESTED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
     }
