@@ -202,6 +202,39 @@ public class OrderService {
         processAcceptCancelOrderRequestBySeller(buyer, order, seller);
     }
 
+
+    /**
+     * [서비스 로직]
+     * 판매자가 구매자의 주문 취소 요청을 거절
+     * 즉, 주문 절차가 원래대로 진행됨
+     * 주문 상태 CANCEL_REQUESTED -> CONFIRM
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void rejectCancelOrderRequestBySeller(Long orderId){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        order.rejectCancelRequestBySeller();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
+        String sellerMessage= buyer.getNickname()+" 님의 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+
+    }
+
     /**
      * 판매자가 상품 배송 상태로 변경(취소도 가능)
      * 메시지 생성

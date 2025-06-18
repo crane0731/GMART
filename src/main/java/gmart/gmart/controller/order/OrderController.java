@@ -132,8 +132,16 @@ public class OrderController {
     @PostMapping("/{id}/buyer-cancel/seller-accept")
     public ResponseEntity<ApiResponse<?>> acceptCancelOrderBySeller(@PathVariable("id")Long orderId){
         orderService.acceptCancelOrderRequestBySeller(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 승인 완료")));
     }
+
+    @PostMapping("/{id}/buyer-cancel/seller-reject")
+    public ResponseEntity<ApiResponse<?>> rejectCancelOrderBySeller(@PathVariable("id")Long orderId){
+        orderService.rejectCancelOrderRequestBySeller(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 거절 완료")));
+    }
+
+
 
 
 

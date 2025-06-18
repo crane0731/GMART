@@ -1,6 +1,5 @@
 package gmart.gmart.domain;
 
-import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.exception.ErrorMessage;
@@ -196,7 +195,7 @@ public class Order extends BaseTimeEntity {
      */
     public void confirmOrder(){
         //검증 로직
-        validateConfirmable();
+        validateReserved();
         
         //구매자의 결제 금액 처리
         deductBuyerPayment();
@@ -228,6 +227,18 @@ public class Order extends BaseTimeEntity {
 
     /**
      * [비즈니스 로직]
+     * 판매자가 구매자의 주문 취소 요청을 거절
+     */
+    public void rejectCancelRequestBySeller(){
+
+        //주문 상태가 주문 취소 요청 인지 검증
+        validateCancelRequest();
+
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
+
+    /**
+     * [비즈니스 로직]
      * 판매자가 주문 거절 처리
      */
     public void cancelOrderBySeller(String cancelReason){
@@ -246,7 +257,7 @@ public class Order extends BaseTimeEntity {
 
         }
         //주문 캔슬
-        this.orderStatus=OrderStatus.CANCELLED;
+        this.orderStatus=OrderStatus.REJECTED;
 
         this.cancelReason = cancelReason;
 
@@ -317,20 +328,6 @@ public class Order extends BaseTimeEntity {
         this.buyer.chargeGPoint(this.usedPoint);
     }
 
-    //==취소 검증 로직==//
-    private void validateCancel() {
-        if (this.orderStatus.equals(OrderStatus.CANCELLED)) {
-            throw new OrderCustomException(ErrorMessage.ALREADY_CANCEL_ORDER);
-        }
-    }
-
-
-    //==주문 확인 처리 검증 로직==//
-    private void validateConfirmable() {
-        if (!this.orderStatus.equals(OrderStatus.RESERVED)) {
-            throw new OrderCustomException(ErrorMessage.CANNOT_CONFIRM_ORDER);
-        }
-    }
 
     //==구매자 금액 처리로직==//
     private void deductBuyerPayment() {
@@ -353,6 +350,22 @@ public class Order extends BaseTimeEntity {
         this.item.changeSaleStatus(SaleStatus.RESERVED);
     }
 
+
+    //==취소 검증 로직==//
+    private void validateCancel() {
+        if (this.orderStatus.equals(OrderStatus.CANCELLED)) {
+            throw new OrderCustomException(ErrorMessage.ALREADY_CANCEL_ORDER);
+        }
+    }
+
+
+    //==주문 예약 상태 검증 로직==//
+    private void validateReserved() {
+        if (!this.orderStatus.equals(OrderStatus.RESERVED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_CONFIRM_ORDER);
+        }
+    }
+
     //== (구매자가)주문 취소 검증로직 ==//
     private void validateCancelRequestByBuyer() {
         if(!this.orderStatus.equals(OrderStatus.CONFIRMED)) {
@@ -373,6 +386,11 @@ public class Order extends BaseTimeEntity {
     private void validateAcceptCancelRequestBySeller() {
         validateCancel();
 
+        validateCancelRequest();
+    }
+
+    //==주문 상태가 주문취소 요청 상태인지 검증하는 로직==//
+    private void validateCancelRequest() {
         if(!this.orderStatus.equals(OrderStatus.CANCEL_REQUESTED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
