@@ -1,13 +1,12 @@
 package gmart.gmart.controller.order;
 
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.delivery.CreateDeliveryRequestDto;
+import gmart.gmart.dto.delivery.trackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.service.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -117,7 +116,7 @@ public class OrderController {
      * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/seller-reject")
+    @PostMapping("/{id}/seller-rejection")
     public ResponseEntity<ApiResponse<?>> rejectOrderRequestBySeller(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult){
 
         Map<String, String> errorMessages = new HashMap<>();
@@ -170,23 +169,47 @@ public class OrderController {
      * @param orderId 주문 아이디
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/buyer-cancel/seller-reject")
+    @PostMapping("/{id}/buyer-cancel/seller-rejection")
     public ResponseEntity<ApiResponse<?>> rejectCancelOrderBySeller(@PathVariable("id")Long orderId){
         orderService.rejectCancelOrderRequestBySeller(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 거절 완료")));
     }
 
+    /**
+     * [컨트롤러]
+     * 판매자가 상품 배송 준비를 완료
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/delivery-preparations")
+    public ResponseEntity<ApiResponse<?>> readyDelivery(@PathVariable("id")Long orderId){
+        orderService.readyDelivery(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 준비 완료")));
+    }
 
     /**
      * [컨트롤러]
-     * 판매자가 상품을 배송 -> 배송 생성
+     * 판매자가 상품 배송 준비 완료를 취소
      * @param orderId 주문 아이디
-     * @param requestDto 배송 생성 요청 DTO
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/delivery-preparations/cancel")
+    public ResponseEntity<ApiResponse<?>> cancelReadyDelivery(@PathVariable("id")Long orderId){
+        orderService.cancelReadyDelivery(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 준비 취소 완료")));
+    }
+
+
+    /**
+     * [컨트롤러]
+     * 판매자가 상품을 배송
+     * @param orderId 주문 아이디
+     * @param requestDto 배송 요청 DTO
      * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
     @PostMapping("/{id}/delivery")
-    public ResponseEntity<ApiResponse<?>> createDelivery(@PathVariable("id")Long orderId, @Valid @RequestBody CreateDeliveryRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse<?>> shipItem(@PathVariable("id")Long orderId, @Valid @RequestBody trackingNumberRequestDto requestDto, BindingResult bindingResult) {
 
         Map<String, String> errorMessages = new HashMap<>();
         //필드에러가 있는지 확인
@@ -195,14 +218,11 @@ public class OrderController {
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
         }
 
-        orderService.createDelivery(orderId,requestDto);
+        orderService.shipItem(orderId,requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 시작 완료")));
 
     }
-
-
-
 
     //==필드에러가 있는지 확인하는 로직==//
     private boolean errorCheck(BindingResult bindingResult, Map<String, String> errorMessages) {

@@ -4,6 +4,8 @@ import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.DeliveryStatus;
 import gmart.gmart.domain.enums.RefundStatus;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.OrderCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -87,7 +89,7 @@ public class Delivery extends BaseTimeEntity {
      * @param refundStatus 환불 상태
      * @return Delivery 배송 엔티티
      */
-    public static Delivery create(Member sender , Member receiver, RefundStatus refundStatus,String trackingNumber) {
+    public static Delivery create(Member sender , Member receiver, RefundStatus refundStatus) {
 
         Delivery delivery = new Delivery();
 
@@ -99,11 +101,9 @@ public class Delivery extends BaseTimeEntity {
         delivery.receiverPhone= receiver.getPhoneNumber();
         delivery.receiverAddress=receiver.getAddress();
 
-        delivery.deliveryStatus=DeliveryStatus.SHIPPING;
+        delivery.deliveryStatus=DeliveryStatus.READY;
 
         delivery.refundStatus=refundStatus;
-
-        delivery.trackingNumber=trackingNumber;
 
         delivery.deleteStatus=DeleteStatus.UNDELETED;
 
@@ -116,6 +116,42 @@ public class Delivery extends BaseTimeEntity {
      */
     protected void setOrder(Order order) {
         this.order = order;
+    }
+
+
+    /**
+     * [Setter]
+     * @param trackingNumber 송장 번호
+     */
+    protected void setTrackingNumber(String trackingNumber){
+        this.trackingNumber=trackingNumber;
+
+        this.deliveryStatus=DeliveryStatus.SHIPPING;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 배송 준비 완료
+     */
+    public void ready(){
+        this.deliveryStatus=DeliveryStatus.READY;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 배송 준비 취소
+     */
+    protected void cancelReady(){
+        //검증 로직
+        validateCancelReady();
+        this.deliveryStatus = DeliveryStatus.CANCELED;
+    }
+
+    //==배송 준비 취소 검증 로직==//
+    private void validateCancelReady() {
+        if(!deliveryStatus.equals(DeliveryStatus.READY)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_READY_DELIVERY);
+        }
     }
 
 }

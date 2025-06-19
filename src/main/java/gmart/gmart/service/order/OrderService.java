@@ -6,7 +6,7 @@ import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
-import gmart.gmart.dto.delivery.CreateDeliveryRequestDto;
+import gmart.gmart.dto.delivery.trackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -262,17 +262,16 @@ public class OrderService {
 
     }
 
+
     /**
      * [서비스 로직]
-     * 판매자가 주문 상태를 상품 배송 상태로 변경
-     * 판매자가 상품을 배송했다는의미
+     * 판매자가 배송 준비 상태로 설정하는 기능
      * 배송 생성
      * 메시지 생성
      * @param orderId 주문 아이디
-     * @param requestDto 배송 생성 요청 DTO
      */
     @Transactional
-    public void createDelivery(Long orderId, CreateDeliveryRequestDto requestDto){
+    public void readyDelivery(Long orderId){
 
         //현재 로그인한 회원(판매자)
         Member seller = memberService.findBySecurityContextHolder();
@@ -287,18 +286,61 @@ public class OrderService {
         Member buyer = order.getBuyer();
 
         //배송 생성 로직
-        processCreateDelivery(requestDto, buyer, seller, order);
-
+        processReadyDelivery(buyer, seller, order);
     }
 
+    /**
+     * [서비스 로직]
+     * 판매자가 상품 배송을 시작함을 알리는 서비스
+     * 메시지 생성
+     * @param orderId 주문 아이디
+     * @param requestDto 요청 DTO
+     */
+    @Transactional
+    public void shipItem(Long orderId, trackingNumberRequestDto requestDto){
+
+        //현재 로그인한 회원(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //상품 배송 시작 처리
+        processShipItem(requestDto, order, seller, buyer);
+    }
 
     /**
-     * 판매자가 상품 배송 취소
-     * 다시 주문상태를 주문 확인으로 변경
+     * [서비스 로직]
+     * 판매자가 상품 배송 준비를 취소
+     * 배송 상태를 CANCELED 로 변경
      * 메시지 생성
+     * @param orderId 주문 아이디
      */
+    @Transactional
+    public void cancelReadyDelivery(Long orderId){
 
+        //현재 로그인한 회원(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
 
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //배송 준비 취소 처리 로직
+        processCancelReadyDelivery(order, seller, buyer);
+
+    }
 
     /**
      * 구매자가 상품을 받으면 구매확정 처리를 함
@@ -526,19 +568,47 @@ public class OrderService {
     }
 
     //==배송 생성 로직==//
-    private void processCreateDelivery(CreateDeliveryRequestDto requestDto, Member buyer, Member seller, Order order) {
-        //배송 생성
-        Delivery delivery = Delivery.create(seller,buyer, RefundStatus.NOT_REFUNDED, requestDto.getTrackingNumber());
+    private void processReadyDelivery(Member buyer, Member seller, Order order) {
 
-        //주문에 배송 설정
-        order.setDelivery(delivery);
+        //만약 배송 정보가 있다면
+        if(order.getDelivery()!=null){
+            //기존 배송 을 다시 준비 완료 상태로 되돌림
+            order.getDelivery().ready();
+        }else{
+            //배송 생성
+            Delivery delivery = Delivery.create(seller,buyer, RefundStatus.NOT_REFUNDED);
 
-        //배송 저장
-        deliveryService.save(delivery);
+            //주문에 배송 설정
+            order.setDelivery(delivery);
+
+            //배송 저장
+            deliveryService.save(delivery);
+        }
+        //메시지 생성
+        String buyerMessage= " 배송 준비! "+ seller.getNickname() + " 님이 상품 발송 준비를 완료했습니다.";
+        String sellerMessage= " 배송 준비! "+ buyer.getNickname()+" 님에게 상품 발송 준비를 알렸습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==상품 배송 시작 처리 하는 로직==//
+    private void processShipItem(trackingNumberRequestDto requestDto, Order order, Member seller, Member buyer) {
+        //배송 시작 처리
+        order.shipItem(requestDto.getTrackingNumber());
 
         //메시지 생성
         String buyerMessage= " 배송 시작! "+ seller.getNickname() + " 님이 상품을 발송하였습니다.";
         String sellerMessage= " 배송 시작! "+ buyer.getNickname()+" 님에게 상품을 발송하였습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==배송 준비 취소 처리 로직==//
+    private void processCancelReadyDelivery(Order order, Member seller, Member buyer) {
+        //배송 준비 취소 처리
+        order.cancelReadyDelivery();
+
+        //메시지 생성
+        String buyerMessage= " 배송 준비 취소 "+ seller.getNickname() + " 님이 상품 발송 준비를 취소했습니다.";
+        String sellerMessage= " 배송 준비 취소"+ buyer.getNickname()+" 님에게 상품 발송 준비 취소를 알렸습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 

@@ -153,15 +153,15 @@ public class Order extends BaseTimeEntity {
         this.delivery=delivery;
         delivery.setOrder(this);
 
-        shipItem();
-
     }
 
     /**
      * [비즈니스 로직]
      * 주문 상태를 배송 시작함으로 변경
      */
-    public void shipItem(){
+    public void shipItem(String trackingNumber){
+
+        this.delivery.setTrackingNumber(trackingNumber);
         this.orderStatus=OrderStatus.SHIPPED;
     }
 
@@ -363,6 +363,14 @@ public class Order extends BaseTimeEntity {
         this.cancelRequestedDate=LocalDateTime.now();
     }
 
+    /**
+     * [비즈니스 로직]
+     * 배송 준비 취소
+     */
+    public void cancelReadyDelivery(){
+        this.delivery.cancelReady();
+    }
+
     //==구매자의 결제 데이터 복구 로직==//
     private void markCanceled() {
         this.escrowStatus=EscrowStatus.CANCELED;
@@ -435,5 +443,6 @@ public class Order extends BaseTimeEntity {
             throw new OrderCustomException(ErrorMessage.CANNOT_SHIP_DELIVERY);
         }
     }
+
 
 }
