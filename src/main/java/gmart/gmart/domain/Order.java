@@ -195,7 +195,7 @@ public class Order extends BaseTimeEntity {
      */
     public void confirmOrder(){
         //검증 로직
-        validateReserved();
+        validateReservedByConfirm();
         
         //구매자의 결제 금액 처리
         deductBuyerPayment();
@@ -210,7 +210,7 @@ public class Order extends BaseTimeEntity {
      */
     public void acceptCancelRequestBySeller(){
         //검증 로직
-        validateAcceptCancelRequestBySeller();
+        validateCancelRequestByCancel();
 
         //구매자의 결제 데이터 복구
         recoveryBuyerPayment();
@@ -232,7 +232,7 @@ public class Order extends BaseTimeEntity {
     public void rejectCancelRequestBySeller(){
 
         //주문 상태가 주문 취소 요청 인지 검증
-        validateCancelRequest();
+        validateCancelRequestByCancel();
 
         this.orderStatus = OrderStatus.CONFIRMED;
     }
@@ -246,7 +246,7 @@ public class Order extends BaseTimeEntity {
 
         //주문의 상태가 이미 예약 상태인지 확인
         //RESERVED 상태가 아니라면 구매 거절 불가
-        validateReserved();
+        validateReservedByCancel();
 
         //주문 캔슬
         this.orderStatus=OrderStatus.REJECTED;
@@ -269,7 +269,7 @@ public class Order extends BaseTimeEntity {
     public void cancelOrderBySeller(String cancelReason){
 
         //주문의 상태가 주문 확인 상태인지 검증
-        validateConfirmed();
+        validateConfirmedByCancel();
 
         //만약 주문 상태가 주문 확인 처리 상태였다면 다시 복구
 
@@ -299,7 +299,7 @@ public class Order extends BaseTimeEntity {
     public void cancelOrderByBuyer(String cancelReason){
 
         //검증 로직
-        validateCancelOrderByBuyer();
+        validateReservedByCancel();
 
         //주문 캔슬
         this.orderStatus=OrderStatus.CANCELLED;
@@ -323,7 +323,7 @@ public class Order extends BaseTimeEntity {
      */
     public void cancelRequestByBuyer(String cancelReason){
         //주문의 상태가 주문확인 인지 확인
-        validateConfirmed();
+        validateConfirmedByCancel();
 
         this.orderStatus = OrderStatus.CANCEL_REQUESTED;
 
@@ -374,54 +374,31 @@ public class Order extends BaseTimeEntity {
     }
 
 
-    //==취소 검증 로직==//
-    private void validateCancel() {
-        if (this.orderStatus.equals(OrderStatus.CANCELLED)) {
-            throw new OrderCustomException(ErrorMessage.ALREADY_CANCEL_ORDER);
-        }
-    }
-
-
     //==주문 예약 상태 검증 로직==//
-    private void validateReserved() {
+    private void validateReservedByConfirm() {
         if (!this.orderStatus.equals(OrderStatus.RESERVED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CONFIRM_ORDER);
         }
     }
 
-    //== (구매자가)주문 취소 검증로직 ==//
-    private void validateConfirmed() {
+    //==주문 상태가 주문 예약 상태인지 검증하는 로직==//
+    private void validateReservedByCancel() {
+        if (!this.orderStatus.equals(OrderStatus.RESERVED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+    }
+
+    //== 주문 상태가 주문확인 상태인지 검증하는 로직==//
+    private void validateConfirmedByCancel() {
         if(!this.orderStatus.equals(OrderStatus.CONFIRMED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
     }
 
-    //==구매자 주문 취소 검증 로직==//
-    private void validateCancelOrderByBuyer() {
-        validateCancel();
-
-        if(!this.orderStatus.equals(OrderStatus.RESERVED)){
-            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
-        }
-    }
-
-    //==판매자의 주문 취소 요청 승낙 검증 로직==//
-    private void validateAcceptCancelRequestBySeller() {
-        validateCancel();
-
-        validateCancelRequest();
-    }
 
     //==주문 상태가 주문취소 요청 상태인지 검증하는 로직==//
-    private void validateCancelRequest() {
+    private void validateCancelRequestByCancel() {
         if(!this.orderStatus.equals(OrderStatus.CANCEL_REQUESTED)) {
-            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
-        }
-    }
-
-    //==주문 상태가 거절 상태인지 검증하는 로직==//
-    private void validateRejected(){
-        if(!this.orderStatus.equals(OrderStatus.REJECTED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
     }
