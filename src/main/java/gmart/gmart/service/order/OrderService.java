@@ -5,6 +5,7 @@ import gmart.gmart.domain.Item;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.*;
+import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
 import gmart.gmart.dto.delivery.trackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
@@ -368,11 +369,55 @@ public class OrderService {
 
     }
 
+
     /**
-     * 구매자가 상품을 받고 환불을 요청함
-     * 배송 상태도 배송 완료로 변경
+     * [서비스 로직]
+     * 구매자가 상품 수령 후 환불을 요청함
+     * 배송 상태는 '배송 완료'로 변경됨
      * 메시지 생성
+     * @param orderId 주문 아이디
+     * @param requestDto 환불 요청 DTO
      */
+    @Transactional
+    public void refundRequest(Long orderId, RefundOrderRequestDto requestDto){
+
+        //현재 로그인한 회원 조회 (구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        // 주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //주문 반품 요청 로직
+        processRefundRequest(requestDto, order, seller, buyer);
+
+    }
+
+    /**
+     * [서비스 로직]
+     * 판매자가 환불 요청을 거절함
+     * 환불 요청을 거절했다는 것은 거래가 정상적으로 이루어졌다는 뜻 -> 구매 확정 처리
+     * 메시지 생성
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void rejectRefundRequest(Long orderId){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문조회
+        Order order = findById(orderId);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //구매 확정 처리 로직
+        processCompletedOrder(seller, order, buyer);
+    }
+
 
     /**
      * 판매자가 환불 요청을 승인함
@@ -389,8 +434,6 @@ public class OrderService {
      * 판매자가 다시 상품을 받고 환불 완료처리를 함
      * 메시지 생성
      */
-
-
 
 
     /**
@@ -661,5 +704,14 @@ public class OrderService {
                 GMoneyDeltaType.SALE,description, order.getPaidPrice(), beforeGMoney, afterGMoney);
     }
 
+    //==주문 반품 요청 로직==//
+    private void processRefundRequest(RefundOrderRequestDto requestDto, Order order, Member seller, Member buyer) {
+        order.refundRequest(requestDto.getRefundReason());
+
+        //메시지 생성
+        String buyerMessage=  seller.getNickname() + " 님에게 환불 요청을 보냈습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 환불 요청을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
 
 }

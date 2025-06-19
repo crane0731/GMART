@@ -73,6 +73,11 @@ public class Delivery extends BaseTimeEntity {
     @Column(name = "refund_status")
     private RefundStatus refundStatus;
 
+    @org.hibernate.annotations.Comment("환불 송장 번호")
+    @Column(name = "refund_tracking_number")
+    private String refundTrackingNumber;
+
+
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
@@ -154,6 +159,7 @@ public class Delivery extends BaseTimeEntity {
     protected void finishDelivery(){
         this.deliveryStatus=DeliveryStatus.DELIVERED;
     }
+
 
     //==배송 준비 취소 검증 로직==//
     private void validateCancelReady() {

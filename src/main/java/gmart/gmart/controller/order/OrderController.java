@@ -1,5 +1,6 @@
 package gmart.gmart.controller.order;
 
+import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.delivery.trackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
@@ -236,6 +237,44 @@ public class OrderController {
         orderService.completeOrder(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 확정 완료")));
     }
+
+    /**
+     * [컨트롤러]
+     * 구매자가 환불 요청
+     * @param orderId 주문 아이디
+     * @param requestDto 환불 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/refund-request")
+    public ResponseEntity<ApiResponse<?>> refundRequest(@PathVariable("id")Long orderId, @Valid @RequestBody RefundOrderRequestDto requestDto, BindingResult bindingResult) {
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        orderService.refundRequest(orderId,requestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 요청 완료")));
+
+    }
+
+    /**
+     * [컨트롤러]
+     * 판매자가 구매자의 환불요청을 거절함 -> 구매확정
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/refund-request/rejection")
+    public ResponseEntity<ApiResponse<?>> rejectRefundRequest(@PathVariable("id")Long orderId){
+        orderService.rejectRefundRequest(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 거절 완료 , 구매 확정 완료")));
+    }
+
+
 
     //==필드에러가 있는지 확인하는 로직==//
     private boolean errorCheck(BindingResult bindingResult, Map<String, String> errorMessages) {

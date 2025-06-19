@@ -399,6 +399,27 @@ public class Order extends BaseTimeEntity {
         this.item.getStore().plusTradeCount();
     }
 
+    /**
+     * [비즈니스 로직]
+     * 환불 요청
+     * @param refundReason 환불 사유
+     */
+    public void refundRequest(String refundReason){
+
+        this.orderStatus=OrderStatus.REFUND_REQUESTED;
+
+        //배송은 완료 한것이니 배송 완료 처리
+        this.delivery.finishDelivery();
+
+        this.cancelReason = refundReason;
+
+        this.cancelReasonWriter=OrderRole.BUYER;
+
+        this.cancelRequestedDate=LocalDateTime.now();
+    }
+
+
+
     //==구매 확정 전 검증 로직==//
     private void validateCompletedOrder() {
         if(!this.orderStatus.equals(OrderStatus.SHIPPED)){
