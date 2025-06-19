@@ -52,7 +52,6 @@ public class Store extends BaseAuditingEntity {
     @Column(name = "item_count")
     private Long itemCount;
 
-
     @org.hibernate.annotations.Comment("총 방문 수")
     @Column(name = "total_visit_count")
     private Long totalVisitCount;
@@ -173,5 +172,13 @@ public class Store extends BaseAuditingEntity {
         if(this.itemCount > 0){
             this.itemCount--;
         }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 거래 수 증가
+     */
+    public void plusTradeCount(){
+        this.tradeCount++;
     }
 }

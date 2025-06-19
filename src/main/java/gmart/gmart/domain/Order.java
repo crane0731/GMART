@@ -391,7 +391,12 @@ public class Order extends BaseTimeEntity {
 
         //에스크로 상태 잠금 해제 (입금 완료)
         this.escrowStatus= EscrowStatus.RELEASED;
+        
+        //상품 상태 판매 완료로 변경
+        this.item.changeSaleStatus(SaleStatus.SOLD_OUT);
 
+        //상점의 거래한 수 1 증가
+        this.item.getStore().plusTradeCount();
     }
 
     //==구매 확정 전 검증 로직==//
