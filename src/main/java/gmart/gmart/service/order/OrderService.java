@@ -149,14 +149,16 @@ public class OrderService {
 
     }
 
+
     /**
      * [서비스 로직]
-     * 판매자가 구매 요청을 거절(CANCEL)
-     * 메시지 생성
+     * 판매자가 구매자의 구매 요청을 거절함
+     * 처음 구매자가 주문 신청을 넣으면 거절가능
      * @param orderId 주문 아이디
+     * @param requestDto 주문 취소 요청 DTO
      */
     @Transactional
-    public void cancelOrder(Long orderId,CancelOrderRequestDto requestDto) {
+    public void rejectOrderRequestBySeller(Long orderId,CancelOrderRequestDto requestDto) {
 
         //현재 로그인한 회원 조회(판매자)
         Member seller = memberService.findBySecurityContextHolder();
@@ -170,7 +172,34 @@ public class OrderService {
         //구매자 조회
         Member buyer = order.getBuyer();
 
-        //주문 거절 처리 로직
+        //주문 요청 거절 로직
+        processRejectOrderRequestBySeller(requestDto, order, seller, buyer);
+
+    }
+
+    /**
+     * [서비스 로직]
+     * 판매자가 주문을 취소함
+     * 상품을 배송하기 전까지 가능
+     * @param orderId 주문 아이디
+     * @param requestDto 주문 취소 요청 DTO
+     */
+    @Transactional
+    public void cancelOrder(Long orderId,CancelOrderRequestDto requestDto){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //주문 취소 로직
         processCancel(order, seller, buyer,requestDto);
 
     }
@@ -381,7 +410,7 @@ public class OrderService {
         createLog("상품 구매",buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
     }
 
-    //==주문 거절 처리 로직==//
+    //==주문 취소 로직==//
     private void processCancel(Order order, Member seller, Member buyer,CancelOrderRequestDto requestDto) {
 
         //구매자의 주문 거절 전 건머니와 건포인트
@@ -390,12 +419,12 @@ public class OrderService {
 
         order.cancelOrderBySeller(requestDto.getCancelReason());
 
-        //구매자의 주문 거절 흐 건머니와 건포인트
+        //구매자의 주문 거절 후 건머니와 건포인트
         Long afterGMoney = buyer.getGMoney();
         Long afterGPoint = buyer.getGPoint();
 
         //메시지 생성
-        String buyerMessage= seller.getNickname() + " 님이 구매 요청을 거절하셨습니다.";
+        String buyerMessage= seller.getNickname() + " 님이 구매 요청을 거절하셨습니다. 사유 : " + order.getCancelReason();
         String sellerMessage= buyer.getNickname()+" 님의 구매 요청을 거절하셨습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
 
@@ -409,7 +438,7 @@ public class OrderService {
         order.cancelRequestByBuyer(requestDto.getCancelReason());
 
         String buyerMessage= seller.getNickname() + " 님에게 구매 취소를 요쳥했습니다.";
-        String sellerMessage= buyer.getNickname()+" 님이 구매 취소 요청을 보냈습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 구매 취소 요청을 보냈습니다. 사유 " + order.getCancelReason();
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 
@@ -419,7 +448,7 @@ public class OrderService {
         order.cancelOrderByBuyer(requestDto.getCancelReason());
 
         String buyerMessage= seller.getNickname() + " 님의 상품 구매를 취소했습니다.";
-        String sellerMessage= buyer.getNickname()+" 님이 구매를 취소했습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 구매를 취소했습니다. 사유 :"+order.getCancelReason();
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 
@@ -443,6 +472,16 @@ public class OrderService {
 
         //로그 생성
         createLog("주문 취소", buyer, order, beforeGMoney, afterGMoney, beforeGPoint, afterGPoint);
+    }
+
+    //==주문 요청 거절 로직==//
+    private void processRejectOrderRequestBySeller(CancelOrderRequestDto requestDto, Order order, Member seller, Member buyer) {
+        order.rejectOrderRequestBySeller(requestDto.getCancelReason());
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 구매 요청을 거절하셨습니다. 사유 : " + order.getCancelReason();
+        String sellerMessage= buyer.getNickname()+" 님의 구매 요청을 거절하셨습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 
 

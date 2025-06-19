@@ -237,27 +237,50 @@ public class Order extends BaseTimeEntity {
         this.orderStatus = OrderStatus.CONFIRMED;
     }
 
+
+    /**
+     * [비즈니스 로직]
+     * 판매자가 구매자의 구매 요청을 거절함
+     */
+    public void rejectOrderRequestBySeller(String cancelReason){
+
+        //주문의 상태가 이미 예약 상태인지 확인
+        //RESERVED 상태가 아니라면 구매 거절 불가
+        validateReserved();
+
+        //주문 캔슬
+        this.orderStatus=OrderStatus.REJECTED;
+
+        this.cancelReason = cancelReason;
+
+        this.cancelReasonWriter=OrderRole.SELLER;
+
+        this.cancelRequestedDate = LocalDateTime.now();
+
+        this.cancelCompletedDate = LocalDateTime.now();
+    }
+
+
+
     /**
      * [비즈니스 로직]
      * 판매자가 주문 거절 처리
      */
     public void cancelOrderBySeller(String cancelReason){
 
-        //검증 로직
-        validateCancel();
+        //주문의 상태가 주문 확인 상태인지 검증
+        validateConfirmed();
 
         //만약 주문 상태가 주문 확인 처리 상태였다면 다시 복구
-        if(this.orderStatus.equals(OrderStatus.CONFIRMED)) {
 
-            //구매자의 결제 데이터 복구
-            recoveryBuyerPayment();
+        //구매자의 결제 데이터 복구
+        recoveryBuyerPayment();
 
-            //구매 취소 상태 처리
-            markCanceled();
+        //구매 취소 상태 처리
+         markCanceled();
 
-        }
         //주문 캔슬
-        this.orderStatus=OrderStatus.REJECTED;
+        this.orderStatus=OrderStatus.CANCELLED;
 
         this.cancelReason = cancelReason;
 
@@ -299,8 +322,8 @@ public class Order extends BaseTimeEntity {
      * 구매자가 주문을 취소요청 함, 단 주문의 상태가 주문확인을 한 상태여야함(아직 상품을 배송하기 전)
      */
     public void cancelRequestByBuyer(String cancelReason){
-        //(구매자가)주문 취소 검증
-        validateCancelRequestByBuyer();
+        //주문의 상태가 주문확인 인지 확인
+        validateConfirmed();
 
         this.orderStatus = OrderStatus.CANCEL_REQUESTED;
 
@@ -367,7 +390,7 @@ public class Order extends BaseTimeEntity {
     }
 
     //== (구매자가)주문 취소 검증로직 ==//
-    private void validateCancelRequestByBuyer() {
+    private void validateConfirmed() {
         if(!this.orderStatus.equals(OrderStatus.CONFIRMED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
@@ -392,6 +415,13 @@ public class Order extends BaseTimeEntity {
     //==주문 상태가 주문취소 요청 상태인지 검증하는 로직==//
     private void validateCancelRequest() {
         if(!this.orderStatus.equals(OrderStatus.CANCEL_REQUESTED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+    }
+
+    //==주문 상태가 거절 상태인지 검증하는 로직==//
+    private void validateRejected(){
+        if(!this.orderStatus.equals(OrderStatus.REJECTED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
     }

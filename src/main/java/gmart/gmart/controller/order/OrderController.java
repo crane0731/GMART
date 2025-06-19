@@ -54,6 +54,8 @@ public class OrderController {
      * 구매자가 판매자에게 주문 신청 취소를 요청함
      * 주문 상태가 아직 주문확인 상태 즉,판매자가 주문 확인을 하고 아직 상품을 배송하기 전인 상태 만 가능
      * @param orderId 주문 아이디
+     * @param requestDto 취소 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
     @PostMapping("/{id}/buyer-cancel-request")
@@ -75,6 +77,8 @@ public class OrderController {
      * 구매자가 주문 취소 처리
      * 아직 판매자가 주문을 확인하기 전 상태에서만 가능 (주문 예약 상태)
      * @param orderId 주문 아이디
+     * @param requestDto 취소 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
     @PostMapping("/{id}/buyer-cancel")
@@ -103,10 +107,34 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 확인 완료")));
     }
 
+
     /**
      * [컨트롤러]
-     * 주문 취소 처리 -> 판매자가 거절
+     * 주문 취소 처리 -> 판매자가 구매자의 구매 요청 주문 거절
      * @param orderId 주문 아이디
+     * @param requestDto 취소 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/seller-reject")
+    public ResponseEntity<ApiResponse<?>> rejectOrderRequestBySeller(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult){
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+        orderService.rejectOrderRequestBySeller(orderId,requestDto);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 거절 완료")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 주문 취소 처리 -> 판매자가 주문 취소
+     * @param orderId 주문 아이디
+     * @param requestDto 취소 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
     @PostMapping("/{id}/seller-cancel")
