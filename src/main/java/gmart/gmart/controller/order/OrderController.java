@@ -1,6 +1,7 @@
 package gmart.gmart.controller.order;
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.delivery.CreateDeliveryRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.service.order.OrderService;
@@ -163,12 +164,42 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 승인 완료")));
     }
 
+    /**
+     * [컨트롤러]
+     * 판매자가 구매자의 주문 취소 요청을 거절 -> 주문 절차가 원래대로 진행됨
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
     @PostMapping("/{id}/buyer-cancel/seller-reject")
     public ResponseEntity<ApiResponse<?>> rejectCancelOrderBySeller(@PathVariable("id")Long orderId){
         orderService.rejectCancelOrderRequestBySeller(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 거절 완료")));
     }
 
+
+    /**
+     * [컨트롤러]
+     * 판매자가 상품을 배송 -> 배송 생성
+     * @param orderId 주문 아이디
+     * @param requestDto 배송 생성 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/delivery")
+    public ResponseEntity<ApiResponse<?>> createDelivery(@PathVariable("id")Long orderId, @Valid @RequestBody CreateDeliveryRequestDto requestDto, BindingResult bindingResult) {
+
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        orderService.createDelivery(orderId,requestDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 시작 완료")));
+
+    }
 
 
 

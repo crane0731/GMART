@@ -25,6 +25,10 @@ public class Delivery extends BaseTimeEntity {
     @Column(name = "delivery_id")
     private Long id;
 
+    @org.hibernate.annotations.Comment("송장 번호")
+    @Column(name = "tracking_number")
+    private String trackingNumber;
+
     @org.hibernate.annotations.Comment("받는 사람 이름")
     @Column(name = "sender_name")
     private String senderName;
@@ -83,7 +87,7 @@ public class Delivery extends BaseTimeEntity {
      * @param refundStatus 환불 상태
      * @return Delivery 배송 엔티티
      */
-    public static Delivery create(Member sender , Member receiver,RefundStatus refundStatus) {
+    public static Delivery create(Member sender , Member receiver, RefundStatus refundStatus,String trackingNumber) {
 
         Delivery delivery = new Delivery();
 
@@ -95,13 +99,23 @@ public class Delivery extends BaseTimeEntity {
         delivery.receiverPhone= receiver.getPhoneNumber();
         delivery.receiverAddress=receiver.getAddress();
 
-        delivery.deliveryStatus=DeliveryStatus.DELIVERED;
+        delivery.deliveryStatus=DeliveryStatus.SHIPPING;
 
         delivery.refundStatus=refundStatus;
+
+        delivery.trackingNumber=trackingNumber;
 
         delivery.deleteStatus=DeleteStatus.UNDELETED;
 
         return delivery;
+    }
+
+    /**
+     * [Setter]
+     * @param order 주문 엔티티
+     */
+    protected void setOrder(Order order) {
+        this.order = order;
     }
 
 }

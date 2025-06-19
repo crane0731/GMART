@@ -1,19 +1,19 @@
 package gmart.gmart.service.order;
 
+import gmart.gmart.domain.Delivery;
 import gmart.gmart.domain.Item;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
-import gmart.gmart.domain.enums.AdminMessageType;
-import gmart.gmart.domain.enums.GMoneyDeltaType;
-import gmart.gmart.domain.enums.GPointDeltaType;
-import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
+import gmart.gmart.dto.delivery.CreateDeliveryRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
 import gmart.gmart.repository.order.OrderRepository;
 import gmart.gmart.service.admin.AdminMessageService;
+import gmart.gmart.service.delivery.DeliveryService;
 import gmart.gmart.service.gmoney.GMoneyLogService;
 import gmart.gmart.service.gpoint.GPointLogService;
 import gmart.gmart.service.item.ItemService;
@@ -35,6 +35,7 @@ public class OrderService {
     private final AdminMessageService adminMessageService;//관리자 메시지 서비스
     private final GMoneyLogService gMoneyLogService; //건머니 거래 로그 서비스
     private final GPointLogService gPointLogService; //건포인트 거래 로그 서비스
+    private final DeliveryService deliveryService;//배송 서비스
 
     private final OrderRepository orderRepository; //주문 레파지토리
 
@@ -237,6 +238,7 @@ public class OrderService {
      * 판매자가 구매자의 주문 취소 요청을 거절
      * 즉, 주문 절차가 원래대로 진행됨
      * 주문 상태 CANCEL_REQUESTED -> CONFIRM
+     * 메시지 생성
      * @param orderId 주문 아이디
      */
     @Transactional
@@ -254,20 +256,49 @@ public class OrderService {
         //구매자 조회
         Member buyer = order.getBuyer();
 
-        order.rejectCancelRequestBySeller();
-
-        //메시지 생성
-        String buyerMessage= seller.getNickname() + " 님이 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
-        String sellerMessage= buyer.getNickname()+" 님의 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
-        createMessage(buyer,buyerMessage, seller,sellerMessage);
+        //판매자가 구매자의 주문 취소 요청 거절 로직
+        processRejectCancelOrderRequestBySeller(order, seller, buyer);
 
 
     }
 
     /**
-     * 판매자가 상품 배송 상태로 변경(취소도 가능)
+     * [서비스 로직]
+     * 판매자가 주문 상태를 상품 배송 상태로 변경
+     * 판매자가 상품을 배송했다는의미
+     * 배송 생성
+     * 메시지 생성
+     * @param orderId 주문 아이디
+     * @param requestDto 배송 생성 요청 DTO
+     */
+    @Transactional
+    public void createDelivery(Long orderId, CreateDeliveryRequestDto requestDto){
+
+        //현재 로그인한 회원(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //현재 로그인한 회원이 주문의 판매자인지 확인
+        validateOrderSeller(seller, order);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //배송 생성 로직
+        processCreateDelivery(requestDto, buyer, seller, order);
+
+    }
+
+
+    /**
+     * 판매자가 상품 배송 취소
+     * 다시 주문상태를 주문 확인으로 변경
      * 메시지 생성
      */
+
+
 
     /**
      * 구매자가 상품을 받으면 구매확정 처리를 함
@@ -481,6 +512,33 @@ public class OrderService {
         //메시지 생성
         String buyerMessage= seller.getNickname() + " 님이 구매 요청을 거절하셨습니다. 사유 : " + order.getCancelReason();
         String sellerMessage= buyer.getNickname()+" 님의 구매 요청을 거절하셨습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==판매자가 구매자의 주문 취소 요청 거절 로직==//
+    private void processRejectCancelOrderRequestBySeller(Order order, Member seller, Member buyer) {
+        order.rejectCancelRequestBySeller();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
+        String sellerMessage= buyer.getNickname()+" 님의 주문 취소 요청을 거절하였습니다. 계속해서 거래가 진행됩니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==배송 생성 로직==//
+    private void processCreateDelivery(CreateDeliveryRequestDto requestDto, Member buyer, Member seller, Order order) {
+        //배송 생성
+        Delivery delivery = Delivery.create(seller,buyer, RefundStatus.NOT_REFUNDED, requestDto.getTrackingNumber());
+
+        //주문에 배송 설정
+        order.setDelivery(delivery);
+
+        //배송 저장
+        deliveryService.save(delivery);
+
+        //메시지 생성
+        String buyerMessage= " 배송 시작! "+ seller.getNickname() + " 님이 상품을 발송하였습니다.";
+        String sellerMessage= " 배송 시작! "+ buyer.getNickname()+" 님에게 상품을 발송하였습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 

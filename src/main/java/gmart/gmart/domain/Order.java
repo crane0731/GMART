@@ -141,6 +141,32 @@ public class Order extends BaseTimeEntity {
     }
 
     /**
+     * [연관관계 편의 메서드]
+     * Order<->Delivery
+     * @param delivery 배송 엔티티
+     */
+    public void setDelivery(Delivery delivery){
+
+        //배송 : 주문 상태가 주문확인 인지 검증
+        validateConfirmedByDelivery();
+
+        this.delivery=delivery;
+        delivery.setOrder(this);
+
+        shipItem();
+
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 주문 상태를 배송 시작함으로 변경
+     */
+    public void shipItem(){
+        this.orderStatus=OrderStatus.SHIPPED;
+    }
+
+
+    /**
      * [총 가격 계산]
      * @param itemPrice 상품 가격
      * @param deliveryPrice 배송비
@@ -400,6 +426,13 @@ public class Order extends BaseTimeEntity {
     private void validateCancelRequestByCancel() {
         if(!this.orderStatus.equals(OrderStatus.CANCEL_REQUESTED)) {
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+    }
+
+    //==배송 : 주문의 상태가 주문확인 인지 검증하는 로직==//
+    private void validateConfirmedByDelivery(){
+        if(!this.orderStatus.equals(OrderStatus.CONFIRMED)) {
+            throw new OrderCustomException(ErrorMessage.CANNOT_SHIP_DELIVERY);
         }
     }
 
