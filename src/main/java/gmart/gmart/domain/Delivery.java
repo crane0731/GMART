@@ -147,6 +147,14 @@ public class Delivery extends BaseTimeEntity {
         this.deliveryStatus = DeliveryStatus.CANCELED;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 배송 완료
+     */
+    protected void finishDelivery(){
+        this.deliveryStatus=DeliveryStatus.DELIVERED;
+    }
+
     //==배송 준비 취소 검증 로직==//
     private void validateCancelReady() {
         if(!deliveryStatus.equals(DeliveryStatus.READY)){

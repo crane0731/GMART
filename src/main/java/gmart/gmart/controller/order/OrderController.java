@@ -8,6 +8,7 @@ import gmart.gmart.service.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -221,7 +222,19 @@ public class OrderController {
         orderService.shipItem(orderId,requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 시작 완료")));
+    }
 
+    /**
+     * [컨트롤러]
+     * 구매자 구매확정
+     * 판매자에게 판매 대금 입금
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<ApiResponse<?>> completeOrder(@PathVariable("id")Long orderId){
+        orderService.completeOrder(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 확정 완료")));
     }
 
     //==필드에러가 있는지 확인하는 로직==//

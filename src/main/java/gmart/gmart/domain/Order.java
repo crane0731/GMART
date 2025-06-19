@@ -371,6 +371,36 @@ public class Order extends BaseTimeEntity {
         this.delivery.cancelReady();
     }
 
+    /**
+     * [비즈니스 로직]
+     * 구매 확정
+     */
+    public void completedOrder(){
+
+        //구매 확정 전 검증
+        validateCompletedOrder();
+
+        //주문 상태 구매 확정으로 변경
+        this.orderStatus=OrderStatus.COMPLETED;
+
+        //배송 완료 처리
+        this.delivery.finishDelivery();
+
+        //판매자에게 주문 가격 입금
+        this.seller.chargeGMoney(this.totalPrice);
+
+        //에스크로 상태 잠금 해제 (입금 완료)
+        this.escrowStatus= EscrowStatus.RELEASED;
+
+    }
+
+    //==구매 확정 전 검증 로직==//
+    private void validateCompletedOrder() {
+        if(!this.orderStatus.equals(OrderStatus.SHIPPED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_COMPLETE_ORDER);
+        }
+    }
+
     //==구매자의 결제 데이터 복구 로직==//
     private void markCanceled() {
         this.escrowStatus=EscrowStatus.CANCELED;

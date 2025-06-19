@@ -343,10 +343,30 @@ public class OrderService {
     }
 
     /**
+     * [서비스 로직]
      * 구매자가 상품을 받으면 구매확정 처리를 함
      * 배송 상태도 배송 완료로 변경
+     * 판매자에게 판매 대금 입금
      * 메시지 생성
+     * 건머니 로그 생성
+     * @param orderId 주문 아이디
      */
+    @Transactional
+    public void completeOrder(Long orderId){
+
+        //현재 로그인한 회원(구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //구매확정 처리 로직
+        processCompletedOrder(seller, order, buyer);
+
+    }
 
     /**
      * 구매자가 상품을 받고 환불을 요청함
@@ -370,6 +390,9 @@ public class OrderService {
      * 메시지 생성
      */
 
+
+
+
     /**
      * [생성]
      * @param order 주문 엔티티
@@ -388,6 +411,9 @@ public class OrderService {
     public Order findById(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(()-> new OrderCustomException(ErrorMessage.NOT_FOUND_ORDER));
     }
+
+
+
 
     //==주문 처리 로직==//
     private void processOrder(CreateOrderRequestDto requestDto, Member buyer, Member seller, Item item) {
@@ -611,7 +637,29 @@ public class OrderService {
         String sellerMessage= " 배송 준비 취소"+ buyer.getNickname()+" 님에게 상품 발송 준비 취소를 알렸습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
+    //==구매확정 처리 로직==//
+    private void processCompletedOrder(Member seller, Order order, Member buyer) {
+        //구매 확정 전 판매자의 건머니
+        Long beforeGMoney = seller.getGMoney();
 
+        //구매 확정 처리
+        order.completedOrder();
+
+        //구매 확정 후 판매자의 건머니
+        Long afterGMoney = seller.getGMoney();
+
+        //메시지 생성
+        String buyerMessage= " 구매 확정 완료! "+ seller.getNickname() + " 님에게 구매 확정 알림을 보냈습니다.";
+        String sellerMessage= " 구매 확정 완료!"+ buyer.getNickname()+" 님이 구매 확정을 완료했습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //건머니 로그 생성
+
+        String description = "구매 확정 상품 대금 수령";
+
+        gMoneyLogService.createLog(seller.getId(), order.getId(),
+                GMoneyDeltaType.SALE,description, order.getPaidPrice(), beforeGMoney, afterGMoney);
+    }
 
 
 }
