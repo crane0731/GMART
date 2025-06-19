@@ -274,6 +274,19 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 거절 완료 , 구매 확정 완료")));
     }
 
+    /**
+     * [컨트롤러]
+     * 판매자가 구매자의 환불 요청을 승인함
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/refund-request/accept")
+    public ResponseEntity<ApiResponse<?>> acceptRefundRequest(@PathVariable("id")Long orderId){
+        orderService.acceptRefundRequest(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 요청 승인 완료")));
+    }
+
+
 
 
     //==필드에러가 있는지 확인하는 로직==//

@@ -13,6 +13,7 @@ public enum OrderStatus {
     SHIPPED,// 상품 발송 -> 판매자가 상품을 발송함
     COMPLETED, //구매 확정 -> 구매자가 상품을 받은 후 구매 확정 완료
     REFUND_REQUESTED, //환불 요청 -> 구매자가 환불을 요청
+    REFUND_APPROVED, //환불 승인 -> 판매자가 환불 요청을 승인
     REFUNDED //환불 완료 -> 판매자가 상품을 다시 받고 환불완료를 누름
 
 }

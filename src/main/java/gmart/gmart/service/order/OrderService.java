@@ -418,11 +418,38 @@ public class OrderService {
         processCompletedOrder(seller, order, buyer);
     }
 
-
     /**
+     * [서비스 로직]
      * 판매자가 환불 요청을 승인함
      * 메시지 생성
+     * @param orderId 주문 아이디
      */
+    @Transactional
+    public void acceptRefundRequest(Long orderId){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문조회
+        Order order = findById(orderId);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //판매자 환불 요청 승인 처리
+        processAcceptRefundRequest(order, seller, buyer);
+    }
+
+    //==판매자 환불 요청 승인 처리 로직==//
+    private void processAcceptRefundRequest(Order order, Member seller, Member buyer) {
+        //판매자 환불 요청 승인 처리
+        order.acceptRefundRequest();
+
+        //메시지 생성
+        String buyerMessage=  seller.getNickname() + " 님이 환불 요청을 승인하였습니다.";
+        String sellerMessage= buyer.getNickname()+" 님에게 환불 요청 승인 알림을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
 
     /**
      * 구매자가 다시 판매자에게 상품을 보냄

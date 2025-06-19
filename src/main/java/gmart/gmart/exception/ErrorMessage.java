@@ -77,7 +77,7 @@ public final class ErrorMessage {
     public static final String CANNOT_SHIP_DELIVERY ="배송을 설정할 수 없습니다.";
     public static final String CANNOT_CANCEL_READY_DELIVERY = "배송 준비완료를 취소할 수 없습니다.";
     public static final String CANNOT_COMPLETE_ORDER ="구매 확정 처리를 할 수 없습니다.";
-    public static final String CANNOT_REJECT_REFUND_REQUEST ="환불 요청을 거절 할 수 없습니다.";
+    public static final String CANNOT_ACCEPT_REFUND_REQUEST ="환불 요청을 승인 할 수 없습니다.";
 
     public static final String ALREADY_CANCEL_ORDER="이미 취소된 주문입니다.";
 

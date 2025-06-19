@@ -418,6 +418,23 @@ public class Order extends BaseTimeEntity {
         this.cancelRequestedDate=LocalDateTime.now();
     }
 
+    /**
+     * [비즈니스 로직]
+     * 환불 요청 승인
+     */
+    public void acceptRefundRequest(){
+        //환불 요청 승인 검증 로직
+        validateAcceptRefundRequest();
+
+        this.orderStatus=OrderStatus.REFUND_APPROVED;
+    }
+
+    //==환불 요청 승인 검증 로직==//
+    private void validateAcceptRefundRequest() {
+        if(!this.orderStatus.equals(OrderStatus.REFUND_REQUESTED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_ACCEPT_REFUND_REQUEST);
+        }
+    }
 
 
     //==구매 확정 전 검증 로직==//
