@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.LikeStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.QLikeStore;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.store.SearchLikeStoreCondDto;
 import jakarta.persistence.EntityManager;
 
@@ -36,6 +37,8 @@ public class LikeStoreRepositoryImpl implements LikeStoreRepositoryCustom {
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(likeStore.member.eq(member));
+
+        builder.and(likeStore.deleteStatus.eq(DeleteStatus.UNDELETED));
 
         if(cond.getName() != null && !cond.getName().isBlank()) {
             builder.and(likeStore.store.name.containsIgnoreCase(cond.getName()));

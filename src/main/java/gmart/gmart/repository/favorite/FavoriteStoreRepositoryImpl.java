@@ -6,6 +6,7 @@ import gmart.gmart.domain.FavoriteStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.QFavoriteGundam;
 import gmart.gmart.domain.QFavoriteStore;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.favorite.SearchFavoriteStoreCondDto;
 import jakarta.persistence.EntityManager;
 
@@ -38,6 +39,8 @@ public class FavoriteStoreRepositoryImpl implements FavoriteStoreRepositoryCusto
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(favoriteStore.member.eq(member));
+
+        builder.and(favoriteStore.deleteStatus.eq(DeleteStatus.UNDELETED));
 
         if(cond.getName()!=null && !cond.getName().isBlank()) {
             builder.and(favoriteStore.store.name.containsIgnoreCase(cond.getName()));

@@ -1,6 +1,7 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.DeleteStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,6 +40,11 @@ public class LikeStore extends BaseTimeEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @org.hibernate.annotations.Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
     /**
      * [생성 메서드]
      * @param member 회원 엔티티
@@ -49,6 +55,7 @@ public class LikeStore extends BaseTimeEntity {
         LikeStore likeStore = new LikeStore();
         likeStore.setMember(member);
         likeStore.store = store;
+        likeStore.deleteStatus = DeleteStatus.UNDELETED;
         return likeStore;
     }
 
@@ -59,6 +66,14 @@ public class LikeStore extends BaseTimeEntity {
     private void setMember(Member member) {
         this.member = member;
         member.getLikeStores().add(this);
+    }
+
+    /**
+     * [비즈니스 로직]
+     * SOFT DELETE
+     */
+    public void softDelete() {
+        this.deleteStatus=DeleteStatus.DELETED;
     }
 
 }

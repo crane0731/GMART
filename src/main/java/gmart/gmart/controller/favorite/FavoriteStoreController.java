@@ -34,7 +34,7 @@ public class FavoriteStoreController {
 
     /**
      * [컨트롤러]
-     * 회원 관심 상점 삭제
+     * 회원 관심 상점 논리 삭제 (SOFT DELETE)
      * @param storeId 상점 아이디
      * @return 성공메시지
      */

@@ -119,6 +119,8 @@ public class LikeStoreService {
         likeStoreRepository.save(likeStore);
     }
 
+
+
     //==상점 좋아요 취소 로직(조회 + 좋아요 수 감소 +삭제)==//
     private void cancelLike(Member member, Store store) {
         //삭제 할 상점 좋아요 엔티티 조회
@@ -127,8 +129,9 @@ public class LikeStoreService {
         //상점 좋아요 수 감소
         store.minusLikeCount();
 
-        //삭제
-        delete(likeStore);
+        //논리적 삭제(SOFT DELETE)
+        likeStore.softDelete();
+
     }
 
     //==로그인한 회원이 이미 좋아요 한 상점인지 확인 메서드 ==//

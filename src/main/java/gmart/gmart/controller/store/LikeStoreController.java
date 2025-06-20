@@ -37,12 +37,12 @@ public class LikeStoreController {
 
     /**
      * [컨트롤러]
-     * 상점 좋아요 취소
+     * 상점 좋아요 취소 (SOFT DELETE)
      * @param storeId 상점 아이디
      * @return 성공 메시지
      */
     @DeleteMapping("/{id}/like")
-    public ResponseEntity<ApiResponse<?>> cancellikeStore(@PathVariable("id") Long storeId){
+    public ResponseEntity<ApiResponse<?>> cancelLikeStore(@PathVariable("id") Long storeId){
 
         likeStoreService.cancelLikeStore(storeId);
 

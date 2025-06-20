@@ -1,6 +1,8 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
+import gmart.gmart.domain.enums.DeleteStatus;
+import gmart.gmart.exception.ErrorMessage;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,6 +41,11 @@ public class FavoriteStore extends BaseTimeEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @org.hibernate.annotations.Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
 
     /**
      * [생성 메서드]
@@ -50,6 +57,7 @@ public class FavoriteStore extends BaseTimeEntity {
         FavoriteStore favoriteStore = new FavoriteStore();
         favoriteStore.setMember(member);
         favoriteStore.store = store;
+        favoriteStore.deleteStatus = DeleteStatus.UNDELETED;
         return favoriteStore;
     }
 
@@ -61,5 +69,15 @@ public class FavoriteStore extends BaseTimeEntity {
     private void setMember(Member member) {
         this.member = member;
         member.getFavoriteStores().add(this);
+    }
+
+    /**
+     * [비즈니스 로직]
+     * SOFT DELETE
+     */
+    public void softDelete(){
+        if (deleteStatus == DeleteStatus.UNDELETED){
+            this.deleteStatus = DeleteStatus.DELETED;
+        }
     }
 }

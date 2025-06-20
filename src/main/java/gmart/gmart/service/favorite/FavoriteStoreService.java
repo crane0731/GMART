@@ -149,6 +149,6 @@ public class FavoriteStoreService {
         store.minusFavoriteCount();
 
         //삭제
-        delete(favoriteStore);
+       favoriteStore.softDelete();
     }
 }

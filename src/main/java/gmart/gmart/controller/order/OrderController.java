@@ -322,8 +322,6 @@ public class OrderController {
     }
 
 
-
-
     //==필드에러가 있는지 확인하는 로직==//
     private boolean errorCheck(BindingResult bindingResult, Map<String, String> errorMessages) {
         //유효성 검사에서 오류가 발생한 경우 모든 메시지를 Map에 추가
