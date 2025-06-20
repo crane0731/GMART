@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class trackingNumberRequestDto {
+public class TrackingNumberRequestDto {
 
     @NotBlank(message = "송장 번호를 입력해주세요.")
     private String trackingNumber; //송장 번호

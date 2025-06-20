@@ -7,7 +7,7 @@ import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
-import gmart.gmart.dto.delivery.trackingNumberRequestDto;
+import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -298,7 +298,7 @@ public class OrderService {
      * @param requestDto 요청 DTO
      */
     @Transactional
-    public void shipItem(Long orderId, trackingNumberRequestDto requestDto){
+    public void shipItem(Long orderId, TrackingNumberRequestDto requestDto){
 
         //현재 로그인한 회원(판매자)
         Member seller = memberService.findBySecurityContextHolder();
@@ -440,22 +440,31 @@ public class OrderService {
         processAcceptRefundRequest(order, seller, buyer);
     }
 
-    //==판매자 환불 요청 승인 처리 로직==//
-    private void processAcceptRefundRequest(Order order, Member seller, Member buyer) {
-        //판매자 환불 요청 승인 처리
-        order.acceptRefundRequest();
-
-        //메시지 생성
-        String buyerMessage=  seller.getNickname() + " 님이 환불 요청을 승인하였습니다.";
-        String sellerMessage= buyer.getNickname()+" 님에게 환불 요청 승인 알림을 보냈습니다.";
-        createMessage(buyer,buyerMessage, seller,sellerMessage);
-    }
-
     /**
+     * [서비스 로직]
      * 구매자가 다시 판매자에게 상품을 보냄
+     * 구매자는 환불 송장 입력
      * 배송 상태 배송으로 변경
      * 메시지 생성
+     * @param orderId 주문 아이디
+     * @param requestDto 송장 번호 요청 DTO
      */
+    @Transactional
+    public void refundShipItem(Long orderId, TrackingNumberRequestDto requestDto){
+
+        //현재 로그인한 회원 (구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //환불 배송 처리 로직
+        processRefundShipItem(requestDto, order, seller, buyer);
+
+    }
 
     /**
      * 판매자가 다시 상품을 받고 환불 완료처리를 함
@@ -672,7 +681,7 @@ public class OrderService {
             order.getDelivery().ready();
         }else{
             //배송 생성
-            Delivery delivery = Delivery.create(seller,buyer, RefundStatus.NOT_REFUNDED);
+            Delivery delivery = Delivery.create(seller,buyer, RefundStatus.NOT_REFUND);
 
             //주문에 배송 설정
             order.setDelivery(delivery);
@@ -687,7 +696,7 @@ public class OrderService {
     }
 
     //==상품 배송 시작 처리 하는 로직==//
-    private void processShipItem(trackingNumberRequestDto requestDto, Order order, Member seller, Member buyer) {
+    private void processShipItem(TrackingNumberRequestDto requestDto, Order order, Member seller, Member buyer) {
         //배송 시작 처리
         order.shipItem(requestDto.getTrackingNumber());
 
@@ -738,6 +747,28 @@ public class OrderService {
         //메시지 생성
         String buyerMessage=  seller.getNickname() + " 님에게 환불 요청을 보냈습니다.";
         String sellerMessage= buyer.getNickname()+" 님이 환불 요청을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==판매자 환불 요청 승인 처리 로직==//
+    private void processAcceptRefundRequest(Order order, Member seller, Member buyer) {
+        //판매자 환불 요청 승인 처리
+        order.acceptRefundRequest();
+
+        //메시지 생성
+        String buyerMessage=  seller.getNickname() + " 님이 환불 요청을 승인하였습니다.";
+        String sellerMessage= buyer.getNickname()+" 님에게 환불 요청 승인 알림을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==환불 배송 처리 로직==//
+    private void processRefundShipItem(TrackingNumberRequestDto requestDto, Order order, Member seller, Member buyer) {
+        //주문 환불 배송 처리
+        order.refundShipItem(requestDto.getTrackingNumber());
+
+        //메시지 생성
+        String buyerMessage= " 환불 배송 시작! "+ seller.getNickname() + " 님에게 상품을 발송하였습니다.";
+        String sellerMessage= " 환불 배송 시작! "+ buyer.getNickname()+" 님이 상품을 발송하였습니다.";
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 

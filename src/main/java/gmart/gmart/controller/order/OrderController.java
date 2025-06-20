@@ -2,7 +2,7 @@ package gmart.gmart.controller.order;
 
 import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.delivery.trackingNumberRequestDto;
+import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.service.order.OrderService;
@@ -211,7 +211,7 @@ public class OrderController {
      * @return 성공 메시지
      */
     @PostMapping("/{id}/delivery")
-    public ResponseEntity<ApiResponse<?>> shipItem(@PathVariable("id")Long orderId, @Valid @RequestBody trackingNumberRequestDto requestDto, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse<?>> shipItem(@PathVariable("id")Long orderId, @Valid @RequestBody TrackingNumberRequestDto requestDto, BindingResult bindingResult) {
 
         Map<String, String> errorMessages = new HashMap<>();
         //필드에러가 있는지 확인
@@ -284,6 +284,28 @@ public class OrderController {
     public ResponseEntity<ApiResponse<?>> acceptRefundRequest(@PathVariable("id")Long orderId){
         orderService.acceptRefundRequest(orderId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 요청 승인 완료")));
+    }
+
+    /**
+     * [컨트롤러]
+     * 구매자가 판매자에게 다시 상품 환불 배송 시작
+     * @param orderId 주문 아이디
+     * @param requestDto 송장 번호 요청 DTO
+     * @param bindingResult 에러메시지를 바인딩할 객체
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/refund-delivery")
+    public ResponseEntity<ApiResponse<?>> refundDelivery(@PathVariable("id")Long orderId, @Valid @RequestBody TrackingNumberRequestDto requestDto, BindingResult bindingResult) {
+        Map<String, String> errorMessages = new HashMap<>();
+        //필드에러가 있는지 확인
+        //오류 메시지가 존재하면 이를 반환
+        if (errorCheck(bindingResult, errorMessages)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+        }
+
+        orderService.refundShipItem(orderId,requestDto);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 배송 시작 완료")));
+
     }
 
 

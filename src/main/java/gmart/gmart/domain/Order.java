@@ -165,6 +165,17 @@ public class Order extends BaseTimeEntity {
         this.orderStatus=OrderStatus.SHIPPED;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 환불용 배송을 설정함
+     * 환불 송장번호 세팅
+     * @param refundTrackingNumber
+     */
+    public void refundShipItem(String refundTrackingNumber){
+        this.delivery.setRefundTrackingNumber(refundTrackingNumber);
+        this.orderStatus=OrderStatus.REFUND_SHIPPED;
+    }
+
 
     /**
      * [총 가격 계산]

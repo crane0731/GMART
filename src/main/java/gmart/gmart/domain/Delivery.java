@@ -125,12 +125,25 @@ public class Delivery extends BaseTimeEntity {
 
 
     /**
-     * [Setter]
+     * [비즈니스 로직]
+     * 송장 번호 세팅
      * @param trackingNumber 송장 번호
      */
     protected void setTrackingNumber(String trackingNumber){
         this.trackingNumber=trackingNumber;
 
+        this.deliveryStatus=DeliveryStatus.SHIPPING;
+
+        this.refundStatus=RefundStatus.REFUND;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 환불 - 송장번호 세팅
+     * @param refundTrackingNumber
+     */
+    protected void setRefundTrackingNumber(String refundTrackingNumber){
+        this.refundTrackingNumber=refundTrackingNumber;
         this.deliveryStatus=DeliveryStatus.SHIPPING;
     }
 
