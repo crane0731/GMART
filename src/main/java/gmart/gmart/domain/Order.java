@@ -99,6 +99,9 @@ public class Order extends BaseTimeEntity {
     @Column(name = "delete_status")
     private DeleteStatus deleteStatus;
 
+    @OneToOne(mappedBy = "order")
+    private Review review;
+
 
     /**
      * [생성 메서드]

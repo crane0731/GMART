@@ -137,6 +137,11 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<AdminMessage> adminMessages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "reviewer")
+    private List<Review> writtenReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reviewee")
+    private List<Review> receivedReviews=new ArrayList<>();
 
     /**
      * 회원 생성 로직
