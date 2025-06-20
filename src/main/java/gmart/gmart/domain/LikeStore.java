@@ -73,7 +73,24 @@ public class LikeStore extends BaseTimeEntity {
      * SOFT DELETE
      */
     public void softDelete() {
-        this.deleteStatus=DeleteStatus.DELETED;
+
+        if(deleteStatus == DeleteStatus.UNDELETED) {
+            this.deleteStatus=DeleteStatus.DELETED;
+
+        }
+    }
+
+    /**
+     * [비즈니스 로직]
+     * RECOVERY
+     */
+    public void recovery(){
+
+        if (deleteStatus == DeleteStatus.DELETED) {
+            this.deleteStatus=DeleteStatus.UNDELETED;
+
+            this.store.plusLikedCount();
+        }
     }
 
 }

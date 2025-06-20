@@ -3,6 +3,7 @@ package gmart.gmart.service.favorite;
 import gmart.gmart.domain.FavoriteStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.favorite.FavoriteStoreListResponseDto;
 import gmart.gmart.dto.favorite.SearchFavoriteStoreCondDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -134,9 +135,16 @@ public class FavoriteStoreService {
 
     //==현재 로그인한 회원이 이미 관심 등록한 상점인지 확인하는 메서드==//
     private void existsFavoriteStore(Member member, Store store) {
-        Boolean exists = favoriteStoreRepository.existsByMemberAndStore(member, store);
-        if (exists) {
-            throw new StoreCustomException(ErrorMessage.ALREADY_FAVORITE_STORE);
+        FavoriteStore favoriteStore = favoriteStoreRepository.findByMemberAndStore(member, store).orElse(null);
+
+        if (favoriteStore != null) {
+
+            if(favoriteStore.getDeleteStatus().equals(DeleteStatus.UNDELETED)){
+                throw new StoreCustomException(ErrorMessage.ALREADY_FAVORITE_STORE);
+            }
+            else {
+                favoriteStore.recovery();
+            }
         }
     }
 

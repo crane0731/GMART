@@ -3,6 +3,7 @@ package gmart.gmart.service.store;
 import gmart.gmart.domain.LikeStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.store.LikeStoreListResponseDto;
 import gmart.gmart.dto.store.SearchLikeStoreCondDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -136,10 +137,15 @@ public class LikeStoreService {
 
     //==로그인한 회원이 이미 좋아요 한 상점인지 확인 메서드 ==//
     private void existsLikeStore(Member member, Store store) {
-        boolean exists = likeStoreRepository.existsByMemberAndStore(member, store);
+        LikeStore likeStore = likeStoreRepository.findByMemberAndStore(member, store).orElse(null);
 
-        if (exists) {
-            throw new StoreCustomException(ErrorMessage.ALREADY_LIKE_STORE);
+        if (likeStore != null) {
+            if (likeStore.getDeleteStatus().equals(DeleteStatus.UNDELETED)) {
+                throw new StoreCustomException(ErrorMessage.ALREADY_LIKE_STORE);
+            }
+            else {
+                likeStore.recovery();
+            }
         }
     }
 

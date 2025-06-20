@@ -80,4 +80,17 @@ public class FavoriteStore extends BaseTimeEntity {
             this.deleteStatus = DeleteStatus.DELETED;
         }
     }
+
+    /**
+     * [비즈니스 로직]
+     * RECOVERY
+     */
+    public void recovery(){
+        if(deleteStatus == DeleteStatus.DELETED){
+            this.deleteStatus=DeleteStatus.UNDELETED;
+
+            this.store.plusFavoriteCount();
+        }
+
+    }
 }

@@ -13,14 +13,6 @@ import java.util.Optional;
  */
 public interface FavoriteStoreRepository extends JpaRepository<FavoriteStore, Long>, FavoriteStoreRepositoryCustom {
 
-    /**
-     * 회원과 상점으로 이미 관심 상점 엔티티가 존재하는지 확인
-     * @param member 회원 엔티티
-     * @param store 상점 엔티티
-     * @return Boolean
-     */
-    Boolean existsByMemberAndStore(Member member, Store store);
-
 
     /**
      * 회원과 상점으로 관심 상점 엔티티 조회
