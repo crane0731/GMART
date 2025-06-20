@@ -440,6 +440,36 @@ public class Order extends BaseTimeEntity {
         this.orderStatus=OrderStatus.REFUND_APPROVED;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 환불 완료
+     */
+    public void refundComplete(){
+
+        //환불 완료 처리 검증 로직
+        validateRefundComplete();
+
+        this.orderStatus=OrderStatus.REFUNDED;
+        this.delivery.finishDelivery();
+
+        this.seller.chargeGMoney(this.deliveryPrice);
+
+        this.buyer.chargeGMoney(this.paidPrice-this.deliveryPrice);
+        this.buyer.chargeGPoint(this.usedPoint);
+
+        this.escrowStatus=EscrowStatus.RELEASED;
+
+        this.cancelCompletedDate=LocalDateTime.now();
+
+    }
+
+    //==환불 완료 처리 검증 로직==//
+    private void validateRefundComplete() {
+        if(!orderStatus.equals(OrderStatus.REFUND_SHIPPED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_COMPLETE_REFUND);
+        }
+    }
+
     //==환불 요청 승인 검증 로직==//
     private void validateAcceptRefundRequest() {
         if(!this.orderStatus.equals(OrderStatus.REFUND_REQUESTED)){

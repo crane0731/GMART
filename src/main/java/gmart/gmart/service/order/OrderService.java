@@ -467,10 +467,30 @@ public class OrderService {
     }
 
     /**
+     * [서비스 로직]
      * 판매자가 다시 상품을 받고 환불 완료처리를 함
+     * 판매자는 부담했던 배송비를 다시 받음
+     * 구매자는 판매자의 배송비를 제외한 나머지 금액을 환불 받음
+     * 배송비는 포인트에서 차감되지않고 결제 금액에서 차감됨
      * 메시지 생성
+     * 건머니 , 건머니 로그 생성
+     * @param orderId 주문 아이디
      */
+    @Transactional
+    public void refundComplete(Long orderId){
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
 
+        //주문 조회
+        Order order = findById(orderId);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //환불 완료 처리
+        processRefundComplete(seller, buyer, order);
+
+    }
 
     /**
      * [생성]
@@ -490,8 +510,6 @@ public class OrderService {
     public Order findById(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(()-> new OrderCustomException(ErrorMessage.NOT_FOUND_ORDER));
     }
-
-
 
 
     //==주문 처리 로직==//
@@ -772,4 +790,40 @@ public class OrderService {
         createMessage(buyer,buyerMessage, seller,sellerMessage);
     }
 
+    //==환불 완료 관련 로그 생성 로직==//
+    private void createLogByRefundComplete(Member seller, Order order, Long beforeSellerGMoney, Long afterSellerGMoney, Member buyer, Long beforeBuyerGMoney, Long afterBuyerGMoney, Long beforeBuyerGPoint, Long afterBuyerGPoint) {
+        gMoneyLogService.createLog(seller.getId(), order.getId(),GMoneyDeltaType.REFUND,"환불 완료, 배송비 입금", order.getDeliveryPrice(), beforeSellerGMoney, afterSellerGMoney);
+
+        gMoneyLogService.createLog(buyer.getId(), order.getId(),GMoneyDeltaType.REFUND,"환불 완료, 결제 대금 환불 (배송비 제외)", order.getPaidPrice()- order.getDeliveryPrice(), beforeBuyerGMoney, afterBuyerGMoney);
+
+        gPointLogService.createLog(buyer.getId(), order.getId(),GPointDeltaType.REFUND,"환불 완료, 결제 포인트 환불", order.getUsedPoint(), beforeBuyerGPoint, afterBuyerGPoint);
+    }
+
+    //==환불 완료 처리 로직==//
+    private void processRefundComplete(Member seller, Member buyer, Order order) {
+        //판매자 이전 건머니
+        Long beforeSellerGMoney = seller.getGMoney();
+
+        //구매자 이전 건머니 , 건포인트
+        Long beforeBuyerGMoney = buyer.getGMoney();
+        Long beforeBuyerGPoint = buyer.getGPoint();
+
+        //환불 완료 처리
+        order.refundComplete();
+
+        //판매자 이후 건머니
+        Long afterSellerGMoney = seller.getGMoney();
+
+        //구매자 이후 건머니 , 건포인트
+        Long afterBuyerGMoney = buyer.getGMoney();
+        Long afterBuyerGPoint = buyer.getGPoint();
+
+        //메시지 생성
+        String buyerMessage= " 환불 완료! "+ seller.getNickname() + " 님이 환불 처리를 완료하였습니다.";
+        String sellerMessage= " 환불 완료! "+ buyer.getNickname()+" 님에게 환불 처리 완료 알림을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //로그 생성
+        createLogByRefundComplete(seller, order, beforeSellerGMoney, afterSellerGMoney, buyer, beforeBuyerGMoney, afterBuyerGMoney, beforeBuyerGPoint, afterBuyerGPoint);
+    }
 }

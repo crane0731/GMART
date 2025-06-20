@@ -308,6 +308,19 @@ public class OrderController {
 
     }
 
+    /**
+     * [컨트롤러]
+     * 판매자 환불 완료 처리
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/refund-complete")
+    public ResponseEntity<ApiResponse<?>> refundComplete(@PathVariable("id")Long orderId){
+        orderService.refundComplete(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 처리 완료")));
+
+    }
+
 
 
 
