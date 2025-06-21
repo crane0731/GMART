@@ -16,6 +16,25 @@ public class SearchInquiryCondDto {
 
     private AnswerStatus answerStatus; //  답변 상태 -> [UNANSWERED,ANSWERED]
 
-    private CreatedDateSortType createSortType; //최신순, 과거순 ->[CREATE_DATE_ASC, CREATE_DATE_DESC]
+    private CreatedDateSortType createdDateSortType; //날짜 정렬 타입
+
+
+    /**
+     * [생성 메서드]
+     * @param title 문의 제목
+     * @param answerStatus 답변 상태
+     * @param createdDateSortType 날짜 정렬 타입
+     * @return SearchInquiryCondDto 검색 조건 DTO
+     */
+    public static SearchInquiryCondDto create(String title,AnswerStatus answerStatus, CreatedDateSortType createdDateSortType){
+
+        SearchInquiryCondDto searchInquiryCondDto= new SearchInquiryCondDto();
+
+        searchInquiryCondDto.setTitle(title);
+        searchInquiryCondDto.setAnswerStatus(answerStatus);
+        searchInquiryCondDto.setCreatedDateSortType(createdDateSortType);
+
+        return searchInquiryCondDto;
+    }
 
 }

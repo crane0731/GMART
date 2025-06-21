@@ -33,7 +33,7 @@ public class AdminInquiryService {
         Inquiry inquiry = inquiryService.findById(inquiryId);
 
         //문의 삭제
-        inquiryService.delete(inquiry);
+        inquiry.softDelete();
     }
 
     /**

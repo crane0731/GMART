@@ -3,6 +3,9 @@ package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.AnswerStatus;
+import gmart.gmart.domain.enums.DeleteStatus;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.InquiryCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -48,8 +51,13 @@ public class Inquiry extends BaseTimeEntity {
     @Column(name = "answer_status", nullable = false)
     private AnswerStatus answerStatus;
 
+    @Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
     /**
-     * 생성 메서드
+     * [생성 메서드]
      * @param member 회원
      * @param title 제목
      * @param content 내용
@@ -61,11 +69,12 @@ public class Inquiry extends BaseTimeEntity {
         inquiry.content = content;
         inquiry.answerStatus=AnswerStatus.UNANSWERED;
         inquiry.setMember(member); // 연관관계 세팅 포함
+        inquiry.deleteStatus=DeleteStatus.UNDELETED;
         return inquiry;
     }
 
     /**
-     * 연관관계편의메서드
+     * [연관관계 편의메서드]
      * 문의-회원 세팅
      */
      public void setMember(Member member){
@@ -74,7 +83,8 @@ public class Inquiry extends BaseTimeEntity {
     }
 
     /**
-     * 업데이트 로직
+     * [비즈니스 로직]
+     * 업데이트
      */
     public void update(String title, String content){
         this.title = title;
@@ -99,6 +109,25 @@ public class Inquiry extends BaseTimeEntity {
     public void deleteAnswer(){
         this.answer=null;
         this.answerStatus=AnswerStatus.UNANSWERED;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * SOFT DELETE
+     */
+    public void softDelete(){
+        //이미 삭제 상태인지 검증
+        validateDeleted();
+        //논리적 삭제 처리
+        this.deleteStatus=DeleteStatus.DELETED;
+
+    }
+
+    //==이미 삭제 상태인지 검증하는 로직==//
+    private void validateDeleted() {
+        if(this.deleteStatus.equals(DeleteStatus.DELETED)){
+            throw new InquiryCustomException(ErrorMessage.ALREADY_DELETE);
+        }
     }
 
 

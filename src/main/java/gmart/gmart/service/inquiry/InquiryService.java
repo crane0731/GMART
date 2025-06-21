@@ -2,12 +2,14 @@ package gmart.gmart.service.inquiry;
 
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.inquiry.*;
 import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.InquiryCustomException;
 import gmart.gmart.repository.inquiry.InquiryRepository;
 import gmart.gmart.service.member.MemberService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,13 +35,16 @@ public class InquiryService {
 
     private final InquiryRepository inquiryRepository;//문의 레파지토리
 
+
     /**
+     * [서비스 로직]
      * 문의를 생성하고 등록하는 서비스
+     * @param requestDto
      */
     @Transactional
     public void createInquiry(CreateInquiryRequestDto requestDto) {
 
-        //로그인한 회원
+        //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //문의 객체 생성
@@ -50,7 +55,8 @@ public class InquiryService {
     }
 
     /**
-     * 문의(제목, 내용)를 수정하는 서비스
+     * [서비스 로직]
+     * 문의(제목, 내용)를 수정
      * @param inquiryId 문의 아이디(PK)
      * @param requestDto  수정 요청 DTO
      */
@@ -69,11 +75,12 @@ public class InquiryService {
     }
 
     /**
-     * 문의 삭제 서비스
+     * [서비스 로직]
+     * 문의 논리적 삭제 (SOFT DELETE)
      * @param inquiryId 문의 아이디(PK)
      */
     @Transactional
-    public void deleteInquiry(Long inquiryId) {
+    public void softDelete(Long inquiryId) {
 
         //문의 조회
         Inquiry inquiry = findById(inquiryId);
@@ -82,25 +89,27 @@ public class InquiryService {
         validateInquiryOwner(inquiry);
 
         //삭제
-        delete(inquiry);
+        inquiry.softDelete();
 
     }
 
     /**
-     * 조회 서비스
+     * [서비스 로직]
+     * 문의 단 건 상세 조회
      * @param inquiryId 문의 아이디(PK)
      * @return 응답 DTO
      */
     public InquiryResponseDto getInquiry(Long inquiryId) {
 
         //조회
-        Inquiry inquiry = findById(inquiryId);
+        Inquiry inquiry = findOne(inquiryId);
 
         //DTO 생성 및 반환
         return InquiryResponseDto.createDto(inquiry);
     }
 
     /**
+     * [서비스 로직]
      * 검색 조건에 따른 리스트 조회 서비스
      * @param cond 검색 조건
      * @return 커스텀 페이징된 응답 DTO
@@ -118,19 +127,26 @@ public class InquiryService {
     }
 
     /**
-     * 삭제
-     */
-    @Transactional
-    public void delete(Inquiry inquiry) {
-        inquiryRepository.delete(inquiry);
-    }
-
-    /**
-     * 단일 조회
+     * [조회]
+     * PK 값을 통한 단일 조회
+     * @param inquiryId 문의 아이디
+     * @return Inquiry 문의 엔티티
      */
     public Inquiry findById(Long inquiryId) {
         return inquiryRepository.findById(inquiryId).orElseThrow(()->new InquiryCustomException(ErrorMessage.NOT_FOUND_INQUIRY));
     }
+
+    /**
+     * [조회 : 패치조인]
+     * PK 값을 통한 단일 조회
+     * @param inquiryId 문의 아이디
+     * @return Inquiry 문의 엔티티
+     */
+    public Inquiry findOne(Long inquiryId){
+        return inquiryRepository.findOne(inquiryId, DeleteStatus.UNDELETED).orElseThrow(()->new InquiryCustomException(ErrorMessage.NOT_FOUND_INQUIRY));
+    }
+
+
 
     /**
      * 문의 저장 메서드
@@ -188,8 +204,7 @@ public class InquiryService {
         Pageable pageable = createPageable();
 
         //조회
-        Page<Inquiry> page = inquiryRepository.findAllByCond(cond, pageable);
-        return page;
+        return inquiryRepository.findAllByCond(cond, pageable);
     }
 
 

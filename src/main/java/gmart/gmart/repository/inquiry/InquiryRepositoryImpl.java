@@ -5,6 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.QInquiry;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.enums.CreatedDateSortType;
 import gmart.gmart.dto.inquiry.SearchInquiryCondDto;
 import jakarta.persistence.EntityManager;
@@ -44,6 +45,8 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 
         BooleanBuilder builder = new BooleanBuilder();
 
+        builder.and(inquiry.deleteStatus.eq(DeleteStatus.UNDELETED));
+
         if(cond.getTitle() != null && !cond.getTitle().isBlank()) {
             builder.and(inquiry.title.containsIgnoreCase(cond.getTitle()));
         }
@@ -53,12 +56,13 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
         }
 
         OrderSpecifier<LocalDateTime> order =
-                cond.getCreateSortType() == CreatedDateSortType.CREATE_DATE_ASC ? inquiry.createdDate.asc() : inquiry.createdDate.desc();
+                cond.getCreatedDateSortType() == CreatedDateSortType.CREATE_DATE_ASC ? inquiry.createdDate.asc() : inquiry.createdDate.desc();
 
         //실제 페이지 데이터 조회
         List<Inquiry> content = query
                 .select(inquiry)
                 .from(inquiry)
+                .join(inquiry.member).fetchJoin()
                 .where(builder)
                 .orderBy(order)
                 .offset(pageable.getOffset())

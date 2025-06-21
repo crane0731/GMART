@@ -1,6 +1,8 @@
 package gmart.gmart.controller.inquiry;
 
+import gmart.gmart.domain.enums.AnswerStatus;
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.enums.CreatedDateSortType;
 import gmart.gmart.dto.inquiry.*;
 import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.inquiry.InquiryService;
@@ -26,7 +28,8 @@ public class InquiryController {
     private final InquiryService inquiryService; //문의 서비스
 
     /**
-     * 문의 등록 컨트롤러
+     * [컨트롤러]
+     * 문의 등록
      * @param requestDto 등록 요청 DTO
      * @param bindingResult 에러메시지를 담을 객체
      * @return 성공 메시지
@@ -50,7 +53,8 @@ public class InquiryController {
     }
 
     /**
-     * 문의 수정 컨트롤러
+     * [컨트롤러]
+     * 문의 수정
      * @param inquiryId 문의 아이디(PK)
      * @param requestDto 수정 요청 DTO
      * @param bindingResult 에러메시지를 담을 객체
@@ -75,14 +79,15 @@ public class InquiryController {
     }
 
     /**
-     * 문의 삭제 컨트롤러
+     * [컨트롤러]
+     * 문의 논리적 삭제 처리
      * @param inquiryId 문의 아이디(PK)
      * @return 성공 메시지
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> deleteInquiry(@PathVariable("id") Long inquiryId) {
+    public ResponseEntity<ApiResponse<?>> softDelete(@PathVariable("id") Long inquiryId) {
 
-        inquiryService.deleteInquiry(inquiryId);
+        inquiryService.softDelete(inquiryId);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","문의 삭제 완료")));
 
@@ -106,10 +111,24 @@ public class InquiryController {
      * @param cond 검색 조건
      * @return Page<InquiryListResponseDto> 응답 DTO
      */
-    @GetMapping("")
-    public ResponseEntity<ApiResponse<?>> getAllInquiry(@RequestBody SearchInquiryCondDto cond) {
 
-        PagedResponseDto<InquiryListResponseDto> responseDto = inquiryService.getAllInquiry(cond);
+    /**
+     * [컨트롤러]
+     * 조건에 따른 문의 목록 조회
+     * @param title 문의 제목
+     * @param answerStatus 답변 상태
+     * @param createdDateSortType 날짜 정렬 타입
+     * @return Page<InquiryListResponseDto> 페이징된 응답 DTO 리스트
+     */
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllInquiry(@RequestParam(value = "title", required = false)String title,
+                                                        @RequestParam(value = "answerStatus",required = false)AnswerStatus answerStatus,
+                                                        @RequestParam(value = "createdDateSortType",required = false)CreatedDateSortType createdDateSortType) {
+
+
+        SearchInquiryCondDto condDto = SearchInquiryCondDto.create(title, answerStatus, createdDateSortType);
+
+        PagedResponseDto<InquiryListResponseDto> responseDto = inquiryService.getAllInquiry(condDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
 
