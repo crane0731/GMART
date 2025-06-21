@@ -340,6 +340,14 @@ public class Member extends BaseTimeEntity {
         this.gPoint-=usedGPoint;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 리뷰 받은 수 증가
+     */
+    public void plusReviewedCount(){
+        this.reviewedCount++;
+    }
+
     //==Address 생성==//
     private static Address createAddress(AddressDto dto) {
         return Address.createEntity(dto);

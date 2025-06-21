@@ -181,4 +181,12 @@ public class Store extends BaseAuditingEntity {
     public void plusTradeCount(){
         this.tradeCount++;
     }
+
+    /**
+     * [비즈니스 로직]
+     * 리뷰 받은 수 증가
+     */
+    public void plusReviewedCount(){
+        this.reviewedCount++;
+    }
 }

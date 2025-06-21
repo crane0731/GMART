@@ -3,6 +3,8 @@ package gmart.gmart.domain;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.ReviewType;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.ReviewCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -48,6 +50,7 @@ public class Review extends BaseAuditingEntity {
     private ReviewType reviewType;
 
     @org.hibernate.annotations.Comment("리뷰 점수")
+    @Column(name = "rating")
     private Long rating;
 
 
@@ -55,4 +58,94 @@ public class Review extends BaseAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
     private DeleteStatus deleteStatus;
+
+    /**
+     * [생성 메서드]
+     * @param reviewer 리뷰어
+     * @param reviewee 리뷰
+     * @param order 주문
+     * @param content 내용
+     * @param reviewType 리뷰 타입
+     * @param rating 점수
+     * @return Review 리뷰 엔티티
+     */
+    public static Review create(Member reviewer, Member reviewee, Order order, String content, ReviewType reviewType, Long rating) {
+        Review review = new Review();
+
+        review.setReviewer(reviewer);
+        review.setReviewee(reviewee);
+
+        review.order = order;
+        review.content = content;
+        review.reviewType = reviewType;
+        review.rating = rating;
+        review.deleteStatus = DeleteStatus.UNDELETED;
+        return review;
+
+    }
+
+    /**
+     * [연관관계 편의메서드]
+     * @param reviewer
+     */
+    public void setReviewer(Member reviewer) {
+        this.reviewer = reviewer;
+        reviewer.getWrittenReviews().add(this);
+    }
+
+    /**
+     * [연관관계 편의 메서드]
+     * @param reviewee
+     */
+    public void setReviewee(Member reviewee) {
+        this.reviewee = reviewee;
+        reviewee.getReceivedReviews().add(this);
+    }
+
+    /**
+     * [비즈니스 로직]
+     * SOFT DELETE
+     */
+    public void softDelete(){
+        //이미 삭제 되었는지 확인
+        validateSoftDelete();
+
+        this.deleteStatus=DeleteStatus.DELETED;
+    }
+
+    /**
+     * [비즈니스 로직]
+     * RECOVERY
+     */
+    public void recovery(){
+
+        //이미 삭제상태가 아닌지 확인
+        validateRecovery();
+
+        this.deleteStatus=DeleteStatus.UNDELETED;
+        this.reviewee.plusReviewedCount();
+        this.reviewee.getStore().plusReviewedCount();
+
+    }
+
+
+
+    //==이미 삭제상태가 아닌지 확인하는 로직==//
+    private void validateRecovery() {
+        if(this.deleteStatus.equals(DeleteStatus.UNDELETED)){
+            throw new ReviewCustomException(ErrorMessage.CANNOT_RECOVERY);
+        }
+    }
+
+    //==이미 삭제 되었는지 확인하는 로직==//
+    private void validateSoftDelete() {
+        if (DeleteStatus.DELETED.equals(deleteStatus)){
+            throw new ReviewCustomException(ErrorMessage.CANNOT_DELETE);
+        }
+    }
+
+
 }
+
+
+
