@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +39,20 @@ public class ReviewController {
         }
         reviewService.createReview(requestDto);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","리뷰 등록 완료")));
+
+    }
+
+    /**
+     * [컨트롤러]
+     * 리뷰 논리적 삭제(SOFT DELETE)
+     * @param reviewId 리뷰 아이디
+     * @return 성공 메시지
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> deleteReview(@PathVariable("id") Long reviewId) {
+
+        reviewService.softDelete(reviewId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","리뷰 삭제 완료")));
 
     }
 

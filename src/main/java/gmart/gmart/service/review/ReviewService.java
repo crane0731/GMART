@@ -55,7 +55,23 @@ public class ReviewService {
     /**
      * 리뷰 삭제(SOFT DELETE)
      */
+    @Transactional
+    public void softDelete(Long reviewId){
 
+        //현재 로그인한 회원 조회(구매자)
+        Member member = memberService.findBySecurityContextHolder();
+
+        //리뷰 조회
+        Review review = findById(reviewId);
+
+        //현재 로그인한 회원이 리뷰의 작성자인지 확인
+        validateReviewOwner(member, review);
+
+        //리뷰 논리적 삭제 처리
+        review.softDelete();
+
+
+    }
     /**
      * 리뷰 조회
      */
@@ -156,6 +172,13 @@ public class ReviewService {
 
         //주문이 구매확정 상태인지 확인 -> 구매 확정 상태여야 리뷰를 등록 할 수 있음
         validateOrderCompleted(order);
+    }
+
+    //==현재 로그인한 회원이 리뷰의 작성자인지 확인 하는 로직==//
+    private void validateReviewOwner(Member member, Review review) {
+        if(!member.getId().equals(review.getReviewer().getId())){
+            throw new ReviewCustomException(ErrorMessage.NO_PERMISSION);
+        }
     }
 
 }

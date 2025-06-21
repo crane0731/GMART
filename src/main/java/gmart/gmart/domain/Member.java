@@ -348,6 +348,16 @@ public class Member extends BaseTimeEntity {
         this.reviewedCount++;
     }
 
+    /**
+     * [비즈니스 로직]
+     * 리뷰 받은 수 감소
+     */
+    public void minusReviewedCount(){
+        if(this.reviewedCount>0){
+           this.reviewedCount--;
+        }
+    }
+
     //==Address 생성==//
     private static Address createAddress(AddressDto dto) {
         return Address.createEntity(dto);

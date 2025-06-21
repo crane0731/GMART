@@ -111,6 +111,9 @@ public class Review extends BaseAuditingEntity {
         validateSoftDelete();
 
         this.deleteStatus=DeleteStatus.DELETED;
+        this.reviewee.minusReviewedCount();
+        this.reviewee.getStore().minusReviewedCount();
+
     }
 
     /**
@@ -140,7 +143,7 @@ public class Review extends BaseAuditingEntity {
     //==이미 삭제 되었는지 확인하는 로직==//
     private void validateSoftDelete() {
         if (DeleteStatus.DELETED.equals(deleteStatus)){
-            throw new ReviewCustomException(ErrorMessage.CANNOT_DELETE);
+            throw new ReviewCustomException(ErrorMessage.ALREADY_DELETE);
         }
     }
 

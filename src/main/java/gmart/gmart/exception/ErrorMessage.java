@@ -83,6 +83,7 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_REVIEW ="리뷰를 찾을 수 없습니다.";
     public static final String ALREADY_REVIEW="이미 리뷰가 존재합니다.";
 
+    public static final String ALREADY_DELETE="이미 삭제 처리 되었습니다.";
     public static final String CANNOT_DELETE = "삭제 할 수없습니다.";
     public static final String CANNOT_RECOVERY="복구 할 수 없습니다.";
 
