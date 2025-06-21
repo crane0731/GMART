@@ -7,6 +7,7 @@ import gmart.gmart.domain.Store;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.OrderStatus;
 import gmart.gmart.dto.review.CreateReviewRequestDto;
+import gmart.gmart.dto.review.ReviewResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ReviewCustomException;
 import gmart.gmart.repository.review.ReviewRepository;
@@ -70,11 +71,32 @@ public class ReviewService {
         //리뷰 논리적 삭제 처리
         review.softDelete();
 
-
     }
+
     /**
-     * 리뷰 조회
+     * [서비스 로직]
+     * 리뷰 상세 조회
+     * @param reviewId 리뷰 아이디
+     * @return ReviewResponseDto 응답 DTO
      */
+    public ReviewResponseDto getReviewDetails(Long reviewId){
+
+        //리뷰 조회
+        Review review = findOne(reviewId);
+
+        //조회한 리뷰가 삭제된 상태인지 확인
+        validateReviewDeleted(review);
+
+        //응답 DTO 생성 + 반환
+        return ReviewResponseDto.create(review);
+    }
+
+    //==조회한 리뷰가 삭제된 상태인지 확인하는 로직==//
+    private void validateReviewDeleted(Review review) {
+        if(review.getDeleteStatus().equals(DeleteStatus.DELETED)){
+            throw new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW);
+        }
+    }
 
     /**
      * 자신이 쓴 리뷰 목록 조회
@@ -107,6 +129,16 @@ public class ReviewService {
      */
     public Review findById(Long id) {
         return reviewRepository.findById(id).orElseThrow(()-> new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW));
+    }
+
+    /**
+     * [조회 : 패치조인]
+     * ID (PK) 값으로 단일 조회(패치 조인)
+     * @param id 리뷰 아이디
+     * @return Review 리뷰 엔티티
+     */
+    public Review findOne(Long id) {
+        return reviewRepository.findOne(id).orElseThrow(()-> new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW));
     }
 
 

@@ -2,6 +2,7 @@ package gmart.gmart.controller.review;
 
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.review.CreateReviewRequestDto;
+import gmart.gmart.dto.review.ReviewResponseDto;
 import gmart.gmart.service.review.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,20 @@ public class ReviewController {
         reviewService.softDelete(reviewId);
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","리뷰 삭제 완료")));
 
+    }
+
+    /**
+     * [컨트롤러]
+     * 리뷰 상세 조회 (단건 조회)
+     * @param reviewId 리뷰 아이디
+     * @return ReviewResponseDto 응답 DTO
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>>  getReviewDetails(@PathVariable("id") Long reviewId) {
+
+        ReviewResponseDto responseDto = reviewService.getReviewDetails(reviewId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
     }
 
 
