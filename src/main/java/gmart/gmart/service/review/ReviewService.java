@@ -6,16 +6,24 @@ import gmart.gmart.domain.Review;
 import gmart.gmart.domain.Store;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.dto.review.CreateReviewRequestDto;
-import gmart.gmart.dto.review.ReviewResponseDto;
+import gmart.gmart.dto.review.ReviewDetailsResponseDto;
+import gmart.gmart.dto.review.ReviewListResponseDto;
+import gmart.gmart.dto.review.SearchReviewCondDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ReviewCustomException;
 import gmart.gmart.repository.review.ReviewRepository;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 리뷰 서비스
@@ -54,7 +62,9 @@ public class ReviewService {
     }
 
     /**
-     * 리뷰 삭제(SOFT DELETE)
+     * [서비스 로직]
+     * 리뷰 논리적 삭제 (SOFT DELETE)
+     * @param reviewId 리뷰 아이디
      */
     @Transactional
     public void softDelete(Long reviewId){
@@ -79,7 +89,7 @@ public class ReviewService {
      * @param reviewId 리뷰 아이디
      * @return ReviewResponseDto 응답 DTO
      */
-    public ReviewResponseDto getReviewDetails(Long reviewId){
+    public ReviewDetailsResponseDto getReviewDetails(Long reviewId){
 
         //리뷰 조회
         Review review = findOne(reviewId);
@@ -88,29 +98,31 @@ public class ReviewService {
         validateReviewDeleted(review);
 
         //응답 DTO 생성 + 반환
-        return ReviewResponseDto.create(review);
-    }
-
-    //==조회한 리뷰가 삭제된 상태인지 확인하는 로직==//
-    private void validateReviewDeleted(Review review) {
-        if(review.getDeleteStatus().equals(DeleteStatus.DELETED)){
-            throw new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW);
-        }
+        return ReviewDetailsResponseDto.create(review);
     }
 
     /**
-     * 자신이 쓴 리뷰 목록 조회
+     * [서비스 로직]
+     * 자신의 리뷰 조회
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
      */
+    public PagedResponseDto<ReviewListResponseDto> getMyReviews(SearchReviewCondDto condDto){
 
-    /**
-     * 자신이 받은 리뷰 목록 조회
-     */
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
 
+        Page<Review> page = reviewRepository.findByCondByMember(member, condDto, createPageable());
+
+        List<ReviewListResponseDto> content = page.getContent().stream().map(ReviewListResponseDto::create).toList();
+
+        //페이징 응답 DTO 생성 + 반환
+        return createPagedResponseDto(content, page);
+    }
+    
     /**
      * 특정 회원이 받은 리뷰 목록 조회
      */
-
-
 
     /**
      * [저장]
@@ -211,6 +223,32 @@ public class ReviewService {
         if(!member.getId().equals(review.getReviewer().getId())){
             throw new ReviewCustomException(ErrorMessage.NO_PERMISSION);
         }
+    }
+
+    //==조회한 리뷰가 삭제된 상태인지 확인하는 로직==//
+    private void validateReviewDeleted(Review review) {
+        if(review.getDeleteStatus().equals(DeleteStatus.DELETED)){
+            throw new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW);
+        }
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable() {
+        Pageable pageable = PageRequest.of(0, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
+    }
+
+    //==페이징 응답 DTO 생성 메서드==//
+    private PagedResponseDto<ReviewListResponseDto> createPagedResponseDto(List<ReviewListResponseDto> content, Page<Review> page) {
+        return PagedResponseDto.<ReviewListResponseDto>builder()
+                .content(content)
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .build();
     }
 
 }

@@ -1,8 +1,14 @@
 package gmart.gmart.controller.review;
 
+import gmart.gmart.domain.enums.ReviewType;
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.enums.CreatedDateSortType;
+import gmart.gmart.dto.enums.ReviewRole;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.dto.review.CreateReviewRequestDto;
-import gmart.gmart.dto.review.ReviewResponseDto;
+import gmart.gmart.dto.review.ReviewDetailsResponseDto;
+import gmart.gmart.dto.review.ReviewListResponseDto;
+import gmart.gmart.dto.review.SearchReviewCondDto;
 import gmart.gmart.service.review.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +72,29 @@ public class ReviewController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<?>>  getReviewDetails(@PathVariable("id") Long reviewId) {
 
-        ReviewResponseDto responseDto = reviewService.getReviewDetails(reviewId);
+        ReviewDetailsResponseDto responseDto = reviewService.getReviewDetails(reviewId);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+    }
+
+    /**
+     * [컨트롤러]
+     * 회원이 자신의 리뷰 목록을 조건에 따라 조회
+     * @param reviewRole 리뷰 역할
+     * @param reviewType 리뷰 타입
+     * @param createdDateSortType 날짜 정렬 타입
+     * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<?>> getMyReviews(@RequestParam("reviewRole") ReviewRole reviewRole,
+                                                       @RequestParam("reviewType") ReviewType reviewType,
+                                                       @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType) {
+
+        SearchReviewCondDto condDto = SearchReviewCondDto.create(reviewRole, reviewType, createdDateSortType);
+
+        PagedResponseDto<ReviewListResponseDto> responseDtos = reviewService.getMyReviews(condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
     }
 
 

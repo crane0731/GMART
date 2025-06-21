@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ReviewResponseDto {
+public class ReviewDetailsResponseDto {
 
     public Long reviewId; //리뷰 아이디
     public String content; //리뷰 내용
@@ -29,6 +29,8 @@ public class ReviewResponseDto {
     public Long orderId; //주문 아이디
     public Long itemId; //상품 아이디
     public String itemTitle; //상품 제목
+    public Long itemPrice; //상품 가격
+    public Long deliveryPrice; //배송비
 
 
     /**
@@ -36,8 +38,8 @@ public class ReviewResponseDto {
      * @param review 리뷰 엔티티
      * @return ReviewResponseDto 응답 DTO
      */
-    public static ReviewResponseDto create(Review review) {
-        ReviewResponseDto dto = new ReviewResponseDto();
+    public static ReviewDetailsResponseDto create(Review review) {
+        ReviewDetailsResponseDto dto = new ReviewDetailsResponseDto();
 
         dto.setReviewId(review.getId());
         dto.setContent(review.getContent());
@@ -56,6 +58,8 @@ public class ReviewResponseDto {
         dto.setOrderId(review.getOrder().getId());
         dto.setItemId(review.getOrder().getItem().getId());
         dto.setItemTitle(review.getOrder().getItem().getTitle());
+        dto.setItemPrice(review.getOrder().getItemPrice());
+        dto.setDeliveryPrice(review.getOrder().getDeliveryPrice());
 
         return dto;
     }

@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * 리뷰 레파지토리
  */
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
 
     /**
      * [쿼리 메서드]
@@ -35,4 +35,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "JOIN FETCH o.item i " +
             "WHERE r.id= :id")
     Optional<Review> findOne(@Param("id") Long id);
+
 }
