@@ -120,9 +120,27 @@ public class ReviewService {
         return createPagedResponseDto(content, page);
     }
     
+
     /**
+     * [서비스 로직]
      * 특정 회원이 받은 리뷰 목록 조회
+     * @param memberId 회원 아이디
+     * @param condDto 검색 조건 DTO
+     * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
      */
+    public PagedResponseDto<ReviewListResponseDto>getReviews(Long memberId,SearchReviewCondDto condDto){
+
+        //회원 조회
+        Member member = memberService.findById(memberId);
+
+        Page<Review> page = reviewRepository.findByCondByMember(member, condDto, createPageable());
+
+        List<ReviewListResponseDto> content = page.getContent().stream().map(ReviewListResponseDto::create).toList();
+
+        //페이징 된 응답 DTO + 반환
+        return createPagedResponseDto(content, page);
+
+    }
 
     /**
      * [저장]

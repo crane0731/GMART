@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/gmart/review")
+@RequestMapping("/api/gmart")
 public class ReviewController {
 
     private final ReviewService reviewService;// 리뷰 서비스
@@ -36,7 +36,7 @@ public class ReviewController {
      * @param bindingResult 에러메시지를 바인딩할 객체
      * @return 성공 메시지
      */
-    @PostMapping("")
+    @PostMapping("/review")
     public ResponseEntity<ApiResponse<?>> createReview(@Valid @RequestBody CreateReviewRequestDto requestDto, BindingResult bindingResult) {
         Map<String, String> errorMessages = new HashMap<>();
         //필드에러가 있는지 확인
@@ -55,7 +55,7 @@ public class ReviewController {
      * @param reviewId 리뷰 아이디
      * @return 성공 메시지
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/review/{id}")
     public ResponseEntity<ApiResponse<?>> deleteReview(@PathVariable("id") Long reviewId) {
 
         reviewService.softDelete(reviewId);
@@ -69,7 +69,7 @@ public class ReviewController {
      * @param reviewId 리뷰 아이디
      * @return ReviewResponseDto 응답 DTO
      */
-    @GetMapping("/{id}")
+    @GetMapping("/review/{id}")
     public ResponseEntity<ApiResponse<?>>  getReviewDetails(@PathVariable("id") Long reviewId) {
 
         ReviewDetailsResponseDto responseDto = reviewService.getReviewDetails(reviewId);
@@ -85,7 +85,7 @@ public class ReviewController {
      * @param createdDateSortType 날짜 정렬 타입
      * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
      */
-    @GetMapping("/me")
+    @GetMapping("/members/me/review")
     public ResponseEntity<ApiResponse<?>> getMyReviews(@RequestParam("reviewRole") ReviewRole reviewRole,
                                                        @RequestParam("reviewType") ReviewType reviewType,
                                                        @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType) {
@@ -96,6 +96,29 @@ public class ReviewController {
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
     }
+
+    /**
+     * [컨트롤러]
+     * 특정 회원의 리뷰 목록을 조건에 따라 조회
+     * @param memberId 회원 아이디
+     * @param reviewRole 리뷰 역할
+     * @param reviewType 리뷰 타입
+     * @param createdDateSortType 날짜 정렬 타입
+     * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
+     */
+    @GetMapping("/members/{id}/review")
+    public ResponseEntity<ApiResponse<?>> getReviews(@PathVariable("id")Long memberId,
+                                                     @RequestParam("reviewRole") ReviewRole reviewRole,
+                                                     @RequestParam("reviewType") ReviewType reviewType,
+                                                     @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType) {
+
+        SearchReviewCondDto condDto = SearchReviewCondDto.create(reviewRole, reviewType, createdDateSortType);
+
+        PagedResponseDto<ReviewListResponseDto> responseDtos = reviewService.getReviews(memberId,condDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+    }
+
 
 
     //==필드에러가 있는지 확인하는 로직==//

@@ -24,6 +24,7 @@ public class ReviewListResponseDto {
 
     private Long reviewerId; //리뷰어 아이디
     private String reviewerNickName; //리뷰어 닉네임
+    private String reviewerProfileImageUrl; //리뷰어 프로필 이미지 URL
 
     private Long revieweeId; //리뷰당사자 아이디
     private String revieweeNickName; //리뷰 당사자 닉네임
@@ -48,6 +49,7 @@ public class ReviewListResponseDto {
 
         dto.setReviewerId(review.getReviewer().getId());
         dto.setReviewerNickName(review.getReviewer().getNickname());
+        dto.setReviewerProfileImageUrl(review.getReviewer().getProfileImageUrl());
 
         dto.setRevieweeId(review.getReviewee().getId());
         dto.setRevieweeNickName(review.getReviewee().getNickname());
