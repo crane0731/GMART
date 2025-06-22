@@ -22,6 +22,7 @@ public class AdminInquiryController {
     private final AdminInquiryService adminInquiryService;//관리자 문의 서비스
 
     /**
+     * [컨트롤러]
      * 관리자 문의 답변
      * @param inquiryId 문의 아이디(PK)
      * @param requestDto 문의 답변 요청 DTO
