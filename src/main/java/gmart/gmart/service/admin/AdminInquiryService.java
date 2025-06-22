@@ -23,6 +23,7 @@ public class AdminInquiryService {
     private final InquiryService inquiryService;//문의 서비스
 
     /**
+     * [서비스 로직]
      * 관리자 문의 삭제 서비스
      * @param inquiryId 문의 아이디
      */
@@ -37,6 +38,7 @@ public class AdminInquiryService {
     }
 
     /**
+     * [서비스 로직]
      * 관리자 문의 답변 등록
      * @param inquiryId 문의 아이디
      * @param requestDto 답변 요청 DTO
@@ -56,6 +58,7 @@ public class AdminInquiryService {
     }
 
     /**
+     * [서비스 로직]
      * 관리자 문의 답변 삭제
      * @param inquiryId 문의 아이디(PK)
      */
