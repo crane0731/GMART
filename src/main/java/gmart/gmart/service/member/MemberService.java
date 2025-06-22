@@ -13,6 +13,7 @@ import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.member.MemberRepository;
+import gmart.gmart.repository.token.KakaoAccessTokenRepository;
 import gmart.gmart.service.token.RefreshTokenService;
 import gmart.gmart.service.token.TokenService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
@@ -20,6 +21,9 @@ import gmart.gmart.service.redis.TokenBlackListService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +51,8 @@ public class MemberService {
 
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final KakaoAccessTokenRepository kakaoAccessTokenRepository; //카카오 엑세스 토큰 레파지토리
 
 
     /**
@@ -164,9 +171,32 @@ public class MemberService {
         //현재 로그인한 회원 조회
         Member member = findBySecurityContextHolder();
 
+        // 카카오 로그아웃 API 호출 (카카오 토큰이 있는 경우)
+        kakaoAccessTokenRepository.findByMemberId(member.getId()).ifPresent(this::logoutFromKakao);
+
         //리프레쉬 토큰 삭제
         deleteToken(request, member);
 
+    }
+
+    //== 카카오 로그아웃 API 호출 메서드==//
+    private void logoutFromKakao(KakaoAccessToken kakaoAccessToken) {
+        String kakaoUnlinkUrl = "https://kapi.kakao.com/v1/user/unlink";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(kakaoAccessToken.getAccessToken());  // Access Token 설정
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(kakaoUnlinkUrl, request, String.class);
+
+            kakaoAccessTokenRepository.delete(kakaoAccessToken);
+
+            System.out.println("카카오 계정 연결 해제 성공: " + response.getBody());
+        } catch (Exception e) {
+            System.err.println("카카오 계정 연결 해제 실패: " + e.getMessage());
+        }
     }
 
 
