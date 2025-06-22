@@ -68,7 +68,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/gmart/signup","/api/gmart/login","/api/gmart/image/profile","/api/gmart/image/store","/api/gmart/image/item",
                                 "/profile-images/**","/store-images/**","/item-images/**","/api/gmart/token",
-                                "/static/***","/test.html"
+                                "/static/***","/test.html","/api/auth/***","/api/auth/kakao/callback"
                                 )
                         .permitAll()
                         .requestMatchers("/api/gmart/admin/**").hasRole("ADMIN")

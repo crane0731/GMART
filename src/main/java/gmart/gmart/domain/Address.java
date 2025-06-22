@@ -19,17 +19,16 @@ import org.hibernate.annotations.Comment;
 public class Address {
 
     @Comment("주소")
-    @Column(name = "address",nullable = false)
+    @Column(name = "address")
     private String address;
 
     @Comment("상세 주소")
-    @Column(name = "address_details",nullable = false)
+    @Column(name = "address_details")
     private String addressDetails;
 
     @Comment("우편번호")
-    @Column(name = "zipcode",nullable = false)
+    @Column(name = "zipcode")
     private String zipCode;
-
 
     /**
      * 생성 메서드

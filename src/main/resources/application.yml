@@ -16,6 +16,27 @@ spring:
   application:
     name: gmart
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 6c510f79687aff15675884e9f2764fb2
+            client-secret: SeoOJlod3Hqmi1zkkWjOwvRuGS8FuPQB
+            redirect-uri: http://localhost:8081/api/auth/kakao/callback
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - account_email
+              - profile_image
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+
   data:
     redis:
       host: localhost
@@ -61,3 +82,9 @@ jwt:
   issuer: dlwnsgkr8318@skuniv.ac.kr
   access-secret-key: asdasjvnoansckln12359449asddafkmsbxibuoiuoiuqwepppokkasf2asd
   refresh-secret_key: asfacolkasndlknv3203klfamkld02asdkjfajkvnlancdkdklmasdklv
+
+
+kakao:
+  api:
+    client-id: 6c510f79687aff15675884e9f2764fb2
+    client-secret: SeoOJlod3Hqmi1zkkWjOwvRuGS8FuPQB

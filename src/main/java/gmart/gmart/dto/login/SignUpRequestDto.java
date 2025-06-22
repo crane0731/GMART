@@ -1,5 +1,6 @@
-package gmart.gmart.dto;
+package gmart.gmart.dto.login;
 
+import gmart.gmart.dto.AddressDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -34,4 +35,28 @@ public class SignUpRequestDto {
 
     private String profileImageUrl; //프로필 이미지
 
+
+    /**
+     * [생성 메서드]
+     * 카카오 회원가입을 위한 생성 메서드
+     * @param loginId 로그인 아이디
+     * @param nickname 닉네임
+     * @param profileImageUrl 프로필 이미지 URL
+     * @return SignUpRequestDto 회원 가입 요청 DTO
+     */
+    public static SignUpRequestDto createForKakao(String loginId, String nickname,String profileImageUrl){
+
+        SignUpRequestDto dto = new SignUpRequestDto();
+        dto.setLoginId(loginId);
+        dto.setName(nickname);
+        dto.setNickname(nickname+"@Kakao");
+        dto.setProfileImageUrl(profileImageUrl);
+        dto.setPhone(null);
+        dto.setAddress(null);
+        dto.setPassword("0000");
+        dto.setPasswordCheck("0000");
+
+        return dto;
+
+    }
 }

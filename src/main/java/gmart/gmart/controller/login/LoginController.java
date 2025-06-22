@@ -1,7 +1,7 @@
-package gmart.gmart.controller.member;
+package gmart.gmart.controller.login;
 
-import gmart.gmart.dto.LoginRequestDto;
-import gmart.gmart.dto.SignUpRequestDto;
+import gmart.gmart.dto.login.LoginRequestDto;
+import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.service.member.MemberService;

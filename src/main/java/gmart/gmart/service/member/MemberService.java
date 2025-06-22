@@ -2,10 +2,10 @@ package gmart.gmart.service.member;
 
 import gmart.gmart.domain.*;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
-import gmart.gmart.dto.LoginRequestDto;
+import gmart.gmart.dto.login.LoginRequestDto;
 import gmart.gmart.dto.MemberGundamGradeListDto;
 import gmart.gmart.dto.MemberPreferredGundamGradeDto;
-import gmart.gmart.dto.SignUpRequestDto;
+import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.dto.password.ChangePasswordRequestDto;
@@ -216,6 +216,15 @@ public class MemberService {
         return memberRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(ErrorMessage.NOT_FOUND_MEMBER));
     }
 
+    /**
+     * [조회]
+     * Login ID를 통해 회원을 조회 -> 없으면 null
+     * @return
+     */
+    public Member findByLoginIdNullable(String loginId) {
+        return memberRepository.findByLoginId(loginId).orElse(null);
+    }
+
 
     /**
      * ID 를 통해 회원을 조회
@@ -238,7 +247,6 @@ public class MemberService {
 
         //==검증을 무사히 마치면 회원 가입 진행==//
 
-
         //업로드된 이미지 조회
         UploadedImage uploadedImage = getUploadedImage(signUpRequestDto.getProfileImageUrl());
 
@@ -246,6 +254,16 @@ public class MemberService {
         Member member = createMember(signUpRequestDto, uploadedImage);
 
         //회원 저장
+        save(member);
+
+    }
+
+    /**
+     * [저장]
+     * @param member 회원 엔티티
+     */
+    @Transactional
+    public void save(Member member){
         memberRepository.save(member);
 
     }
@@ -267,7 +285,7 @@ public class MemberService {
     }
 
     //==회원 생성 + 프로필 이미지 세팅==//
-    private Member createMember(SignUpRequestDto signUpRequestDto, UploadedImage uploadedImage) {
+    public Member createMember(SignUpRequestDto signUpRequestDto, UploadedImage uploadedImage) {
         //패스워드 인코딩
         String encodedPassword = bCryptPasswordEncoder.encode(signUpRequestDto.getPassword());
 
@@ -301,7 +319,7 @@ public class MemberService {
     }
 
     //==회원가입 검증 로직==//
-    private void signupcheck(SignUpRequestDto signUpRequestDto) {
+    public void signupcheck(SignUpRequestDto signUpRequestDto) {
         //아이디 중복 검사
         loginDuplicatedCheck(signUpRequestDto.getLoginId());
 

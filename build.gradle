@@ -31,6 +31,9 @@ dependencies {
 
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0'
 
+	//oauth2.0
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	//jwt
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'//자바 JWT 라이브러리
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'//XML 문서와 Java 객체 간 매핑 자동화

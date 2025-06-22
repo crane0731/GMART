@@ -3,9 +3,8 @@ package gmart.gmart.domain;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
-import gmart.gmart.domain.enums.ReportStatus;
 import gmart.gmart.dto.AddressDto;
-import gmart.gmart.dto.SignUpRequestDto;
+import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.GMoneyCustomException;
@@ -51,7 +50,7 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Comment("전화 번호")
-    @Column(name = "phone_number" ,nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @Embedded
@@ -148,7 +147,13 @@ public class Member extends BaseTimeEntity {
      */
     public static Member createEntity(SignUpRequestDto dto,String encodedPassword){
 
-        Address address = createAddress(dto.getAddress());
+        Address address;
+
+        if(dto.getAddress()!=null) {
+            address = createAddress(dto.getAddress());
+        }else {
+            address=null;
+        }
 
         Member member = new Member();
 
@@ -169,7 +174,6 @@ public class Member extends BaseTimeEntity {
         member.suspensionCount=0L;
         member.adminMessageCount=0L;
         member.memberRole = MemberRole.MEMBER;
-
 
         return member;
     }
