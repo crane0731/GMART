@@ -1,6 +1,6 @@
 package gmart.gmart.domain;
 
-import gmart.gmart.domain.baseentity.BaseAuditingEntity;
+import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.StoreStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,7 +17,7 @@ import java.util.List;
 @Table(name = "store")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Store extends BaseAuditingEntity {
+public class Store extends BaseTimeEntity {
 
     @org.hibernate.annotations.Comment("상점 아이디")
     @Id

@@ -24,31 +24,30 @@ public class StoreController {
 
     private final StoreService storeService; //상점 서비스
 
-    /**
-     * [컨트롤러]
-     * 상점 생성
-     * @param requestDto 상품 생성 요청 DTO
-     * @param bindingResult 에러 메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<?>> createStore(@Valid @RequestBody CreateStoreRequestDto requestDto,BindingResult bindingResult) {
-
-        // 오류 메시지를 담을 Map
-        Map<String, String> errorMessages = new HashMap<>();
-
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        storeService.createStore(requestDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상점 생성 완료")));
-
-
-    }
+//    /**
+//     * [컨트롤러]
+//     * 상점 생성
+//     * @param requestDto 상품 생성 요청 DTO
+//     * @param bindingResult 에러 메시지를 바인딩할 객체
+//     * @return 성공 메시지
+//     */
+//    @PostMapping("")
+//    public ResponseEntity<ApiResponse<?>> createStore(@Valid @RequestBody CreateStoreRequestDto requestDto,BindingResult bindingResult) {
+//
+//        // 오류 메시지를 담을 Map
+//        Map<String, String> errorMessages = new HashMap<>();
+//
+//        //필드에러가 있는지 확인
+//        //오류 메시지가 존재하면 이를 반환
+//        if (errorCheck(bindingResult, errorMessages)) {
+//            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
+//        }
+//
+//        storeService.createStore(requestDto);
+//
+//        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상점 생성 완료")));
+//
+//    }
 
     /**
      * [컨트롤러]
@@ -86,6 +85,19 @@ public class StoreController {
     public ResponseEntity<ApiResponse<?>> getStoreDetails(@PathVariable("id") Long storeId) {
 
         StoreResponseDto responseDto = storeService.getStoreDetails(storeId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+    }
+
+    /**
+     * [컨트롤러]
+     * 자신의 상점 정보 상세 조회
+     * @return StoreResponseDto 응답 DTO
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<?>> getMyStoreDetails() {
+
+        StoreResponseDto responseDto = storeService.getMyStoreDetails();
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
     }

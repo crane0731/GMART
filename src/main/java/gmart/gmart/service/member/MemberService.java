@@ -9,11 +9,14 @@ import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.dto.password.ChangePasswordRequestDto;
+import gmart.gmart.dto.store.CreateStoreRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.member.MemberRepository;
+import gmart.gmart.repository.store.StoreRepository;
 import gmart.gmart.repository.token.KakaoAccessTokenRepository;
+import gmart.gmart.service.image.UploadStoreProfileImageService;
 import gmart.gmart.service.token.RefreshTokenService;
 import gmart.gmart.service.token.TokenService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
@@ -44,6 +47,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final UploadMemberProfileImageService profileImageService;
+    private final UploadStoreProfileImageService uploadStoreProfileImageService;//업로드 상점 이미지 서비스
     private final RefreshTokenService refreshTokenService;
     private final TokenService tokenService;
     private final TokenBlackListService tokenBlackListService;
@@ -53,6 +57,7 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final KakaoAccessTokenRepository kakaoAccessTokenRepository; //카카오 엑세스 토큰 레파지토리
+    private final StoreRepository storeRepository;// 상점 레파지 토리
 
 
     /**
@@ -286,6 +291,8 @@ public class MemberService {
         //회원 저장
         save(member);
 
+        //상점 생성 로직
+        createStore(member);
     }
 
     /**
@@ -525,6 +532,19 @@ public class MemberService {
         setBlackListAccessToken(request);
     }
 
+    //==상점 생성 로직==//
+    private void createStore(Member member) {
+        //기본 상점 프로필 이미지 조회
+        UploadedImage defaultStoreImage = uploadStoreProfileImageService.findDefaultProfileImage();
 
+        //상점 프로필 이미지 생성
+        StoreProfileImage storeProfileImage = StoreProfileImage.create(defaultStoreImage.getImageUrl());
+
+        //상점 생성
+        Store store = Store.create(member, member.getNickname() + "의 상점", member.getNickname() + "의 상점입니다.", storeProfileImage);
+
+        //상점 저장
+        storeRepository.save(store);
+    }
 
 }
