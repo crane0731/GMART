@@ -100,8 +100,6 @@ public class MemberService {
         //회원정보 업데이트
         processingUpdate(dto, member);
 
-        
-
     }
 
 
@@ -478,12 +476,21 @@ public class MemberService {
         //회원의 기존 프로필 이미지 조회
         String oldImage = member.getProfileImageUrl();
 
+        //만약 바꾸려는 이미지가 null 이라면 기본 프로필 이미지로 설정
+        if(dto.getProfileImageUrl()==null){
+                dto.setProfileImageUrl(defaultProfileImage.getImageUrl());
+        }
+
         //기존 프로필 이미지가 기본이미지가 아니라면 예전 업로드 이미지 비활성화
         if(!oldImage.equals(defaultProfileImage.getImageUrl())) {
 
-            UploadedImage oldUploadImage = getUploadedImage(oldImage);
-            oldUploadImage.usedFalse();
+            //만약 기존 프로필 이미지가 카카오 프로필 이미지라면
+            if(!oldImage.contains("http")){
+                UploadedImage oldUploadedImage = getUploadedImage(oldImage);
+                oldUploadedImage.usedFalse();
+            }
         }
+
 
         member.update(dto);
 
