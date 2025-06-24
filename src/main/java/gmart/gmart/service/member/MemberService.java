@@ -533,7 +533,7 @@ public class MemberService {
     }
 
     //==상점 생성 로직==//
-    private void createStore(Member member) {
+    public void createStore(Member member) {
         //기본 상점 프로필 이미지 조회
         UploadedImage defaultStoreImage = uploadStoreProfileImageService.findDefaultProfileImage();
 
