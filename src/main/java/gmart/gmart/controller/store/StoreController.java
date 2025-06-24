@@ -51,14 +51,13 @@ public class StoreController {
 
     /**
      * [컨트롤러]
-     * 상점 업데이트
-     * @param storeId 상점 아이디
+     * 자신의 상점 정보  업데이트
      * @param requestDto 상점 수정 요청 DTO
      * @param bindingResult 에러 메시지를 바인딩할 객체
      * @return 성공 메시지
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> updateStore(@PathVariable("id") Long storeId, @Valid @RequestBody UpdateStoreRequestDto requestDto, BindingResult bindingResult) {
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<?>> updateStore( @Valid @RequestBody UpdateStoreRequestDto requestDto, BindingResult bindingResult) {
 
         // 오류 메시지를 담을 Map
         Map<String, String> errorMessages = new HashMap<>();
@@ -69,7 +68,7 @@ public class StoreController {
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
         }
 
-        storeService.updateStore(storeId, requestDto);
+        storeService.updateStore(requestDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","상점 수정 완료")));
 

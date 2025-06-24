@@ -53,20 +53,16 @@ public class StoreService {
     /**
      * [서비스 로직]
      * 상점 업데이트
-     * @param storeId 상점 아이디
      * @param requestDto 상점 수정 요청 DTO
      */
     @Transactional
-    public void updateStore(Long storeId,UpdateStoreRequestDto requestDto) {
+    public void updateStore(UpdateStoreRequestDto requestDto) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //수정할 상점 조회
-        Store store = findById(storeId);
-
-        //수정할 상점이 로그인한 회원의 상점인지 확인(회원의 것이 아니면 예외를 던짐)
-        validateStoreOwner(store, member);
+        Store store = member.getStore();
 
         //상점 업데이트 실행
         processUpdate(requestDto, store);
@@ -214,6 +210,15 @@ public class StoreService {
 
     //==새로운 업로드 이미지(상점 프로필 이미지) 사용 처리 + 반환 메서드==//
     private UploadedImage newStoreImageUsedTrueAndGet(UpdateStoreRequestDto requestDto) {
+
+
+
+        if(requestDto.getImageUrl()==null) {
+
+            //기본이미지 반환
+            return uploadStoreProfileImageService.findDefaultProfileImage();
+        }
+
         //새로운 업로드 이미지 조회
         UploadedImage newUploadedImage = uploadStoreProfileImageService.findByImageUrl(requestDto.getImageUrl());
 
