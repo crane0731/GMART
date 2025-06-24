@@ -31,24 +31,24 @@ public class StoreService {
 
     private final StoreRepository storeRepository; //상점 레파지토리
 
-    /**
-     * [서비스 로직]
-     * 상점 생성
-     * @param requestDto 상점 생성 요청 DTO
-     */
-    @Transactional
-    public void createStore(CreateStoreRequestDto requestDto) {
-
-        //현재 로그인한 회원 조회
-        Member member = memberService.findBySecurityContextHolder();
-
-        //업로드 이미지 조회(만약 프로필 이미지가 null 이면 기본 상점 이미지 조회)
-        UploadedImage uploadedImage = getUploadedImage(requestDto);
-
-        //상점 등록 + 상점 프로필 이미지 등록
-        processSaveStoreWithProfileImage(member,requestDto, uploadedImage);
-
-    }
+//    /**
+//     * [서비스 로직]
+//     * 상점 생성
+//     * @param requestDto 상점 생성 요청 DTO
+//     */
+//    @Transactional
+//    public void createStore(CreateStoreRequestDto requestDto) {
+//
+//        //현재 로그인한 회원 조회
+//        Member member = memberService.findBySecurityContextHolder();
+//
+//        //업로드 이미지 조회(만약 프로필 이미지가 null 이면 기본 상점 이미지 조회)
+//        UploadedImage uploadedImage = getUploadedImage(requestDto);
+//
+//        //상점 등록 + 상점 프로필 이미지 등록
+//        processSaveStoreWithProfileImage(member,requestDto, uploadedImage);
+//
+//    }
 
     /**
      * [서비스 로직]
@@ -86,6 +86,25 @@ public class StoreService {
 
         //상점 총 방문수 증가
         store.plusVisitedCount();
+
+        //상점 응답 DTO 생성 + 반환
+        return StoreResponseDto.create(store);
+    }
+
+
+    /**
+     * [서비스 로직]
+     * 자신의 상점 정보 조회
+     * @return StoreResponseDto 응답 DTO
+     */
+    @Transactional
+    public StoreResponseDto getMyStoreDetails(){
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //회원의 상점 조회
+        Store store = member.getStore();
 
         //상점 응답 DTO 생성 + 반환
         return StoreResponseDto.create(store);
@@ -134,33 +153,33 @@ public class StoreService {
         return storeRepository.findById(id).orElseThrow(()->new StoreCustomException(ErrorMessage.NOT_FOUND_STORE));
     }
 
-    //==상점 등록 + 상점 프로필 이미지 등록 메서드==//
-    private void processSaveStoreWithProfileImage(Member member,CreateStoreRequestDto requestDto, UploadedImage uploadedImage) {
-        //상점 프로필 이미지 객체 생성
-        StoreProfileImage storeProfileImage = StoreProfileImage.create(uploadedImage.getImageUrl());
+//    //==상점 등록 + 상점 프로필 이미지 등록 메서드==//
+//    private void processSaveStoreWithProfileImage(Member member,CreateStoreRequestDto requestDto, UploadedImage uploadedImage) {
+//        //상점 프로필 이미지 객체 생성
+//        StoreProfileImage storeProfileImage = StoreProfileImage.create(uploadedImage.getImageUrl());
+//
+//        //상점 객체 생성 + 얀관관계 세팅
+//        Store store = Store.create(member,requestDto.getName(), requestDto.getIntroduction(), storeProfileImage);
+//
+//        //상점 저장
+//        save(store);
+//    }
 
-        //상점 객체 생성 + 얀관관계 세팅
-        Store store = Store.create(member,requestDto.getName(), requestDto.getIntroduction(), storeProfileImage);
-
-        //상점 저장
-        save(store);
-    }
-
-    //==업로드 이미지 조회(만약 프로필 이미지가 null 이면 기본 상점 이미지 조회)메서드==//
-    private UploadedImage getUploadedImage(CreateStoreRequestDto requestDto) {
-
-        //업로드 이미지 조회
-        UploadedImage uploadedImage = uploadStoreProfileImageService.findByImageUrl(requestDto.getImageUrl());
-
-        //업로드 이미지 사용 처리
-        uploadedImage.usedTrue();
-
-        //만약 업로드한 상점 이미지가 없다면 기본 이미지로 설정
-        if(uploadedImage == null) {
-            uploadedImage=uploadStoreProfileImageService.findDefaultProfileImage();
-        }
-        return uploadedImage;
-    }
+//    //==업로드 이미지 조회(만약 프로필 이미지가 null 이면 기본 상점 이미지 조회)메서드==//
+//    private UploadedImage getUploadedImage(CreateStoreRequestDto requestDto) {
+//
+//        //업로드 이미지 조회
+//        UploadedImage uploadedImage = uploadStoreProfileImageService.findByImageUrl(requestDto.getImageUrl());
+//
+//        //업로드 이미지 사용 처리
+//        uploadedImage.usedTrue();
+//
+//        //만약 업로드한 상점 이미지가 없다면 기본 이미지로 설정
+//        if(uploadedImage == null) {
+//            uploadedImage=uploadStoreProfileImageService.findDefaultProfileImage();
+//        }
+//        return uploadedImage;
+//    }
 
     /**
      * [서비스 로직]

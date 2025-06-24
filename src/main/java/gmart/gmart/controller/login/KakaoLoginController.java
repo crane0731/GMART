@@ -47,14 +47,18 @@ public class KakaoLoginController {
      * [컨트롤러]
      * 카카오 인증 콜백 처리
      * @param code 카카오 인증 코드
-     * @return 성공 메시지
      */
     @GetMapping("/kakao/callback")
-    public ResponseEntity<ApiResponse<?>> kakaoCallback(@RequestParam("code") String code) {
+    public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
 
         TokenResponseDto responseDto = kakaoLoginService.kakaoLogin(code);
 
-        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+        // 토큰을 쿼리 파라미터로 붙여서 프론트엔드 특정 페이지로 리다이렉트
+        String redirectUrl = "http://localhost:5173/kakao-success"
+                + "?accessToken=" + responseDto.getAccessToken()
+                + "&refreshToken=" + responseDto.getRefreshToken();
+
+        response.sendRedirect(redirectUrl);
     }
 
 }
