@@ -81,7 +81,15 @@ public class MemberInfoResponseDto {
 
     //==AddressDto 리스트 생성 ==//
     private static AddressDto getAddressDto(Member member) {
-        AddressDto addressDto = AddressDto.createDto(member.getAddress());
+
+        AddressDto addressDto = new AddressDto();
+
+        if(member.getAddress()!=null) {
+            addressDto= AddressDto.createDto(member.getAddress());
+        }
+        else{
+            addressDto=null;
+        }
         return addressDto;
     }
 
