@@ -19,6 +19,7 @@ public class SearchInquiryCondDto {
     private CreatedDateSortType createdDateSortType; //날짜 정렬 타입
 
 
+
     /**
      * [생성 메서드]
      * @param title 문의 제목

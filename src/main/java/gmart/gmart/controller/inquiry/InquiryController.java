@@ -80,11 +80,6 @@ public class InquiryController {
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
     }
 
-    /**
-     * 조건에 따른 문의 리스트 조회
-     * @param cond 검색 조건
-     * @return Page<InquiryListResponseDto> 응답 DTO
-     */
 
     /**
      * [컨트롤러]
@@ -97,12 +92,13 @@ public class InquiryController {
     @GetMapping("")
     public ResponseEntity<ApiResponse<?>> getAllInquiry(@RequestParam(value = "title", required = false)String title,
                                                         @RequestParam(value = "answerStatus",required = false)AnswerStatus answerStatus,
-                                                        @RequestParam(value = "createdDateSortType",required = false)CreatedDateSortType createdDateSortType) {
+                                                        @RequestParam(value = "createdDateSortType",required = false)CreatedDateSortType createdDateSortType,
+                                                        @RequestParam(value = "page", defaultValue = "0") int page) {
 
 
         SearchInquiryCondDto condDto = SearchInquiryCondDto.create(title, answerStatus, createdDateSortType);
 
-        PagedResponseDto<InquiryListResponseDto> responseDto = inquiryService.getAllInquiry(condDto);
+        PagedResponseDto<InquiryListResponseDto> responseDto = inquiryService.getAllInquiry(condDto,page);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
 

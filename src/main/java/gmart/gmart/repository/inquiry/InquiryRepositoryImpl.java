@@ -5,6 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.QInquiry;
+import gmart.gmart.domain.enums.AnswerStatus;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.enums.CreatedDateSortType;
 import gmart.gmart.dto.inquiry.SearchInquiryCondDto;
@@ -51,7 +52,9 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
             builder.and(inquiry.title.containsIgnoreCase(cond.getTitle()));
         }
 
-        if(cond.getAnswerStatus() != null) {
+        if (cond.getAnswerStatus() == null) {
+            builder.and(inquiry.answerStatus.in(AnswerStatus.ANSWERED, AnswerStatus.UNANSWERED));
+        } else {
             builder.and(inquiry.answerStatus.eq(cond.getAnswerStatus()));
         }
 
