@@ -2,6 +2,7 @@ package gmart.gmart.service.inquiry;
 
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.AnswerStatus;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.inquiry.*;
 import gmart.gmart.dto.page.PagedResponseDto;
@@ -66,12 +67,22 @@ public class InquiryService {
         //문의 조회
         Inquiry inquiry = findById(inquiryId);
 
+        //문의가 답변 완료 상태인지 확인 -> 답변완료 상태라면 삭제 불가능
+        validateAnswered(inquiry);
+
         //문의가 현재 로그인한 회원이 쓴건지 확인(아니라면 예외를 던짐)
         validateInquiryOwner(inquiry);
 
         //삭제
         inquiry.softDelete();
 
+    }
+
+    //==문의가 답변 완료 상태인지 확인 로직 ==//
+    private void validateAnswered(Inquiry inquiry) {
+        if(inquiry.getAnswerStatus().equals(AnswerStatus.ANSWERED)){
+            throw new InquiryCustomException(ErrorMessage.CANNOT_DELETE);
+        }
     }
 
     /**
@@ -95,16 +106,16 @@ public class InquiryService {
      * @param cond 검색 조건
      * @return 커스텀 페이징된 응답 DTO
      */
-    public PagedResponseDto<InquiryListResponseDto> getAllInquiry(SearchInquiryCondDto cond) {
+    public PagedResponseDto<InquiryListResponseDto> getAllInquiry(SearchInquiryCondDto cond, int page) {
 
         //검색 조건에 따라 문의 리스트 조회 + 페이징
-        Page<Inquiry> page = findAllByCond(cond);
+        Page<Inquiry> pageList = findAllByCond(cond,page);
 
         //DTO로 변환
-        List<InquiryListResponseDto> content = createInquiryListResponseDtos(page);
+        List<InquiryListResponseDto> content = createInquiryListResponseDtos(pageList);
 
         //페이징 응답 DTO 생성 + 반환
-        return createPagedResponseDto(content, page);
+        return createPagedResponseDto(content, pageList);
     }
 
     /**
@@ -174,15 +185,15 @@ public class InquiryService {
     }
 
     //==페이징 생성 메서드==//
-    private Pageable createPageable() {
-        Pageable pageable = PageRequest.of(0, 10); // 페이지 0, 10개씩 보여줌
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
         return pageable;
     }
 
     //==검색 조건에 따라 문의 리스트 조회 + 페이징 하는 로직==//
-    private Page<Inquiry> findAllByCond(SearchInquiryCondDto cond) {
+    private Page<Inquiry> findAllByCond(SearchInquiryCondDto cond,int page) {
         //페이징 생성
-        Pageable pageable = createPageable();
+        Pageable pageable = createPageable(page);
 
         //조회
         return inquiryRepository.findAllByCond(cond, pageable);
