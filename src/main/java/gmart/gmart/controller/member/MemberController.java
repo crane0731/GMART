@@ -1,6 +1,5 @@
 package gmart.gmart.controller.member;
 
-import gmart.gmart.dto.MemberGundamGradeListDto;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
@@ -36,19 +35,6 @@ public class MemberController {
 
         return ResponseEntity.ok(ApiResponse.success(myMemberInfo));
 
-    }
-
-    /**
-     * 선호하는 건담 등급 등록 or 변경 컨트롤러
-     * @param requestDto
-     * @return
-     */
-    @PostMapping("/gundamgrade")
-    public ResponseEntity<ApiResponse<?>> addGundamGrade(@RequestBody MemberGundamGradeListDto requestDto){
-
-        memberService.updateGundamGrade(requestDto);
-
-        return ResponseEntity.ok(ApiResponse.success(Map.of("message","선호하는 건담 등급 등록 성공")));
     }
 
 

@@ -104,9 +104,6 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberSuspension> memberSuspensions = new ArrayList<>();
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.PERSIST)
@@ -266,17 +263,6 @@ public class Member extends BaseTimeEntity {
     }
 
 
-    /**
-     * 연관관계편의메서드 - 선호 건담 등급 등록
-     */
-    public void updateMemberGundamGrade(List<MemberGundamGrade> gundamGrades) {
-        this.memberGundamGrades.clear();
-        this.memberGundamGrades.addAll(gundamGrades);
-
-        for (MemberGundamGrade gundamGrade : gundamGrades) {
-            gundamGrade.setMember(this);
-        }
-    }
 
 
     /**

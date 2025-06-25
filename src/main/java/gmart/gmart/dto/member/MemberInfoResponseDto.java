@@ -1,14 +1,9 @@
 package gmart.gmart.dto.member;
 
 import gmart.gmart.domain.Member;
-import gmart.gmart.domain.MemberGundamGrade;
 import gmart.gmart.dto.AddressDto;
-import gmart.gmart.dto.MemberPreferredGundamGradeDto;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 회원 정보 응답을 위한 DTO
@@ -38,8 +33,6 @@ public class MemberInfoResponseDto {
     private Long adminMessageCount; //관리자 메시지 받은 횟수
     private String memberRole; //권한
 
-    private List<MemberPreferredGundamGradeDto> preferredGundamGrades; //회원이 선호하는 건담 등급들
-
 
     /**
      * 생성 메서드
@@ -47,9 +40,6 @@ public class MemberInfoResponseDto {
     public static MemberInfoResponseDto createDto(Member member){
 
         AddressDto addressDto = getAddressDto(member);
-
-        List<MemberPreferredGundamGradeDto> memberPreferredGundamGradesDtos = getMemberPreferredGundamGradesDtos(member);
-
 
         MemberInfoResponseDto dto = new MemberInfoResponseDto();
 
@@ -72,8 +62,6 @@ public class MemberInfoResponseDto {
         dto.setAdminMessageCount(member.getAdminMessageCount());
         dto.setMemberRole(member.getMemberRole().toString());
 
-        dto.setPreferredGundamGrades(memberPreferredGundamGradesDtos);
-
         return dto;
 
 
@@ -91,19 +79,6 @@ public class MemberInfoResponseDto {
             addressDto=null;
         }
         return addressDto;
-    }
-
-
-
-    //==MemberPreferredGundamGradesDto 리스트 생성==//
-    private static List<MemberPreferredGundamGradeDto> getMemberPreferredGundamGradesDtos(Member member) {
-        List<MemberPreferredGundamGradeDto> memberPreferredGundamGradesDtos = new ArrayList<>();
-
-        for (MemberGundamGrade memberGundamGrade : member.getMemberGundamGrades()) {
-            MemberPreferredGundamGradeDto dto = MemberPreferredGundamGradeDto.createDto(memberGundamGrade);
-            memberPreferredGundamGradesDtos.add(dto);
-        }
-        return memberPreferredGundamGradesDtos;
     }
 
 }

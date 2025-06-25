@@ -3,13 +3,10 @@ package gmart.gmart.service.member;
 import gmart.gmart.domain.*;
 import gmart.gmart.domain.userdetail.CustomUserDetails;
 import gmart.gmart.dto.login.LoginRequestDto;
-import gmart.gmart.dto.MemberGundamGradeListDto;
-import gmart.gmart.dto.MemberPreferredGundamGradeDto;
 import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
 import gmart.gmart.dto.password.ChangePasswordRequestDto;
-import gmart.gmart.dto.store.CreateStoreRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
@@ -36,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -132,24 +128,6 @@ public class MemberService {
         }
     }
 
-
-    /**
-     * 선호하는 건담 등급 등록 or 변경
-     * @param dto
-     */
-    @Transactional
-    public void updateGundamGrade(MemberGundamGradeListDto dto){
-
-        //현재 로그인한 회원 조회
-        Member member = findBySecurityContextHolder();
-
-        //회원-선호건담등급 객체 생성
-        List<MemberGundamGrade> memberGundamGrades = getMemberGundamGrades(dto);
-
-        //업데이트
-        member.updateMemberGundamGrade(memberGundamGrades);
-        
-    }
 
     /**
      * 나의 회원정보 조회
@@ -397,24 +375,7 @@ public class MemberService {
         }
     }
 
-    //==회원-선호건담등급 객체 생성 ==//
-    private List<MemberGundamGrade> getMemberGundamGrades(MemberGundamGradeListDto dto) {
 
-        //리스트 생성
-        List<MemberGundamGrade> memberGundamGrades = new ArrayList<>();
-
-        if(dto.getGundamGrades() !=null) {
-            for (MemberPreferredGundamGradeDto gundamGrade : dto.getGundamGrades()) {
-
-                //회원-선호건담등급 객체 생성
-                MemberGundamGrade memberGundamGrade = MemberGundamGrade.createEntity(gundamGrade.getGundamGrade());
-
-                //리스트에 추가
-                memberGundamGrades.add(memberGundamGrade);
-            }
-        }
-        return memberGundamGrades;
-    }
 
     //==스프링 시큐리티 수동 로그인==//
     private Member securityLogin(LoginRequestDto dto) {
