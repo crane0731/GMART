@@ -54,32 +54,6 @@ public class InquiryController {
 
     /**
      * [컨트롤러]
-     * 문의 수정
-     * @param inquiryId 문의 아이디(PK)
-     * @param requestDto 수정 요청 DTO
-     * @param bindingResult 에러메시지를 담을 객체
-     * @return 성공 메시지
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> updateInquiry(@PathVariable("id") Long inquiryId,@Valid @RequestBody UpdateInquiryRequestDto requestDto,BindingResult bindingResult) {
-
-        // 오류 메시지를 담을 Map
-        Map<String, String> errorMessages = new HashMap<>();
-
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        inquiryService.updateInquiry(inquiryId,requestDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","문의 수정 완료")));
-
-    }
-
-    /**
-     * [컨트롤러]
      * 문의 논리적 삭제 처리
      * @param inquiryId 문의 아이디(PK)
      * @return 성공 메시지

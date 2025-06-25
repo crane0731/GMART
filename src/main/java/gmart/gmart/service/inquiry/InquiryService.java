@@ -53,26 +53,7 @@ public class InquiryService {
         //문의 저장
         save(inquiry);
     }
-
-    /**
-     * [서비스 로직]
-     * 문의(제목, 내용)를 수정
-     * @param inquiryId 문의 아이디(PK)
-     * @param requestDto  수정 요청 DTO
-     */
-    @Transactional
-    public void updateInquiry(Long inquiryId,UpdateInquiryRequestDto requestDto) {
-
-        //문의 조회
-        Inquiry inquiry = findById(inquiryId);
-
-        //문의가 현재 로그인한 회원이 쓴건지 확인(아니라면 예외를 던짐)
-        validateInquiryOwner(inquiry);
-
-        //업데이트
-        inquiry.update(requestDto.getTitle(), requestDto.getContent());
-
-    }
+    
 
     /**
      * [서비스 로직]
