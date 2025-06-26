@@ -4,6 +4,7 @@ import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.enums.ItemSortType;
 import gmart.gmart.dto.item.*;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.item.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -129,7 +130,8 @@ public class ItemController {
      * @param dealType 거래 타입
      * @param saleStatus 판매 상태
      * @param sortType 정렬 타입
-     * @return List<ItemListResponseDto> 응답 DTO 리스트
+     * @param page 페이지 번호
+     * @return PagedResponseDto<ItemListResponseDto> 페이징된 응답 DTO 리스트
      */
     @GetMapping("")
     public ResponseEntity<ApiResponse<?>> getAllItems(@RequestParam(value = "title",required = false) String title,
@@ -139,10 +141,12 @@ public class ItemController {
                                                       @RequestParam(value = "paintStatus",required = false)PaintStatus paintStatus,
                                                       @RequestParam(value = "dealType",required = false)DealType dealType,
                                                       @RequestParam(value = "saleStatus",required = false) SaleStatus saleStatus,
-                                                      @RequestParam(value = "sortType",required = false) ItemSortType sortType) {
+                                                      @RequestParam(value = "sortType",required = false) ItemSortType sortType,
+                                                      @RequestParam(value = "page", defaultValue = "0") int page
+                                                      ) {
 
         SearchItemCondDto condDto = SearchItemCondDto.create(title, gundamId, gundamGrade, boxStatus, paintStatus, dealType, saleStatus, sortType);
-        List<ItemListResponseDto> responseDto = itemService.getAllItems(condDto);
+        PagedResponseDto<ItemListResponseDto> responseDto = itemService.getAllItems(condDto, page);
         return ResponseEntity.ok().body(ApiResponse.success(responseDto));
 
     }
