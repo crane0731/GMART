@@ -1,8 +1,10 @@
 package gmart.gmart.controller.favorite;
 
+import gmart.gmart.domain.enums.GundamGrade;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.favorite.FavoriteGundamListResponseDto;
 import gmart.gmart.dto.favorite.SearchFavoriteGundamCondDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.favorite.FavoriteGundamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +49,7 @@ public class FavoriteGundamController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> deleteFavoriteGundam(@PathVariable("id") Long id) {
-        favoriteGundamService.deleteFavoriteGundam(id);
+        favoriteGundamService.softDelete(id);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","회원 관심 건담 삭제 성공")));
     }
@@ -56,13 +58,17 @@ public class FavoriteGundamController {
     /**
      * [컨트롤러]
      * 조건에 따른 회원 관심 건담 리스트 조회(로그인한 회원)
-     * @param condDto 검색 조건 DTO
      * @return List<FavoriteGundamListResponseDto> 응답 DTO 리스트
      */
-    @GetMapping("")
-    public ResponseEntity<ApiResponse<?>> getAllFavoriteGundam(@RequestBody SearchFavoriteGundamCondDto condDto) {
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<?>> getAllFavoriteGundam(@RequestParam(value = "name",required = false) String name,
+                                                               @RequestParam(value = "grade",required = false)GundamGrade grade,
+                                                               @RequestParam(value = "page", defaultValue = "0") int page) {
 
-        List<FavoriteGundamListResponseDto> responseDtos = favoriteGundamService.findAllByCond(condDto);
+
+        SearchFavoriteGundamCondDto condDto = SearchFavoriteGundamCondDto.create(name, grade);
+
+        PagedResponseDto<FavoriteGundamListResponseDto> responseDtos = favoriteGundamService.findAllByCond(condDto,page);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
 

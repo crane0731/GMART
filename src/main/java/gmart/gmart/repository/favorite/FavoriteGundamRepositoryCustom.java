@@ -3,6 +3,8 @@ package gmart.gmart.repository.favorite;
 import gmart.gmart.domain.FavoriteGundam;
 import gmart.gmart.domain.Member;
 import gmart.gmart.dto.favorite.SearchFavoriteGundamCondDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,6 +13,6 @@ import java.util.List;
  */
 public interface FavoriteGundamRepositoryCustom {
 
-    List<FavoriteGundam> findAllByMemberAndCond(SearchFavoriteGundamCondDto cond, Member member);
+    Page<FavoriteGundam> findAllByMemberAndCond(SearchFavoriteGundamCondDto cond, Member member, Pageable pageable);
 
 }

@@ -280,9 +280,16 @@ public class Member extends BaseTimeEntity {
         //주소 객체 생성
         Address address = createAddress(dto.getAddress());
 
-        this.nickname=dto.getNickname();
-        this.name = dto.getName();
-        this.phoneNumber = dto.getPhone();
+        //이전 닉네임과 새로 변경할 닉네임이 다를 경우만 변경
+        if(!this.nickname.equals(dto.getNickname())) {
+            this.nickname=dto.getNickname();
+        }
+
+        //이전 전화번호와 새로 변경할 전화번호가 다를 경우만 변경
+        if(!this.phoneNumber.equals(dto.getPhone())) {
+            this.phoneNumber = dto.getPhone();
+        }
+
         this.address = address;
         this.profileImageUrl= dto.getProfileImageUrl();
     }

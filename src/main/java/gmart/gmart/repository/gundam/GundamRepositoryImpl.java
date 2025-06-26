@@ -6,6 +6,9 @@ import gmart.gmart.domain.Gundam;
 import gmart.gmart.domain.QGundam;
 import gmart.gmart.dto.gundam.SearchGundamCondDto;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ public class GundamRepositoryImpl implements GundamRepositoryCustom {
      * @return List<Gundam> 건담 엔티티 리스트
      */
     @Override
-    public List<Gundam> findAllByCond(SearchGundamCondDto cond) {
+    public Page<Gundam> findAllByCond(SearchGundamCondDto cond, Pageable pageable) {
 
         QGundam gundam = QGundam.gundam;
 
@@ -43,10 +46,21 @@ public class GundamRepositoryImpl implements GundamRepositoryCustom {
             builder.and(gundam.grade.eq(cond.getGrade()));
         }
 
-        return query.select(gundam)
+        List<Gundam> content = query.select(gundam)
                 .from(gundam)
                 .where(builder)
                 .orderBy(gundam.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        Long total = query.select(gundam.count())
+                .from(gundam)
+                .where(builder)
+                .fetchOne();
+
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+
     }
 }
