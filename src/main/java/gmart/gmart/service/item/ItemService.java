@@ -2,7 +2,9 @@ package gmart.gmart.service.item;
 
 import gmart.gmart.command.CommandMapper;
 import gmart.gmart.domain.*;
+import gmart.gmart.dto.inquiry.InquiryListResponseDto;
 import gmart.gmart.dto.item.*;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ItemCustomException;
 import gmart.gmart.repository.item.ItemRepository;
@@ -11,6 +13,8 @@ import gmart.gmart.service.image.UploadItemImageService;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.store.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -145,17 +149,33 @@ public class ItemService {
      * @param condDto 검색 조건 DTO
      * @return List<ItemListResponseDto> 응답 DTO 리스트
      */
-    public List<ItemListResponseDto> getAllItems(SearchItemCondDto condDto) {
+    public PagedResponseDto<ItemListResponseDto> getAllItems(SearchItemCondDto condDto, int page) {
 
-        return itemRepository.findAllByCond(condDto, createPageable()).getContent().stream()
-                .map(ItemListResponseDto::create)
-                .toList();
+        Page<Item> pageList = itemRepository.findAllByCond(condDto, createPageable(page));
+
+        List<ItemListResponseDto> content = pageList.getContent().stream().map(ItemListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<ItemListResponseDto> createPagedResponseDto(List<ItemListResponseDto> content, Page<Item> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
     }
 
     //==페이징 생성 메서드==//
-    private Pageable createPageable() {
+    private Pageable createPageable(int page) {
         // 페이지 0, 10개씩 보여줌
-        return PageRequest.of(0, 10);
+        return PageRequest.of(page, 10);
     }
 
 
