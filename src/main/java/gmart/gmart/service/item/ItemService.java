@@ -159,6 +159,25 @@ public class ItemService {
 
     }
 
+    /**
+     * [서비스 로직]
+     * 검색 조건에 따라 자신의 상품 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<ItemListResponseDto> 응답 DTO 리스트
+     */
+    public PagedResponseDto<ItemListResponseDto> getAllMyItems(SearchItemCondDto condDto, int page) {
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        Page<Item> pageList = itemRepository.findAllByCondAndMember(member,condDto, createPageable(page));
+
+        List<ItemListResponseDto> content = pageList.getContent().stream().map(ItemListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+
+    }
+
     //==페이징 응답 DTO 생성==//
     private PagedResponseDto<ItemListResponseDto> createPagedResponseDto(List<ItemListResponseDto> content, Page<Item> page) {
         return new PagedResponseDto<>(

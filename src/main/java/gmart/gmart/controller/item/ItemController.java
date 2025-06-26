@@ -151,6 +151,38 @@ public class ItemController {
 
     }
 
+    /**
+     * [컨트롤러]
+     * 검색 조건에 따라 자신의 상품 목록 조회
+     * @param title 상품 이름
+     * @param gundamId 건담 아이디
+     * @param gundamGrade 건담 등급
+     * @param boxStatus 박스 상태
+     * @param paintStatus 도색 상태
+     * @param dealType 거래 타입
+     * @param saleStatus 판매 상태
+     * @param sortType 정렬 타입
+     * @param page 페이지 번호
+     * @return PagedResponseDto<ItemListResponseDto> 페이징된 응답 DTO 리스트
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<?>> getAllMyItems(@RequestParam(value = "title",required = false) String title,
+                                                      @RequestParam(value = "gundamId",required = false) Long gundamId,
+                                                      @RequestParam(value = "gundamGrade",required = false) GundamGrade gundamGrade,
+                                                      @RequestParam(value = "boxStatus",required = false) BoxStatus boxStatus,
+                                                      @RequestParam(value = "paintStatus",required = false)PaintStatus paintStatus,
+                                                      @RequestParam(value = "dealType",required = false)DealType dealType,
+                                                      @RequestParam(value = "saleStatus",required = false) SaleStatus saleStatus,
+                                                      @RequestParam(value = "sortType",required = false) ItemSortType sortType,
+                                                      @RequestParam(value = "page", defaultValue = "0") int page
+    ) {
+
+        SearchItemCondDto condDto = SearchItemCondDto.create(title, gundamId, gundamGrade, boxStatus, paintStatus, dealType, saleStatus, sortType);
+        PagedResponseDto<ItemListResponseDto> responseDto = itemService.getAllMyItems(condDto, page);
+        return ResponseEntity.ok().body(ApiResponse.success(responseDto));
+
+    }
+
 
 
 
