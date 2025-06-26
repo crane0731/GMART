@@ -1,6 +1,7 @@
 package gmart.gmart.repository.item;
 
 import gmart.gmart.domain.Item;
+import gmart.gmart.domain.Member;
 import gmart.gmart.dto.item.SearchItemCondDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 public interface ItemRepositoryCustom {
 
     Page<Item> findAllByCond(SearchItemCondDto cond, Pageable pageable);
+    Page<Item> findAllByCondAndMember(Member member, SearchItemCondDto cond, Pageable pageable);
 
 
 }
