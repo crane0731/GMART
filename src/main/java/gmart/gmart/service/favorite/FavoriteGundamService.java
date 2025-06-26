@@ -2,9 +2,12 @@ package gmart.gmart.service.favorite;
 
 import gmart.gmart.domain.FavoriteGundam;
 import gmart.gmart.domain.Gundam;
+import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
 import gmart.gmart.dto.favorite.FavoriteGundamListResponseDto;
 import gmart.gmart.dto.favorite.SearchFavoriteGundamCondDto;
+import gmart.gmart.dto.inquiry.InquiryListResponseDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.repository.favorite.FavoriteGundamRepository;
@@ -12,6 +15,9 @@ import gmart.gmart.service.gundam.GundamService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +69,7 @@ public class FavoriteGundamService {
      * @param favoriteGundamId 관심 건담 아이디
      */
     @Transactional
-    public void deleteFavoriteGundam(Long favoriteGundamId) {
+    public void softDelete(Long favoriteGundamId) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
@@ -75,7 +81,7 @@ public class FavoriteGundamService {
         validateFavoriteGundamOwner(member, favoriteGundam);
 
         //관심 건담 삭제
-        delete(favoriteGundam);
+        favoriteGundam.softDelete();
 
     }
 
@@ -86,13 +92,12 @@ public class FavoriteGundamService {
      * @param condDto 검색 조건 DTO
      * @return List<FavoriteGundamListResponseDto> 응답 DTO 리스트
      */
-    public List<FavoriteGundamListResponseDto> findAllByCond(SearchFavoriteGundamCondDto condDto){
-
+    public PagedResponseDto<FavoriteGundamListResponseDto> findAllByCond(SearchFavoriteGundamCondDto condDto,int page){
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //로그인한 회원 + 검색 조건으로 리스트 조회 후 DTO 로 변경
-        return findFavoritesByCond(condDto, member);
+        return findFavoritesByCond(condDto, member,page);
     }
 
     /**
@@ -139,11 +144,34 @@ public class FavoriteGundamService {
     }
 
     //==로그인한 회원 + 검색 조건으로 리스트 조회 후 DTO 로 변경하는 메서드==//
-    private List<FavoriteGundamListResponseDto> findFavoritesByCond(SearchFavoriteGundamCondDto condDto, Member member) {
-        return favoriteGundamRepository.findAllByMemberAndCond(condDto, member)
-                .stream()
-                .map(FavoriteGundamListResponseDto::create)
-                .toList();
+    private PagedResponseDto<FavoriteGundamListResponseDto> findFavoritesByCond(SearchFavoriteGundamCondDto condDto, Member member, int page) {
+
+        Page<FavoriteGundam> pageList = favoriteGundamRepository.findAllByMemberAndCond(condDto, member, createPageable(page));
+
+        List<FavoriteGundamListResponseDto> content = pageList.getContent().stream().map(FavoriteGundamListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+
+    }
+
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<FavoriteGundamListResponseDto> createPagedResponseDto(List<FavoriteGundamListResponseDto> content, Page<FavoriteGundam> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
     }
 
 }

@@ -87,11 +87,11 @@ public class MemberService {
     @Transactional
     public void updateMemberInfo(UpdateMemberInfoRequestDto dto) {
 
-        //업데이트 체킹
-        updateCheck(dto);
-
         //현재 로그인된 회원 조회
         Member member = findBySecurityContextHolder();
+
+        //업데이트 체킹
+        updateCheck(dto,member);
 
         //회원정보 업데이트
         processingUpdate(dto, member);
@@ -358,7 +358,6 @@ public class MemberService {
         if(memberRepository.findByNickname(nickname).isPresent()){
             throw new CustomException(ErrorMessage.DUPLICATED_NICKNAME);
         }
-
     }
 
     //==비밀번호 일치 검사 로직==//
@@ -458,12 +457,16 @@ public class MemberService {
     }
 
     //==회원 정보 수정에 필요한 검증 로직==//
-    private void updateCheck(UpdateMemberInfoRequestDto dto) {
-        //닉네임 중복 검사
-        nicknameDuplicatedCheck(dto.getNickname());
+    private void updateCheck(UpdateMemberInfoRequestDto dto,Member member) {
+        if(!member.getNickname().equals(dto.getNickname())) {
+            //닉네임 중복 검사
+            nicknameDuplicatedCheck(dto.getNickname());
+        }
 
-        //전화번호 중복 검사
-        phoneDuplicatedCheck(dto.getPhone());
+        if(!member.getPhoneNumber().equals(dto.getPhone())) {
+            //전화번호 중복 검사
+            phoneDuplicatedCheck(dto.getPhone());
+        }
     }
 
     //==회원 삭제 로직==//

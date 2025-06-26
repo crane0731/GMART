@@ -13,8 +13,6 @@ import lombok.Setter;
 @Setter
 public class UpdateMemberInfoRequestDto {
 
-    @NotBlank(message = "이름을 입력해 주세요.")
-    private String name; //이름
 
     @NotBlank(message = "닉네임을 입력해 주세요.")
     private String nickname; //닉네임
