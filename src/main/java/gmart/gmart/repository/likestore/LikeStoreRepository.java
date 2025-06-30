@@ -3,7 +3,10 @@ package gmart.gmart.repository.likestore;
 import gmart.gmart.domain.LikeStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
+import gmart.gmart.domain.enums.DeleteStatus;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
@@ -18,7 +21,10 @@ import java.util.Optional;
          * @param store 상점 엔티티
          * @return Boolean
          */
-        boolean existsByMemberAndStore(Member member, Store store);
+        @Query("SELECT (count(ls) > 0) " +
+                "FROM LikeStore ls " +
+                "where ls.member=:member and ls.store =:store and ls.deleteStatus= :deleteStatus")
+        boolean existsByMemberAndStore(@Param("member") Member member, @Param("store") Store store,@Param("deleteStatus") DeleteStatus deleteStatus);
 
 
     /**
