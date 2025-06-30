@@ -16,7 +16,7 @@ public class StoreListResponseDto {
     private String storeProfileImageUrl; //상점 이미지
 
     private Long rating; //상점 점수
-    private Long likedCount; //리뷰 받은 수
+    private Long likedCount; //좋아요 수
     private Long itemCount; //상품 수
 
 
@@ -32,7 +32,6 @@ public class StoreListResponseDto {
         dto.setStoreProfileImageUrl(store.getStoreProfileImage().getImageUrl());
 
         dto.setLikedCount(store.getLikedCount());
-        dto.setLikedCount(store.getReviewedCount());
         dto.setItemCount(store.getItemCount());
 
         return dto;

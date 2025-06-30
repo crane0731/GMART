@@ -9,8 +9,13 @@ import gmart.gmart.domain.QFavoriteStore;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.favorite.SearchFavoriteStoreCondDto;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+
+import static org.hibernate.query.results.Builders.fetch;
 
 /**
  * 커스텀 관심 상점 레파지토리 구현체
@@ -33,7 +38,7 @@ public class FavoriteStoreRepositoryImpl implements FavoriteStoreRepositoryCusto
      * @return List<FavoriteStore> 관심 상점 엔티티 리스트
      */
     @Override
-    public List<FavoriteStore> findAllByCond(Member member, SearchFavoriteStoreCondDto cond) {
+    public Page<FavoriteStore> findAllByCond(Member member, SearchFavoriteStoreCondDto cond, Pageable pageable) {
 
         QFavoriteStore favoriteStore = QFavoriteStore.favoriteStore;
         BooleanBuilder builder = new BooleanBuilder();
@@ -46,11 +51,20 @@ public class FavoriteStoreRepositoryImpl implements FavoriteStoreRepositoryCusto
             builder.and(favoriteStore.store.name.containsIgnoreCase(cond.getName()));
         }
 
-        return query.select(favoriteStore)
+        List<FavoriteStore> content = query.select(favoriteStore)
                 .from(favoriteStore)
                 .where(builder)
                 .orderBy(favoriteStore.createdDate.desc())
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
                 .fetch();
+
+        Long total = query.select(favoriteStore.count())
+                .from(favoriteStore)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
 
     }
 }

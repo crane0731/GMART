@@ -1,17 +1,23 @@
 package gmart.gmart.service.favorite;
 
 import gmart.gmart.domain.FavoriteStore;
+import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.favorite.FavoriteStoreListResponseDto;
 import gmart.gmart.dto.favorite.SearchFavoriteStoreCondDto;
+import gmart.gmart.dto.inquiry.InquiryListResponseDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.StoreCustomException;
 import gmart.gmart.repository.favorite.FavoriteStoreRepository;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.store.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,20 +102,42 @@ public class FavoriteStoreService {
      * [서비스 로직]
      * 현재 로그인한 회원의 관심 상점 리스트 조회
      * @param condDto 검색 조건 DTO
+     * @param page 페이지 번호
      * @return  List<FavoriteStoreListResponseDto> 응답 DTO 리스트
      */
-    public List<FavoriteStoreListResponseDto> getFavoriteStoreList(SearchFavoriteStoreCondDto condDto) {
+    public PagedResponseDto<FavoriteStoreListResponseDto> getFavoriteStoreList(SearchFavoriteStoreCondDto condDto, int page) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //관심 상점 조회 + 응답 DTO 리스트 생성 + 반환
-        return favoriteStoreRepository.findAllByCond(member,condDto).stream()
-                .map(FavoriteStoreListResponseDto::create)
-                .toList();
+        Page<FavoriteStore> pageList = favoriteStoreRepository.findAllByCond(member, condDto, createPageable(page));
+
+        List<FavoriteStoreListResponseDto> content = pageList.getContent().stream().map(FavoriteStoreListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+
+
     }
 
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
+    }
 
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<FavoriteStoreListResponseDto> createPagedResponseDto(List<FavoriteStoreListResponseDto> content, Page<FavoriteStore> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
 
     /**
      * [조회]
