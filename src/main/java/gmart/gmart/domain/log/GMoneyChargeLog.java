@@ -4,6 +4,7 @@ package gmart.gmart.domain.log;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.ChargeType;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.GMoneyCustomException;
 import jakarta.persistence.*;
@@ -48,6 +49,11 @@ public class GMoneyChargeLog extends BaseAuditingEntity {
     @Column(name = "after_charge_money")
     private Long afterChargeMoney;
 
+    @Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
     /**
      * [생성 메서드]
      * @param member 회원 엔티티
@@ -66,6 +72,8 @@ public class GMoneyChargeLog extends BaseAuditingEntity {
         log.beforeChargeMoney = beforeChargeMoney;
 
         log.afterChargeMoney = getAfterChargeMoney(beforeChargeMoney, chargeMoney, chargeType);
+
+        log.deleteStatus=DeleteStatus.UNDELETED;
 
         return log;
     }

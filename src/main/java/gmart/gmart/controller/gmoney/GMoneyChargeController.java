@@ -1,10 +1,12 @@
 package gmart.gmart.controller.gmoney;
 
+import gmart.gmart.domain.enums.ChargeType;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.gmoney.GMoneyChargeLogListResponseDto;
 import gmart.gmart.dto.gmoney.GMoneyChargeRequestDto;
 import gmart.gmart.dto.gmoney.GMoneyRefundRequestDto;
 import gmart.gmart.dto.gmoney.SearchGMoneyChargeLogCondDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.gmoney.GMoneyChargeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,14 +78,25 @@ public class GMoneyChargeController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","건머니 환불 성공")));
     }
 
+
+
     /**
      * [컨트롤러]
      * 현재 로그인한 회원의 건머니 충전 로그 목록 조회
-     * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
+     * @param year 년도
+     * @param chargeType 충전 타입
+     * @param page 페이지 번호
+     * @return PagedResponseDto<GMoneyChargeLogListResponseDto> 페이징된 응답 DTO 리스트
      */
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<?>> getAllGMoneyCharges(@RequestBody SearchGMoneyChargeLogCondDto condDto) {
-        List<GMoneyChargeLogListResponseDto> responseDtos = gMoneyChargeService.findAllLogs(condDto);
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<?>> getAllGMoneyCharges(@RequestParam(value = "year",required = false)String year,
+                                                              @RequestParam(value = "chargeType",required = false) ChargeType chargeType,
+                                                              @RequestParam(value = "page",defaultValue = "0")int page) {
+
+
+        SearchGMoneyChargeLogCondDto condDto = SearchGMoneyChargeLogCondDto.create(year, chargeType);
+
+        PagedResponseDto<GMoneyChargeLogListResponseDto> responseDtos = gMoneyChargeService.findAllLogs(condDto, page);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
     }
