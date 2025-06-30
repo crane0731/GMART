@@ -1,5 +1,6 @@
 package gmart.gmart.service.gmoney;
 
+import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.enums.ChargeType;
 import gmart.gmart.domain.log.GMoneyChargeLog;
@@ -7,9 +8,14 @@ import gmart.gmart.dto.gmoney.GMoneyChargeLogListResponseDto;
 import gmart.gmart.dto.gmoney.GMoneyChargeRequestDto;
 import gmart.gmart.dto.gmoney.GMoneyRefundRequestDto;
 import gmart.gmart.dto.gmoney.SearchGMoneyChargeLogCondDto;
+import gmart.gmart.dto.inquiry.InquiryListResponseDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.repository.gmoney.GMoneyChargeLogRepository;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,13 +88,13 @@ public class GMoneyChargeService {
      * @param condDto 검색 조건 DTO
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    public List<GMoneyChargeLogListResponseDto> findAllLogs(SearchGMoneyChargeLogCondDto condDto){
+    public PagedResponseDto<GMoneyChargeLogListResponseDto> findAllLogs(SearchGMoneyChargeLogCondDto condDto,int page){
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
         //현재 로그인한 회원의 건머니 충전 로그 조회 + 응답 DTO 리스트 생성
-        return getChargeLogs(member,condDto);
+        return getChargeLogs(member,condDto,page);
     }
 
     /**
@@ -98,11 +104,31 @@ public class GMoneyChargeService {
      * @param condDto 검색 조건 DTO
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    public List<GMoneyChargeLogListResponseDto> getChargeLogs(Member member,SearchGMoneyChargeLogCondDto condDto) {
-        return gMoneyChargeLogRepository.findAllByCond(member,condDto)
-                .stream()
-                .map(GMoneyChargeLogListResponseDto::create)
-                .toList();
+    public PagedResponseDto<GMoneyChargeLogListResponseDto> getChargeLogs(Member member,SearchGMoneyChargeLogCondDto condDto,int page) {
+        Page<GMoneyChargeLog> pageList = gMoneyChargeLogRepository.findAllByCond(member, condDto, createPageable(page));
+        List<GMoneyChargeLogListResponseDto> content = pageList.getContent().stream().map(GMoneyChargeLogListResponseDto::create).toList();
+        return createPagedResponseDto(content,pageList);
+
+
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<GMoneyChargeLogListResponseDto> createPagedResponseDto(List<GMoneyChargeLogListResponseDto> content, Page<GMoneyChargeLog> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
     }
 
 

@@ -4,10 +4,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.log.GMoneyChargeLog;
 import gmart.gmart.domain.log.QGMoneyChargeLog;
 import gmart.gmart.dto.gmoney.SearchGMoneyChargeLogCondDto;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -33,11 +37,14 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
      * @return  List<GMoneyChargeLog> 건머니 차지로그 엔티티 리스트
      */
     @Override
-    public List<GMoneyChargeLog> findAllByCond(Member member, SearchGMoneyChargeLogCondDto cond) {
+    public Page<GMoneyChargeLog> findAllByCond(Member member, SearchGMoneyChargeLogCondDto cond, Pageable pageable) {
         QGMoneyChargeLog gMoneyChargeLog = QGMoneyChargeLog.gMoneyChargeLog;
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(gMoneyChargeLog.memberId.eq(member.getId()));
+
+        builder.and(gMoneyChargeLog.deleteStatus.eq(DeleteStatus.UNDELETED));
+
 
         if(cond.getYear() != null &&!cond.getYear().isBlank()) {
             Integer year = Integer.parseInt(cond.getYear());
@@ -52,12 +59,19 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
             builder.and(gMoneyChargeLog.chargeType.eq(cond.getChargeType()));
         }
 
-       return  query
+        List<GMoneyChargeLog> content = query
                 .select(gMoneyChargeLog)
                 .from(gMoneyChargeLog)
                 .where(builder)
                 .orderBy(gMoneyChargeLog.createdDate.desc())
                 .fetch();
+
+        Long total = query.select(gMoneyChargeLog.count())
+                .from(gMoneyChargeLog)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
 
     }
 }

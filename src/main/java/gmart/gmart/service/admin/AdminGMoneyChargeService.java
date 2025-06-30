@@ -4,6 +4,7 @@ package gmart.gmart.service.admin;
 import gmart.gmart.domain.Member;
 import gmart.gmart.dto.gmoney.GMoneyChargeLogListResponseDto;
 import gmart.gmart.dto.gmoney.SearchGMoneyChargeLogCondDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.gmoney.GMoneyChargeService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,13 @@ public class AdminGMoneyChargeService {
      * @param condDto 검색 조건 DTO
      * @return List<GMoneyChargeLogListResponseDto> 응답 DTO 리스트
      */
-    public List<GMoneyChargeLogListResponseDto> findAllLogs(Long MemberId, SearchGMoneyChargeLogCondDto condDto) {
+    public PagedResponseDto<GMoneyChargeLogListResponseDto> findAllLogs(Long MemberId, SearchGMoneyChargeLogCondDto condDto, int page) {
 
         //회원 조회
         Member member = memberService.findById(MemberId);
 
         //건머니 충전 로그 조회 + DTO 변환 + 반환
-        return gMoneyChargeService.getChargeLogs(member, condDto);
+        return gMoneyChargeService.getChargeLogs(member, condDto,page);
 
     }
 
