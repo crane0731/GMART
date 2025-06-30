@@ -38,14 +38,31 @@ public class FavoriteItemController {
 
     /**
      * [컨트롤러]
+     * 관삼 상품 존재 상태 반환
+     * true : 존재
+     * false : 없음
+     * @param itemId 상품 아이디
+     * @return boolean
+     */
+    @GetMapping("/item/{id}")
+    public ResponseEntity<ApiResponse<?>> getFavoriteItem(@PathVariable("id") Long itemId){
+
+        boolean favoriteItemStatus = favoriteItemService.getFavoriteItemStatus(itemId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(favoriteItemStatus));
+
+    }
+
+    /**
+     * [컨트롤러]
      * 관심 상품 논리적 삭제 (SOFT DELETE)
-     * @param favoriteItemId 관심 상품 아이디
+     * @param itemId 관심 상품 아이디
      * @return 성공 메시지
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> deleteFavoriteItem(@PathVariable("id") Long favoriteItemId){
+    @DeleteMapping("item/{id}")
+    public ResponseEntity<ApiResponse<?>> deleteFavoriteItem(@PathVariable("id") Long itemId){
 
-        favoriteItemService.deleteFavoriteItem(favoriteItemId);
+        favoriteItemService.deleteFavoriteItem(itemId);
 
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","관심 상품 삭제 성공")));
 
@@ -65,5 +82,6 @@ public class FavoriteItemController {
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
 
     }
+
 
 }

@@ -30,6 +30,8 @@ public class FavoriteItemService {
     private final FavoriteItemRepository favoriteItemRepository;//관심 상품 레파지토리
 
 
+
+
     /**
      * [서비스 로직]
      * 현재 로그인한 회원이 상품을 관심 상품에 등록
@@ -48,20 +50,43 @@ public class FavoriteItemService {
         processSaveFavoriteItem(member, item);
     }
 
-
     /**
      * [서비스 로직]
-     * 관심 상품 논리적 삭제 처리 (SOFT DELETE)
-     * @param favoriteItemId 관심 상품 아이디
+     * 관삼 상품 존재 상태 반환
+     * true : 존재
+     * false : 없음
+     * @param itemId 상품 아이디
+     * @return boolean
      */
-    @Transactional
-    public void deleteFavoriteItem(Long favoriteItemId) {
+    public boolean getFavoriteItemStatus(Long itemId) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
-        //삭제할 관심 상품 조회
-        FavoriteItem favoriteItem = findById(favoriteItemId);
+        //상품 조회
+        Item item = itemService.findById(itemId);
+
+        return favoriteItemRepository.existsByMemberAndItemAndDeleteStatus(member, item, DeleteStatus.UNDELETED);
+
+    }
+
+
+    /**
+     * [서비스 로직]
+     * 관심 상품 논리적 삭제 처리 (SOFT DELETE)
+     * @param itemId 관심 상품 아이디
+     */
+    @Transactional
+    public void deleteFavoriteItem(Long itemId) {
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //상품 조회
+        Item item = itemService.findById(itemId);
+
+        //관심 상품 조회
+        FavoriteItem favoriteItem = getFavoriteItem(member, item);
 
         //삭제할 관심 상품이 회원의 것인지 확인
         validateExistsFavoriteItemByMember(favoriteItem, member);
@@ -171,6 +196,12 @@ public class FavoriteItemService {
 
         //상품의 관심등록 수 증가
         item.plusFavoriteCount();
+    }
+
+    //==회원+상품으로 관심 상품 조회 로직==//
+    private FavoriteItem getFavoriteItem(Member member, Item item) {
+        FavoriteItem favoriteItem = favoriteItemRepository.findByMemberAndItem(member, item).orElseThrow(() -> new ItemCustomException(ErrorMessage.NOT_FOUND_FAVORITE_ITEM));
+        return favoriteItem;
     }
 
 }
