@@ -78,6 +78,14 @@ public class FavoriteGundam extends BaseTimeEntity {
         this.deleteStatus=DeleteStatus.DELETED;
     }
 
+    /**
+     * [비즈니스 로직]
+     * RECOVERY
+     */
+    public void recovery(){
+        this.deleteStatus=DeleteStatus.UNDELETED;
+    }
+
     //==이미 삭제 상태인지 학인하는 로직==//
     private void validateDeleted() {
         if(this.deleteStatus.equals(DeleteStatus.DELETED)){

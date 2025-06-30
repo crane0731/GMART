@@ -4,10 +4,13 @@ import gmart.gmart.command.CreateItemCommand;
 import gmart.gmart.command.UpdateItemCommand;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.*;
+import gmart.gmart.exception.ErrorMessage;
+import gmart.gmart.exception.ItemCustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,16 +106,18 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "reported_status")
     private ItemReportedStatus reportedStatus;
 
+
+
     //거래 방법
     @org.hibernate.annotations.Comment("거래 타입")
     @Enumerated(EnumType.STRING)
     @Column(name = "deal_type")
     private DealType dealType;
 
-    @org.hibernate.annotations.Comment("상품 활성화 여부")
+    @Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
-    @Column(name = "active_status")
-    private ItemActiveStatus activeStatus;
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
 
     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemGundam> itemGundams = new ArrayList<>();
@@ -152,8 +157,7 @@ public class Item extends BaseAuditingEntity {
         item.favoriteCount=0L;
         item.chattingCount=0L;
         item.reportedCount=0L;
-
-        item.activeStatus=ItemActiveStatus.ACTIVE;
+        item.deleteStatus=DeleteStatus.UNDELETED;
 
         return item;
     }
@@ -229,8 +233,11 @@ public class Item extends BaseAuditingEntity {
      * [비즈니스 로직]
      * 상품 삭제(비활성화) 처리
      */
-    public void inActive(){
-        this.activeStatus=ItemActiveStatus.INACTIVE;
+    public void softDelete(){
+        //이미 삭제 상태인지 확인
+        validateDeleted();
+        //삭제 처리
+        this.deleteStatus=DeleteStatus.DELETED;
     }
 
     /**
@@ -276,6 +283,13 @@ public class Item extends BaseAuditingEntity {
     public void reported(){
         this.reportedStatus=ItemReportedStatus.REPORTED;
         plusReportCount();
+    }
+
+    //==이미 삭제 상태인지 확인 하는 로직==//
+    private void validateDeleted() {
+        if(this.deleteStatus.equals(DeleteStatus.DELETED)){
+            throw new ItemCustomException(ErrorMessage.ALREADY_DELETE);
+        }
     }
 
 

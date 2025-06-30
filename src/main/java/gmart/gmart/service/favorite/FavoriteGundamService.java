@@ -4,6 +4,7 @@ import gmart.gmart.domain.FavoriteGundam;
 import gmart.gmart.domain.Gundam;
 import gmart.gmart.domain.Inquiry;
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.favorite.FavoriteGundamListResponseDto;
 import gmart.gmart.dto.favorite.SearchFavoriteGundamCondDto;
 import gmart.gmart.dto.inquiry.InquiryListResponseDto;
@@ -53,7 +54,7 @@ public class FavoriteGundamService {
         Gundam gundam = gundamService.findById(gundamId);
 
         //회원이 이미 해당 건담을 관심 건담으로 등록했는지 확인
-        validateNotAlreadyFavoritedGundam(member, gundam);
+        if(validateNotAlreadyFavoritedGundam(member, gundam)) return;
 
         //관심 건담 객체 생성
         FavoriteGundam favoriteGundam = FavoriteGundam.create(member, gundam);
@@ -136,11 +137,19 @@ public class FavoriteGundamService {
     }
 
     //==회원이 이미 해당 건담을 관심 건담으로 등록했는지 확인하는 메서드==//
-    private void validateNotAlreadyFavoritedGundam(Member member, Gundam gundam) {
+    private boolean validateNotAlreadyFavoritedGundam(Member member, Gundam gundam) {
 
-        if(favoriteGundamRepository.existsByMemberAndGundam(member, gundam)) {
-            throw new CustomException(ErrorMessage.ALREADY_FAVORITE_GUNDAM);
+        FavoriteGundam favoriteGundam = favoriteGundamRepository.findByMemberAndGundam(member, gundam).orElse(null);
+        if(favoriteGundam != null) {
+
+            if(favoriteGundam.getDeleteStatus().equals(DeleteStatus.DELETED)){
+                favoriteGundam.recovery();
+                return true;
+            }else {
+                throw new CustomException(ErrorMessage.ALREADY_FAVORITE_GUNDAM);
+            }
         }
+        return false;
     }
 
     //==로그인한 회원 + 검색 조건으로 리스트 조회 후 DTO 로 변경하는 메서드==//

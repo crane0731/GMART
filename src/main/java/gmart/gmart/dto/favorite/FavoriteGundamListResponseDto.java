@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class FavoriteGundamListResponseDto {
 
+    private Long favoriteGundamId; //관심 건담 아이디
+
     private String name; //이름
 
     private String grade; //등급
@@ -25,6 +27,7 @@ public class FavoriteGundamListResponseDto {
      */
     public static FavoriteGundamListResponseDto create(FavoriteGundam favoriteGundam) {
         FavoriteGundamListResponseDto dto = new FavoriteGundamListResponseDto();
+        dto.setFavoriteGundamId(favoriteGundam.getId());
         dto.setName(favoriteGundam.getGundam().getName());
         dto.setGrade(favoriteGundam.getGundam().getGrade().toString());
         dto.setImageUrl(favoriteGundam.getGundam().getImageUrl());

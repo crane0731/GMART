@@ -109,7 +109,7 @@ public class StoreController {
      * @return List<StoreListResponseDto> 응답 DTO 리스트
      */
     @GetMapping("")
-    public ResponseEntity<ApiResponse<?>> getAllStores(@RequestParam("name")String name, @RequestParam(value = "sortType" ,defaultValue = "HIGH_RATING")StoreSortType sortType) {
+    public ResponseEntity<ApiResponse<?>> getAllStores(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "sortType" ,defaultValue ="HIGH_LIKED_COUNT")StoreSortType sortType) {
 
         SearchStoreCondDto searchStoreCondDto = SearchStoreCondDto.create(name, sortType);
 
