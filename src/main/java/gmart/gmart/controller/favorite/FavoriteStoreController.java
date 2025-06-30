@@ -32,6 +32,24 @@ public class FavoriteStoreController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","관심 상점 등록 성공")));
     }
 
+
+    /**
+     * [컨트롤러]
+     * 회원 관심 상점 존재 상태 반환
+     * true : 존재함
+     * false : 존재 안함
+     * @param storeId 상점 아이디
+     * @return boolean
+     */
+    @GetMapping("/store/{id}/status")
+    public ResponseEntity<ApiResponse<?>> getFavoriteStoreStatus(@PathVariable("id")Long storeId){
+
+        boolean favoriteStoreStatus = favoriteStoreService.getFavoriteStoreStatus(storeId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(favoriteStoreStatus));
+
+    }
+
     /**
      * [컨트롤러]
      * 회원 관심 상점 논리 삭제 (SOFT DELETE)

@@ -46,12 +46,31 @@ public class FavoriteStoreService {
         Store store = storeService.findById(storeId);
 
         //현재 로그인한 회원이 이미 관심 등록한 상점인지 확인(이미 등록한 상점이라면 예외를 던짐)
-        existsFavoriteStore(member, store);
+        if(existsFavoriteStore(member, store))return;
 
 
         //관심 상점에 등록
         saveFavoriteStore(member, store);
 
+    }
+
+    /**
+     * [서비스 로직]
+     * 관심 상점의 존재 여부를 반환
+     * true : 존재함
+     * false : 존재 안함
+     * @param storeId 상점 아이디
+     * @return boolean
+     */
+    public boolean getFavoriteStoreStatus(Long storeId) {
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //상점 조회
+        Store store = storeService.findById(storeId);
+
+        //존재 상태 여부 반환
+        return favoriteStoreRepository.existsByMemberAndStoreAndDeleteStatus(member, store, DeleteStatus.UNDELETED);
     }
 
     /**
@@ -134,7 +153,7 @@ public class FavoriteStoreService {
     }
 
     //==현재 로그인한 회원이 이미 관심 등록한 상점인지 확인하는 메서드==//
-    private void existsFavoriteStore(Member member, Store store) {
+    private boolean existsFavoriteStore(Member member, Store store) {
         FavoriteStore favoriteStore = favoriteStoreRepository.findByMemberAndStore(member, store).orElse(null);
 
         if (favoriteStore != null) {
@@ -144,8 +163,10 @@ public class FavoriteStoreService {
             }
             else {
                 favoriteStore.recovery();
+                return true;
             }
         }
+        return false;
     }
 
     //==관심 상점 삭제 로직 메서드==//

@@ -3,6 +3,7 @@ package gmart.gmart.repository.favorite;
 import gmart.gmart.domain.FavoriteStore;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Store;
+import gmart.gmart.domain.enums.DeleteStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public interface FavoriteStoreRepository extends JpaRepository<FavoriteStore, Lo
      * @return  Optional<FavoriteStore> 관심 상점 엔티티
      */
     Optional<FavoriteStore> findByMemberAndStore(Member member, Store store);
+
+    boolean existsByMemberAndStoreAndDeleteStatus(Member member, Store store, DeleteStatus deleteStatus);
 
 
 }
