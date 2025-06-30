@@ -3,6 +3,7 @@ package gmart.gmart.service.item;
 import gmart.gmart.command.CommandMapper;
 import gmart.gmart.domain.*;
 import gmart.gmart.dto.inquiry.InquiryListResponseDto;
+import gmart.gmart.dto.inquiry.SearchInquiryCondDto;
 import gmart.gmart.dto.item.*;
 import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
@@ -77,12 +78,12 @@ public class ItemService {
 
     /**
      * [서비스 로직]
-     * 상품 삭제
+     * 상품 논리적 삭제 처리 (SOFT DELETE)
      * 실제로 상품 엔티티를 삭제하는 것이 아닌 상품 활성화 상태만 비활성으로 변경 처리함
      * @param itemId 상품 아이디
      */
     @Transactional
-    public void deleteItem(Long itemId) {
+    public void softDelete(Long itemId) {
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
@@ -158,6 +159,25 @@ public class ItemService {
         return createPagedResponseDto(content,pageList);
 
     }
+
+    /**
+     * [서비스 로직]
+     * 검색 조건에 따라 특정상점의의 상품 리스트 조회
+     * @param condDto 검색 조건 DTO
+     * @return List<ItemListResponseDto> 응답 DTO 리스트
+     */
+    public PagedResponseDto<ItemListResponseDto> getStoreItems(Long storeId,SearchItemCondDto condDto, int page){
+
+        //상점 조회
+        Store store = storeService.findById(storeId);
+
+        Page<Item> pageList = itemRepository.findAllByCondAndStore(store, condDto, createPageable(page));
+
+        List<ItemListResponseDto> content = pageList.getContent().stream().map(ItemListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+    }
+
 
     /**
      * [서비스 로직]
@@ -326,8 +346,7 @@ public class ItemService {
         //usedFalseUploadImage(item);
 
         //상품 삭제(비활성화 처리)
-        item.inActive();
-//      delete(item);
+        item.softDelete();
 
         //상점의 상품수 감소
         store.minusItemCount();

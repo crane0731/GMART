@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 /**
  * 회원 관심 건담 레파지토리
  */
@@ -23,4 +25,6 @@ public interface FavoriteGundamRepository extends JpaRepository<FavoriteGundam, 
             "where fg.member=:member and fg.gundam=:gundam")
     Boolean existsByMemberAndGundam(@Param("member") Member member, @Param("gundam") Gundam gundam);
 
+
+    Optional<FavoriteGundam>findByMemberAndGundam(Member member, Gundam gundam);
 }
