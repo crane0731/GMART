@@ -44,7 +44,7 @@ public class LikeStoreService {
         Store store = storeService.findById(storeId);
 
         //로그인한 회원이 이미 좋아요 한 상점인지 확인(이미 좋아요 한 상점이라면 예외를 던짐)
-        existsLikeStore(member, store);
+        if(existsLikeStore(member, store))return;
 
         //상점 좋아요 생성 + 저장
         like(store, member);
@@ -88,7 +88,22 @@ public class LikeStoreService {
     }
 
 
+    /**
+     * [서비스 로직]
+     * 좋아요 상태 반환
+     * @param storeId 상점 아이디
+     * @return boolean
+     */
+    public boolean getLikeStatus(Long storeId){
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
 
+        //상점 조회
+        Store store = storeService.findById(storeId);
+
+        //좋아요 존재 여부 반환
+        return likeStoreRepository.existsByMemberAndStore(member, store,DeleteStatus.UNDELETED);
+    }
 
 
     /**
@@ -136,7 +151,7 @@ public class LikeStoreService {
     }
 
     //==로그인한 회원이 이미 좋아요 한 상점인지 확인 메서드 ==//
-    private void existsLikeStore(Member member, Store store) {
+    private boolean existsLikeStore(Member member, Store store) {
         LikeStore likeStore = likeStoreRepository.findByMemberAndStore(member, store).orElse(null);
 
         if (likeStore != null) {
@@ -145,8 +160,10 @@ public class LikeStoreService {
             }
             else {
                 likeStore.recovery();
+                return true;
             }
         }
+        return false;
     }
 
     //==상점 좋아요 생성 + 저장==//

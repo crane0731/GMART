@@ -6,6 +6,7 @@ import gmart.gmart.dto.store.SearchLikeStoreCondDto;
 import gmart.gmart.service.store.LikeStoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,6 +64,15 @@ public class LikeStoreController {
         List<LikeStoreListResponseDto> responseDtos = likeStoreService.findAllByCond(condDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+
+    }
+
+    @GetMapping("/{id}/like-status")
+    public ResponseEntity<ApiResponse<?>> getLikeStatus(@PathVariable("id")Long storeId){
+
+        boolean likeStatus = likeStoreService.getLikeStatus(storeId);
+
+        return ResponseEntity.ok().body(ApiResponse.success(likeStatus));
 
     }
 
