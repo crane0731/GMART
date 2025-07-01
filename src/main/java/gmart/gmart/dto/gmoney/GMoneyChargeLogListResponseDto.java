@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class GMoneyChargeLogListResponseDto {
 
-    public Long MemberId;
+    public Long memberId;
 
-    public Long GMoneyChargeLogId;
+    public Long gmoneyChargeLogId;
 
     public String chargeType;
 
@@ -32,8 +32,8 @@ public class GMoneyChargeLogListResponseDto {
      */
     public static GMoneyChargeLogListResponseDto create(GMoneyChargeLog gMoneyChargeLog) {
         GMoneyChargeLogListResponseDto dto = new GMoneyChargeLogListResponseDto();
-        dto.MemberId = gMoneyChargeLog.getMemberId();
-        dto.GMoneyChargeLogId = gMoneyChargeLog.getId();
+        dto.memberId = gMoneyChargeLog.getMemberId();
+        dto.gmoneyChargeLogId = gMoneyChargeLog.getId();
         dto.chargeType=gMoneyChargeLog.getChargeType().toString();
         dto.chargeMoney=gMoneyChargeLog.getChargeAmount();
         dto.beforeMoney=gMoneyChargeLog.getBeforeChargeMoney();

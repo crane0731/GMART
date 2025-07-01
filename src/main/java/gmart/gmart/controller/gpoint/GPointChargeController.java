@@ -32,7 +32,7 @@ public class GPointChargeController {
      * @param page 페이지 번호
      * @return PagedResponseDto<GPointChargeLogListResponseDto> 패이징된 응답 DTO 리스트
      */
-    @PostMapping("/me")
+    @GetMapping("/me")
     public ResponseEntity<ApiResponse<?>> findAllLogs(@RequestParam(value = "year",required = false)String year,
                                                       @RequestParam(value = "chargeType",required = false) ChargeType chargeType,
                                                       @RequestParam(value = "page",defaultValue = "0")int page){
