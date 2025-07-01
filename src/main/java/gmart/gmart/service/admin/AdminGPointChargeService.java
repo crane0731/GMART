@@ -7,6 +7,7 @@ import gmart.gmart.dto.gpoint.GPointChargeLogListResponseDto;
 import gmart.gmart.dto.gpoint.GPointChargeRequestDto;
 import gmart.gmart.dto.gpoint.GPointRefundRequestDto;
 import gmart.gmart.dto.gpoint.SearchGPointChargeLogCondDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.gpoint.GPointChargeService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -136,15 +137,16 @@ public class AdminGPointChargeService {
      * 관리자 - 특정 회원의 건포인트 충전 로그 리스트 조회
      * @param memberId 회원 아이디
      * @param condDto 검색 조건 DTO
-     * @return List<GPointChargeLogListResponseDto>  응답 DTO 리스트
+     * @param page 페이지 번호
+     * @return PagedResponseDto<GPointChargeLogListResponseDto> 페이징된 응답 DTO 리스트
      */
-    public List<GPointChargeLogListResponseDto> findAllByCond(Long memberId,SearchGPointChargeLogCondDto condDto){
+    public PagedResponseDto<GPointChargeLogListResponseDto> findAllByCond(Long memberId, SearchGPointChargeLogCondDto condDto, int page){
 
         //회원 조회
         Member member = memberService.findById(memberId);
 
         //건포인트 충전 로그 조회 + 응답 DTO 리스트 생성 + 반환
-        return gPointChargeService.getChargeLogs(member,condDto);
+        return gPointChargeService.getChargeLogs(member,condDto,page);
 
     }
 

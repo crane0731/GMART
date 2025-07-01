@@ -4,10 +4,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import gmart.gmart.domain.Member;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.log.GPointChargeLog;
 import gmart.gmart.domain.log.QGPointChargeLog;
 import gmart.gmart.dto.gpoint.SearchGPointChargeLogCondDto;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -32,11 +36,12 @@ public class GPointChargeLogRepositoryImpl implements GPointChargeLogRepositoryC
      * @return List<GPointChargeLog> 건포인트 충전 로그 엔티티 리스트
      */
     @Override
-    public List<GPointChargeLog> findAllByCond(Member member, SearchGPointChargeLogCondDto cond) {
+    public Page<GPointChargeLog> findAllByCond(Member member, SearchGPointChargeLogCondDto cond, Pageable pageable) {
         QGPointChargeLog gPointChargeLog = QGPointChargeLog.gPointChargeLog;
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(gPointChargeLog.memberId.eq(member.getId()));
+        builder.and(gPointChargeLog.deleteStatus.eq(DeleteStatus.UNDELETED));
 
         if(cond.getYear() != null && !cond.getYear().isBlank()) {
             Integer year = Integer.parseInt(cond.getYear());
@@ -51,12 +56,21 @@ public class GPointChargeLogRepositoryImpl implements GPointChargeLogRepositoryC
             builder.and(gPointChargeLog.chargeType.eq(cond.getChargeType()));
         }
 
-        return   query
+        List<GPointChargeLog> content = query
                 .select(gPointChargeLog)
                 .from(gPointChargeLog)
                 .where(builder)
                 .orderBy(gPointChargeLog.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        Long total = query.select(gPointChargeLog.count())
+                .from(gPointChargeLog)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total!=null ? total : 0);
 
     }
 }
