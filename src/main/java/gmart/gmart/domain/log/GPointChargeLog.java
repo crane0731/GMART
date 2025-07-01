@@ -3,6 +3,7 @@ package gmart.gmart.domain.log;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.ChargeType;
+import gmart.gmart.domain.enums.DeleteStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,6 +45,11 @@ public class GPointChargeLog extends BaseTimeEntity {
     @Column(name = "after_charge_point")
     private Long afterChargePoint;
 
+    @Comment("삭제 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status")
+    private DeleteStatus deleteStatus;
+
 
     /**
      * [생성 메서드]
@@ -61,6 +67,7 @@ public class GPointChargeLog extends BaseTimeEntity {
         log.chargeAmount = chargePoint;
         log.beforeChargePoint = beforeChargePoint;
         log.afterChargePoint = afterChargePoint;
+        log.deleteStatus = DeleteStatus.UNDELETED;
         return log;
     }
 }

@@ -88,7 +88,7 @@ public class GMoneyChargeController {
      * @param page 페이지 번호
      * @return PagedResponseDto<GMoneyChargeLogListResponseDto> 페이징된 응답 DTO 리스트
      */
-    @GetMapping("")
+    @GetMapping("/me")
     public ResponseEntity<ApiResponse<?>> getAllGMoneyCharges(@RequestParam(value = "year",required = false)String year,
                                                               @RequestParam(value = "chargeType",required = false) ChargeType chargeType,
                                                               @RequestParam(value = "page",defaultValue = "0")int page) {
