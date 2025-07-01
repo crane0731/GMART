@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class GPointChargeLogListResponseDto {
 
-    public Long MemberId;
+    public Long memberId;
 
-    public Long GPointChargeLogId;
+    public Long gpointChargeLogId;
 
     public String chargeType;
 
@@ -33,8 +33,8 @@ public class GPointChargeLogListResponseDto {
     public static GPointChargeLogListResponseDto create(GPointChargeLog gPointChargeLog){
 
         GPointChargeLogListResponseDto dto = new GPointChargeLogListResponseDto();
-        dto.MemberId = gPointChargeLog.getMemberId();
-        dto.GPointChargeLogId = gPointChargeLog.getId();
+        dto.memberId = gPointChargeLog.getMemberId();
+        dto.gpointChargeLogId = gPointChargeLog.getId();
         dto.chargeType = gPointChargeLog.getChargeType().toString();
         dto.chargePoint = gPointChargeLog.getChargeAmount();
         dto.beforePoint = gPointChargeLog.getBeforeChargePoint();

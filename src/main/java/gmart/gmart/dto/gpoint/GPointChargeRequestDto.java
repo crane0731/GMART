@@ -12,4 +12,5 @@ public class GPointChargeRequestDto {
 
     private Long point; //충전 금액
     private String chargeType; //충전 타입
+
 }
