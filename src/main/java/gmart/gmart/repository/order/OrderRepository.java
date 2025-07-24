@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * 주문 레파지토리
  */
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>,OrderRepositoryCustom {
 
     @Query("SELECT o " +
             "FROM Order o " +

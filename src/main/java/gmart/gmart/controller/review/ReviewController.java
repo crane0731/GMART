@@ -51,7 +51,7 @@ public class ReviewController {
 
     /**
      * [컨트롤러]
-     * 리뷰 논리적 삭제(SOFT DELETE)
+     * aaaaa
      * @param reviewId 리뷰 아이디
      * @return 성공 메시지
      */

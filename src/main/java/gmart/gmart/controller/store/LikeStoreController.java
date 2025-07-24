@@ -56,8 +56,8 @@ public class LikeStoreController {
      * @param name 상점 이름
      * @return List<LikeStoreListResponseDto> 응답 DTO 리스트
      */
-    @GetMapping("/like")
-    public ResponseEntity<ApiResponse<?>> getLikeStore(@RequestParam("name")String name){
+    @GetMapping("/like/me")
+    public ResponseEntity<ApiResponse<?>> getLikeStore(@RequestParam(value = "name",required = false)String name){
 
         SearchLikeStoreCondDto condDto = SearchLikeStoreCondDto.create(name);
 
@@ -67,7 +67,7 @@ public class LikeStoreController {
 
     }
 
-    @GetMapping("/{id}/like-status")
+    @GetMapping("/{id}/like/status")
     public ResponseEntity<ApiResponse<?>> getLikeStatus(@PathVariable("id")Long storeId){
 
         boolean likeStatus = likeStoreService.getLikeStatus(storeId);
