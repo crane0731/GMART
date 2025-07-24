@@ -1,15 +1,15 @@
 package gmart.gmart.service.order;
 
-import gmart.gmart.domain.Delivery;
-import gmart.gmart.domain.Item;
-import gmart.gmart.domain.Member;
-import gmart.gmart.domain.Order;
+import gmart.gmart.domain.*;
 import gmart.gmart.domain.enums.*;
 import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
 import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
+import gmart.gmart.dto.inquiry.InquiryListResponseDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
+import gmart.gmart.dto.order.SellerOrderListResponseDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.OrderCustomException;
 import gmart.gmart.repository.order.OrderRepository;
@@ -20,8 +20,13 @@ import gmart.gmart.service.gpoint.GPointLogService;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 주문 서비스
@@ -41,6 +46,46 @@ public class OrderService {
     private final OrderRepository orderRepository; //주문 레파지토리
 
 
+    /**
+     * [서비스 로직]
+     * 판매자 - 주문 리스트 조회
+     * @param orderStatus 주문 상태
+     * @param page 페이지 번호
+     * @return PagedResponseDto<SellerOrderListResponseDto> 페이지 응답 리스트 DTO
+     */
+    public PagedResponseDto<SellerOrderListResponseDto> findSellerOrderInformation(OrderStatus orderStatus, int page){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //페이징 주문 리스트 조회
+        Page<Order> pageList = orderRepository.findAllByCond(seller, orderStatus, createPageable(page));
+
+        //페이지 객체를 응답 DTO 리스트로 변환
+        List<SellerOrderListResponseDto> content = pageList.getContent().stream().map(SellerOrderListResponseDto::create).toList();
+
+        //페이지 응답 DTO 생성 + 반환
+        return createPagedResponseDto(content,pageList);
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<SellerOrderListResponseDto> createPagedResponseDto(List<SellerOrderListResponseDto> content, Page<Order> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
 
 
     /**
@@ -69,7 +114,6 @@ public class OrderService {
         processOrder(requestDto, buyer, seller, item);
 
     }
-
 
     /**
      * [서비스 로직]
@@ -128,7 +172,7 @@ public class OrderService {
      * 판매자가 구매자의 구매 신청을 구매확인 처리함(판매자가 구매확인 버튼을 누름)
      * 메시지 생성
      * 건머니 로그 생성
-     * 건포이느 로그 생성
+     * 건포인트 로그 생성
      * @param orderId 주문 아이디
      */
     @Transactional
@@ -522,7 +566,7 @@ public class OrderService {
 
         //메시지 생성
         String buyerMessage=seller.getNickname() + " 에게 구매 요청을 보냈습니다.";
-        String sellerMessage=buyer.getNickname()+" 님이 구매를 요쳥했습니다.";
+        String sellerMessage=buyer.getNickname()+" 님이 구매를 요청했습니다.";
         createMessage(buyer,buyerMessage,seller,sellerMessage);
     }
 
