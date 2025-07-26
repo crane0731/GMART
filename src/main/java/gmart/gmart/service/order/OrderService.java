@@ -6,6 +6,7 @@ import gmart.gmart.dto.RefundOrderRequestDto;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
 import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
 import gmart.gmart.dto.inquiry.InquiryListResponseDto;
+import gmart.gmart.dto.order.BuyerOrderListResponseDto;
 import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.dto.order.SellerOrderListResponseDto;
@@ -59,32 +60,36 @@ public class OrderService {
         Member seller = memberService.findBySecurityContextHolder();
 
         //페이징 주문 리스트 조회
-        Page<Order> pageList = orderRepository.findAllByCond(seller, orderStatus, createPageable(page));
+        Page<Order> pageList = orderRepository.findAllByCondAndSeller(seller, orderStatus, createPageable(page));
 
         //페이지 객체를 응답 DTO 리스트로 변환
         List<SellerOrderListResponseDto> content = pageList.getContent().stream().map(SellerOrderListResponseDto::create).toList();
 
         //페이지 응답 DTO 생성 + 반환
-        return createPagedResponseDto(content,pageList);
+        return createPagedSellerResponseDto(content,pageList);
     }
 
-    //==페이징 생성 메서드==//
-    private Pageable createPageable(int page) {
-        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
-        return pageable;
-    }
+    /**
+     * [서비스 로직]
+     * 구매자 - 주문 리스트 조회
+     * @param orderStatus 주문 상태
+     * @param page 페이지 번호
+     * @return PagedResponseDto<BuyerOrderListResponseDto> 페이지 응답 리스트 DTO
+     */
+    public PagedResponseDto<BuyerOrderListResponseDto> findBuyerOrderInformation(OrderStatus orderStatus, int page){
 
-    //==페이징 응답 DTO 생성==//
-    private PagedResponseDto<SellerOrderListResponseDto> createPagedResponseDto(List<SellerOrderListResponseDto> content, Page<Order> page) {
-        return new PagedResponseDto<>(
-                content,
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalPages(),
-                page.getTotalElements(),
-                page.isFirst(),
-                page.isLast()
-        );
+        //현재 로그인한 회원 조회(구매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //페이징 주문 리스트 조회
+        Page<Order> pageList = orderRepository.findAllByCondAndBuyer(seller, orderStatus, createPageable(page));
+
+        //페이지 객체를 응답 DTO 리스트로 변환
+        List<BuyerOrderListResponseDto> content = pageList.getContent().stream().map(BuyerOrderListResponseDto::create).toList();
+
+        //페이지 응답 DTO 생성 + 반환
+        return createPagedBuyerResponseDto(content,pageList);
+
     }
 
 
@@ -870,4 +875,37 @@ public class OrderService {
         //로그 생성
         createLogByRefundComplete(seller, order, beforeSellerGMoney, afterSellerGMoney, buyer, beforeBuyerGMoney, afterBuyerGMoney, beforeBuyerGPoint, afterBuyerGPoint);
     }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
+        return pageable;
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<SellerOrderListResponseDto> createPagedSellerResponseDto(List<SellerOrderListResponseDto> content, Page<Order> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<BuyerOrderListResponseDto> createPagedBuyerResponseDto(List<BuyerOrderListResponseDto> content, Page<Order> page) {
+        return new PagedResponseDto<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast()
+        );
+    }
+
 }
