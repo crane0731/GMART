@@ -11,5 +11,8 @@ import org.springframework.data.domain.Pageable;
  */
 public interface OrderRepositoryCustom {
 
-    Page<Order> findAllByCond(Member seller , OrderStatus orderStatus, Pageable pageable);
+    Page<Order> findAllByCondAndSeller(Member seller , OrderStatus orderStatus, Pageable pageable);
+
+    Page<Order> findAllByCondAndBuyer(Member buyer , OrderStatus orderStatus, Pageable pageable);
+
 }

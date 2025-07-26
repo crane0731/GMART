@@ -31,7 +31,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     }
 
     @Override
-    public Page<Order> findAllByCond(Member seller,OrderStatus orderStatus, Pageable pageable) {
+    public Page<Order> findAllByCondAndSeller(Member seller,OrderStatus orderStatus, Pageable pageable) {
 
         QOrder order = QOrder.order;
         BooleanBuilder builder = new BooleanBuilder();
@@ -40,6 +40,41 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
         if(seller != null) {
             builder.and(order.seller.eq(seller));
+        }
+
+        if (orderStatus != null) {
+            builder.and(order.orderStatus.eq(orderStatus));
+        }
+
+        List<Order> content = query.select(order)
+                .from(order)
+                .join(order.seller).fetchJoin()
+                .join(order.buyer).fetchJoin()
+                .join(order.item).fetchJoin()
+                .leftJoin(order.delivery).fetchJoin()
+                .where(builder)
+                .orderBy(order.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = query.select(order.count())
+                .from(order)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<Order> findAllByCondAndBuyer(Member buyer, OrderStatus orderStatus, Pageable pageable) {
+        QOrder order = QOrder.order;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(order.deleteStatus.eq(DeleteStatus.UNDELETED));
+
+        if(buyer != null) {
+            builder.and(order.buyer.eq(buyer));
         }
 
         if (orderStatus != null) {
