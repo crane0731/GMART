@@ -1,6 +1,8 @@
 package gmart.gmart.domain.log;
 
 import gmart.gmart.command.CreateGMoneyLogCommand;
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.GMoneyDeltaType;
@@ -26,12 +28,14 @@ public class GMoneyLog extends BaseTimeEntity {
     private Long id;
 
     @Comment("회원 아이디")
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Comment("주문 아이디")
-    @Column(name = "order_id" , nullable = false)
-    private Long orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orders_id" , nullable = false)
+    private Order order;
 
     @Comment("건머니 변화 타입")
     @Column(name = "g_money_delta_type", nullable = false)
@@ -69,8 +73,8 @@ public class GMoneyLog extends BaseTimeEntity {
     public static GMoneyLog create(CreateGMoneyLogCommand command) {
 
         GMoneyLog gMoneyLog = new GMoneyLog();
-        gMoneyLog.memberId = command.getMemberId();
-        gMoneyLog.orderId = command.getOrderId();
+        gMoneyLog.member = command.getMember();
+        gMoneyLog.order = command.getOrder();
         gMoneyLog.gMoneyDeltaType = command.getGMoneydeltaType();
         gMoneyLog.description = command.getDescription();
         gMoneyLog.deltaGMoney = command.getDeltaGMoney();

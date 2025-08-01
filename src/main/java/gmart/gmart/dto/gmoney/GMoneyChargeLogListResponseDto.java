@@ -32,7 +32,7 @@ public class GMoneyChargeLogListResponseDto {
      */
     public static GMoneyChargeLogListResponseDto create(GMoneyChargeLog gMoneyChargeLog) {
         GMoneyChargeLogListResponseDto dto = new GMoneyChargeLogListResponseDto();
-        dto.memberId = gMoneyChargeLog.getMemberId();
+        dto.memberId = gMoneyChargeLog.getMember().getId();
         dto.gmoneyChargeLogId = gMoneyChargeLog.getId();
         dto.chargeType=gMoneyChargeLog.getChargeType().toString();
         dto.chargeMoney=gMoneyChargeLog.getChargeAmount();

@@ -24,5 +24,4 @@ public class UpdateItemCommand {
     private AssemblyStatus assemblyStatus; //조립 상태
     private BoxStatus boxStatus; //박스 상태
     private PaintStatus paintStatus; //도색 상태
-    private DealType dealType; //거래 타입
 }

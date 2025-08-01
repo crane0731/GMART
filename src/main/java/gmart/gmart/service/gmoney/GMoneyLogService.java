@@ -1,6 +1,8 @@
 package gmart.gmart.service.gmoney;
 
 import gmart.gmart.command.CreateGMoneyLogCommand;
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.GMoneyDeltaType;
 import gmart.gmart.domain.log.GMoneyLog;
 import gmart.gmart.repository.gmoney.GMoneyLogRepository;
@@ -21,8 +23,8 @@ public class GMoneyLogService {
     /**
      * [서비스 로직]
      * 건머니 거래 로그 생성
-     * @param memberId 회원 아이디
-     * @param orderId 주문 아이디
+     * @param member 회원
+     * @param order 주문
      * @param gMoneyDeltaType 건머니 변화 타입
      * @param description 설명
      * @param deltaGMoney 건머니 변화량
@@ -30,11 +32,11 @@ public class GMoneyLogService {
      * @param afterGMoney 이후 건머니
      */
     @Transactional
-    public void createLog(Long memberId, Long orderId, GMoneyDeltaType gMoneyDeltaType,
+    public void createLog(Member member, Order order, GMoneyDeltaType gMoneyDeltaType,
                           String description, Long deltaGMoney, Long beforeGMoney, Long afterGMoney) {
 
         //커맨드 생성
-        CreateGMoneyLogCommand command = createCommand(memberId, orderId, gMoneyDeltaType, description, deltaGMoney, beforeGMoney, afterGMoney);
+        CreateGMoneyLogCommand command = createCommand(member, order, gMoneyDeltaType, description, deltaGMoney, beforeGMoney, afterGMoney);
 
         //건머니 로그 생성
         GMoneyLog gMoneyLog = GMoneyLog.create(command);
@@ -54,10 +56,10 @@ public class GMoneyLogService {
     }
 
     //==커맨드 생성==//
-    private CreateGMoneyLogCommand createCommand(Long memberId, Long orderId, GMoneyDeltaType gMoneyDeltaType, String description, Long deltaGMoney, Long beforeGMoney, Long afterGMoney) {
+    private CreateGMoneyLogCommand createCommand(Member member, Order order, GMoneyDeltaType gMoneyDeltaType, String description, Long deltaGMoney, Long beforeGMoney, Long afterGMoney) {
         return CreateGMoneyLogCommand.builder()
-                .memberId(memberId)
-                .orderId(orderId)
+                .member(member)
+                .order(order)
                 .gMoneydeltaType(gMoneyDeltaType)
                 .description(description)
                 .deltaGMoney(deltaGMoney)

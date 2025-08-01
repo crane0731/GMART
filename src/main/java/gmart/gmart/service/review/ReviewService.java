@@ -222,7 +222,7 @@ public class ReviewService {
 
     //==주문이 구매확정 상태인지 확인 -> 구매 확정 상태여야 리뷰를 등록 할 수 있음==//
     private void validateOrderCompleted(Order order) {
-        if(!order.getOrderStatus().equals(OrderStatus.COMPLETED)){
+        if(!order.getOrderStatus().equals(OrderStatus.CONFIRM)){
             throw new ReviewCustomException(ErrorMessage.NO_PERMISSION);
         }
     }

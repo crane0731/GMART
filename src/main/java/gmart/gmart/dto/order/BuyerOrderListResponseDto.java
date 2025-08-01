@@ -21,6 +21,7 @@ public class BuyerOrderListResponseDto {
     private Long buyerId; //구매자 아이디
     private String buyerNickname; //구매자 닉네임
     private AddressDto buyerAddress; //구매자 주소
+    private String buyerPhone; //구매자 전화번호
 
     private Long itemId; //상품 아이디
     private String itemName; //상품 이름
@@ -53,6 +54,7 @@ public class BuyerOrderListResponseDto {
         dto.setBuyerId(order.getBuyer().getId());
         dto.setBuyerNickname(order.getBuyer().getNickname());
         dto.setBuyerAddress(AddressDto.createDto(order.getBuyer().getAddress()));
+        dto.setBuyerPhone(order.getBuyer().getPhoneNumber());
 
         dto.setItemId(order.getItem().getId());
         dto.setItemName(order.getItem().getTitle());

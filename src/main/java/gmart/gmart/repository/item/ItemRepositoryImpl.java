@@ -64,9 +64,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             builder.and(item.paintStatus.eq(cond.getPaintStatus()));
         }
 
-        if(cond.getDealType()!=null){
-            builder.and(item.dealType.eq(cond.getDealType()));
-        }
 
         if (cond.getSaleStatus()!=null){
             builder.and(item.saleStatus.eq(cond.getSaleStatus()));
@@ -142,9 +139,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             builder.and(item.paintStatus.eq(cond.getPaintStatus()));
         }
 
-        if(cond.getDealType()!=null){
-            builder.and(item.dealType.eq(cond.getDealType()));
-        }
 
         if (cond.getSaleStatus()!=null){
             builder.and(item.saleStatus.eq(cond.getSaleStatus()));
@@ -220,9 +214,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
             builder.and(item.paintStatus.eq(cond.getPaintStatus()));
         }
 
-        if(cond.getDealType()!=null){
-            builder.and(item.dealType.eq(cond.getDealType()));
-        }
 
         if (cond.getSaleStatus()!=null){
             builder.and(item.saleStatus.eq(cond.getSaleStatus()));

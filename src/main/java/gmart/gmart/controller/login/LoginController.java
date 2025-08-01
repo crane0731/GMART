@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/gmart")
-public class LoginController {
+public class    LoginController {
 
     private final MemberService memberService;
 

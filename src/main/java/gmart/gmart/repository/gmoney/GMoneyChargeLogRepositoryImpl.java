@@ -41,7 +41,7 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
         QGMoneyChargeLog gMoneyChargeLog = QGMoneyChargeLog.gMoneyChargeLog;
         BooleanBuilder builder = new BooleanBuilder();
 
-        builder.and(gMoneyChargeLog.memberId.eq(member.getId()));
+        builder.and(gMoneyChargeLog.member.eq(member));
 
         builder.and(gMoneyChargeLog.deleteStatus.eq(DeleteStatus.UNDELETED));
 

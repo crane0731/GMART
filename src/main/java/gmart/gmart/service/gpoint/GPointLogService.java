@@ -2,6 +2,8 @@ package gmart.gmart.service.gpoint;
 
 
 import gmart.gmart.command.CreateGPointLogCommand;
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.GMoneyDeltaType;
 import gmart.gmart.domain.enums.GPointDeltaType;
 import gmart.gmart.domain.log.GPointLog;
@@ -23,8 +25,8 @@ public class GPointLogService {
     /**
      * [서비스 로직]
      * 건포인트 거래 로그 등록
-     * @param memberId 회원 아이디
-     * @param orderId 주문 아이디
+     * @param member 회원
+     * @param order 주문
      * @param gPointDeltaType 건포인트 변화 타입
      * @param description 설명
      * @param deltaGPoint 건포인트 변화량
@@ -32,11 +34,11 @@ public class GPointLogService {
      * @param afterGPoint 이후 건포인트
      */
     @Transactional
-    public void createLog(Long memberId, Long orderId, GPointDeltaType gPointDeltaType,
+    public void createLog(Member member, Order order, GPointDeltaType gPointDeltaType,
                           String description, Long deltaGPoint, Long beforeGPoint, Long afterGPoint){
 
         //커맨드 생성
-        CreateGPointLogCommand command = createCommand(memberId, orderId, gPointDeltaType, description, deltaGPoint, beforeGPoint, afterGPoint);
+        CreateGPointLogCommand command = createCommand(member, order, gPointDeltaType, description, deltaGPoint, beforeGPoint, afterGPoint);
 
         //건포인트 거래 로그 생성
         GPointLog gPointLog = GPointLog.create(command);
@@ -56,10 +58,10 @@ public class GPointLogService {
     }
 
     //==커맨드 생성==//
-    private CreateGPointLogCommand createCommand(Long memberId, Long orderId, GPointDeltaType gPointDeltaType, String description, Long deltaGPoint, Long beforeGPoint, Long afterGPoint) {
+    private CreateGPointLogCommand createCommand(Member member, Order order, GPointDeltaType gPointDeltaType, String description, Long deltaGPoint, Long beforeGPoint, Long afterGPoint) {
         return CreateGPointLogCommand.builder()
-                .memberId(memberId)
-                .orderId(orderId)
+                .member(member)
+                .order(order)
                 .gPointDeltaType(gPointDeltaType)
                 .description(description)
                 .deltaGPoint(deltaGPoint)

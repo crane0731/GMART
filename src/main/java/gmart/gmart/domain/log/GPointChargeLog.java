@@ -25,8 +25,9 @@ public class GPointChargeLog extends BaseTimeEntity {
     private Long id;
 
     @Comment("회원 아이디")
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Comment("충전 방식")
     @Column(name = "charge_type")
@@ -62,7 +63,7 @@ public class GPointChargeLog extends BaseTimeEntity {
      */
     public static GPointChargeLog create(Member member , ChargeType chargeType , Long chargePoint , Long beforeChargePoint , Long afterChargePoint) {
         GPointChargeLog log = new GPointChargeLog();
-        log.memberId = member.getId();
+        log.member = member;
         log.chargeType = chargeType;
         log.chargeAmount = chargePoint;
         log.beforeChargePoint = beforeChargePoint;

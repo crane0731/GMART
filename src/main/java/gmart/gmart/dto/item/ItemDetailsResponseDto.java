@@ -71,13 +71,11 @@ public class ItemDetailsResponseDto {
         dto.setItemId(item.getId());
         dto.setItemTitle(item.getTitle());
         dto.setItemContent(item.getContent());
-        dto.setLocation(item.getLocation());
         dto.setItemPrice(item.getItemPrice());
         dto.setDeliveryPrice(item.getDeliveryPrice());
 
         dto.setViewCount(item.getViewCount());
         dto.setFavoriteCount(item.getFavoriteCount());
-        dto.setChattingCount(item.getChattingCount());
         dto.setReportedCount(item.getReportedCount());
 
         dto.setSaleStatus(item.getSaleStatus().toString());
@@ -85,7 +83,6 @@ public class ItemDetailsResponseDto {
         dto.setBoxStatus(item.getBoxStatus().toString());
         dto.setPaintStatus(item.getPaintStatus().toString());
         dto.setReportedStatus(item.getReportedStatus().toString());
-        dto.setDealType(item.getDealType().toString());
 
         dto.setCreatedAt(DateFormatUtil.DateFormat(item.getCreatedDate()));
         dto.setUpdatedAt(DateFormatUtil.DateFormat(item.getUpdatedDate()));

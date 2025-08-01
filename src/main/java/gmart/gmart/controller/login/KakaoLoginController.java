@@ -56,6 +56,7 @@ public class KakaoLoginController {
                 + "&refreshToken=" + responseDto.getRefreshToken();
 
         response.sendRedirect(redirectUrl);
+
     }
 
 }
