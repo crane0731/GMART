@@ -58,9 +58,32 @@ public class OrderController {
         return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 신청 취소 완료")));
     }
 
-    //구매 신청 수락
+    /**
+     * [컨트롤러]
+     * 판매자가 구매 신청 요청 거절
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<ApiResponse<?>> rejectOrder(@PathVariable("id")Long orderId){
+        orderService.rejectOrder(orderId);;
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 신청 거절 완료")));
+    }
 
-    //구매 신청 거절
+
+    /**
+     * [컨트롤러]
+     * 판매자가 구매 신청 확인 -> 주문 확인 처리
+     * @param orderId 주문 아이디
+     * @return 성공 메시지
+     */
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<ApiResponse<?>> acceptOrder(@PathVariable("id")Long orderId){
+        orderService.acceptOrder(orderId);;
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 신청 수락 완료")));
+    }
+
+
 
 
 
