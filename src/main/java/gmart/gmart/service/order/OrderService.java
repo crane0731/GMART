@@ -140,13 +140,63 @@ public class OrderService {
         Member seller = order.getSeller();
 
         //현재 로그인한 회원과 주문의 구매자가 같은 회원이아닌지 검증
-        validateOrderOwner(order, buyer);
+        validateOrderBuyer(order, buyer);
 
         //구매 취소 로직
         processOrderCancel(order, seller, buyer);
 
+    }
+
+    /**
+     * [서비스 로직]
+     * 판매자가 구매자의 구매 요청 거절
+     * 메시지 생성
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void rejectOrder(Long orderId){
+
+        //현재 로그인한 회원 조회(판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //구매취소를 원하는 상품 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member buyer = order.getBuyer();
+
+        //판매자가 해당 주문의 판매자인지 확인
+        validateOrderSeller(seller,order);
+
+        //주문 거절 처리 로직
+        processOrderReject(order, seller, buyer);
+
 
     }
+
+
+    //구매 신청 수락
+    @Transactional
+    public void acceptOrder(Long orderId){
+
+        //현재 로그인한 회원 (판매자)
+        Member seller = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //구매자 조회
+        Member buyer = order.getBuyer();
+
+        //현재 로그인한 회원이 주문의 판매자 인지 확인
+        validateOrderSeller(seller,order);
+
+        //주문 수락 처리 로직
+        processOrderAccept(buyer, order, seller);
+
+    }
+
+
 
     /**
      * [생성]
@@ -222,10 +272,13 @@ public class OrderService {
         gMoneyLogService.createLog(buyer, order,
                 GMoneyDeltaType.PURCHASE,description, order.getPaidPrice(), beforeGMoney, afterGMoney);
 
+        //만약 건포인트에 변화가 있다면
+        if(!beforeGPoint.equals(afterGPoint)){
+            //건포인트 로그 생성
+            gPointLogService.createLog(buyer, order,
+                    GPointDeltaType.PURCHASE,description, order.getUsedPoint(), beforeGPoint, afterGPoint);
+        }
 
-        //건포인트 로그 생성
-        gPointLogService.createLog(buyer, order,
-                GPointDeltaType.PURCHASE,description, order.getUsedPoint(), beforeGPoint, afterGPoint);
     }
 
     //==현재 로그인한 회원이 주문의 판매자인지 확인 하는 로직==//
@@ -280,11 +333,56 @@ public class OrderService {
     }
 
     //==현재 로그인한 회원과 주문의 구매자가 같은 회원이아닌지 검증하는 메소드==//
-    private void validateOrderOwner(Order order, Member buyer) {
+    private void validateOrderBuyer(Order order, Member buyer) {
         //현재 로그인한 회원과 주문의 구매자가 같은 회원이아닌지 검증
         if(!order.getBuyer().equals(buyer)){
             throw new OrderCustomException(ErrorMessage.NO_PERMISSION);
         }
+    }
+
+    //==주문 거절 처리 로직==//
+    private void processOrderReject(Order order, Member seller, Member buyer) {
+        order.rejectOrder();
+
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 구매요청을 거절 하엿습니다.";
+        String sellerMessage= buyer.getNickname()+" 님에게 구매 요청 거절 알림을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+    }
+
+    //==주문 수락 처리 로직==//
+    private void processOrderAccept(Member buyer, Order order, Member seller) {
+        //주문 수락 전의 구매자의 건머니와 건포인트
+        Long beforeGMoney = buyer.getGMoney();
+        Long beforeGPoint = buyer.getGPoint();
+
+        //주문 수락 처리
+        order.acceptOrder();
+
+        //배송 정보 생성 + 저장
+        createDelivery(buyer, order);
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 님이 구매요청을 수락 하였습니다.";
+        String sellerMessage= buyer.getNickname()+" 님에게 구매 요청 수락 알림을 보냈습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //주문 수락 후의 구매자의 건머니와 건포인트
+        Long afterGMoney = buyer.getGMoney();
+        Long afterGPoint = buyer.getGPoint();
+
+        //구매자의 건머니 , 건포인트 로그 생성
+        String logDescription= "상품 구매";
+        createLog(logDescription, buyer, order,beforeGMoney,afterGMoney,beforeGPoint,afterGPoint);
+    }
+
+
+    //==배송 정보 생성 + 저장==//
+    private void createDelivery(Member buyer, Order order) {
+        Delivery delivery = Delivery.create(buyer);
+        order.setDelivery(delivery);
+        deliveryService.save(delivery);
     }
 
 }

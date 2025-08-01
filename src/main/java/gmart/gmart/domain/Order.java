@@ -137,7 +137,6 @@ public class Order extends BaseTimeEntity {
      */
     public void setDelivery(Delivery delivery){
 
-
         this.delivery=delivery;
         delivery.setOrder(this);
 
@@ -177,6 +176,7 @@ public class Order extends BaseTimeEntity {
 
             }
         }else {
+            this.paidPrice = totalPrice - usedPoint;
             return totalPrice;
         }
 
@@ -208,7 +208,7 @@ public class Order extends BaseTimeEntity {
      */
     public void cancelOrder(){
         //주문이 구매 요청 상태인지 확인
-        if(this.getOrderStatus().equals(OrderStatus.REQUESTED)){
+        if(!this.getOrderStatus().equals(OrderStatus.REQUESTED)){
             throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
         }
 
@@ -220,7 +220,55 @@ public class Order extends BaseTimeEntity {
 
     }
 
+    /**
+     * [비즈니스 로직]
+     * 주문 거절 처리
+     */
+    public void rejectOrder(){
 
+        //주문이 구매 요청 상태인지 확인
+        if(!this.getOrderStatus().equals(OrderStatus.REQUESTED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+
+        //주문 거절 처리
+        this.orderStatus=OrderStatus.REJECT;
+
+        //상품 SOLD_OUT -> SALE 처리
+        this.item.changeSaleStatus(SaleStatus.SALE);
+
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 주문 수락 처리
+     * 구매자의 결제대금 만큼 건머니와 건포인트가 차감되며 에스크로 홀딩 상태로 변경
+     */
+    public void acceptOrder(){
+
+        //주문이 구매 요청 상태인지 확인
+        if(!this.getOrderStatus().equals(OrderStatus.REQUESTED)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+        }
+
+        //주문 확인 처리
+        this.orderStatus=OrderStatus.ACCEPT;
+
+        //에스크로 결제 대금 홀딩 처리
+        escrowHolding();
+
+
+    }
+
+    //=에스크로 결제 대금 홀딩 처리 로직==//
+    private void escrowHolding() {
+        //구매자의 건 포인트와 건 머니 차감
+        this.buyer.deductGMoney(this.paidPrice);
+        this.buyer.deductGPoint(this.usedPoint);
+
+        //에스크로 상태를 홀딩으로 변경 (에스크로에 결제 대금이 저장됨)
+        this.escrowStatus=EscrowStatus.HOLDING;
+    }
 
 
 }
