@@ -1,9 +1,7 @@
 package gmart.gmart.controller.order;
 
-import gmart.gmart.dto.RefundOrderRequestDto;
+
 import gmart.gmart.dto.api.ApiResponse;
-import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
-import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.service.order.OrderService;
 import jakarta.validation.Valid;
@@ -29,7 +27,7 @@ public class OrderController {
     /**
      * [컨트롤러]
      * 구매자 -> 구매버튼
-     * 주문 신청(등록)
+     * 구매 신청(등록)
      * @param itemId 상품 아이디
      * @param requestDto 주문 신청 요청 DTO
      * @param bindingResult 에러메시지를 바인딩할 객체
@@ -45,279 +43,25 @@ public class OrderController {
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
         }
         orderService.createOrder(itemId, requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 신청 완료")));
-
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 신청 완료")));
     }
 
     /**
      * [컨트롤러]
-     * 구매자가 판매자에게 주문 신청 취소를 요청함
-     * 주문 상태가 아직 주문확인 상태 즉,판매자가 주문 확인을 하고 아직 상품을 배송하기 전인 상태 만 가능
-     * @param orderId 주문 아이디
-     * @param requestDto 취소 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/buyer-cancel-request")
-    public ResponseEntity<ApiResponse<?>> revokeOrder(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult) {
-
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-        orderService.cancelRequestByBuyer(orderId,requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 요청 완료")));
-    }
-
-
-    /**
-     * [컨트롤러]
-     * 구매자가 주문 취소 처리
-     * 아직 판매자가 주문을 확인하기 전 상태에서만 가능 (주문 예약 상태)
-     * @param orderId 주문 아이디
-     * @param requestDto 취소 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/buyer-cancel")
-    public ResponseEntity<ApiResponse<?>> cancelOrderByBuyer(@PathVariable("id")Long orderId, @Valid @RequestBody CancelOrderRequestDto requestDto,BindingResult bindingResult) {
-
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        orderService.cancelOrderByBuyer(orderId, requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 주문확인 처리
+     * 구매자가 구매 신청 취소
      * @param orderId 주문 아이디
      * @return 성공 메시지
      */
-    @PostMapping("/{id}/confirm")
-    public ResponseEntity<ApiResponse<?>> confirmOrder(@PathVariable("id")Long orderId){
-        orderService.confirmOrder(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 확인 완료")));
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<?>> cancelOrder(@PathVariable("id")Long orderId){
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 신청 취소 완료")));
     }
 
+    //구매 신청 수락
 
-    /**
-     * [컨트롤러]
-     * 주문 취소 처리 -> 판매자가 구매자의 구매 요청 주문 거절
-     * @param orderId 주문 아이디
-     * @param requestDto 취소 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/seller-rejection")
-    public ResponseEntity<ApiResponse<?>> rejectOrderRequestBySeller(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult){
+    //구매 신청 거절
 
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-        orderService.rejectOrderRequestBySeller(orderId,requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 거절 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 주문 취소 처리 -> 판매자가 주문 취소
-     * @param orderId 주문 아이디
-     * @param requestDto 취소 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/seller-cancel")
-    public ResponseEntity<ApiResponse<?>> cancelOrderBySeller(@PathVariable("id")Long orderId,@Valid @RequestBody CancelOrderRequestDto requestDto, BindingResult bindingResult) {
-
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        orderService.cancelOrder(orderId,requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 구매자의 주문 취소 요청을 승인 -> 주문 취소 처리
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/buyer-cancel/seller-accept")
-    public ResponseEntity<ApiResponse<?>> acceptCancelOrderBySeller(@PathVariable("id")Long orderId){
-        orderService.acceptCancelOrderRequestBySeller(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 승인 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 구매자의 주문 취소 요청을 거절 -> 주문 절차가 원래대로 진행됨
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/buyer-cancel/seller-rejection")
-    public ResponseEntity<ApiResponse<?>> rejectCancelOrderBySeller(@PathVariable("id")Long orderId){
-        orderService.rejectCancelOrderRequestBySeller(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","주문 취소 거절 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 상품 배송 준비를 완료
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/delivery-preparations")
-    public ResponseEntity<ApiResponse<?>> readyDelivery(@PathVariable("id")Long orderId){
-        orderService.readyDelivery(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 준비 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 상품 배송 준비 완료를 취소
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/delivery-preparations/cancel")
-    public ResponseEntity<ApiResponse<?>> cancelReadyDelivery(@PathVariable("id")Long orderId){
-        orderService.cancelReadyDelivery(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 준비 취소 완료")));
-    }
-
-
-    /**
-     * [컨트롤러]
-     * 판매자가 상품을 배송
-     * @param orderId 주문 아이디
-     * @param requestDto 배송 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/delivery")
-    public ResponseEntity<ApiResponse<?>> shipItem(@PathVariable("id")Long orderId, @Valid @RequestBody TrackingNumberRequestDto requestDto, BindingResult bindingResult) {
-
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        orderService.shipItem(orderId,requestDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","배송 시작 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 구매자 구매확정
-     * 판매자에게 판매 대금 입금
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/complete")
-    public ResponseEntity<ApiResponse<?>> completeOrder(@PathVariable("id")Long orderId){
-        orderService.completeOrder(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","구매 확정 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 구매자가 환불 요청
-     * @param orderId 주문 아이디
-     * @param requestDto 환불 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/refund-request")
-    public ResponseEntity<ApiResponse<?>> refundRequest(@PathVariable("id")Long orderId, @Valid @RequestBody RefundOrderRequestDto requestDto, BindingResult bindingResult) {
-
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        orderService.refundRequest(orderId,requestDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 요청 완료")));
-
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 구매자의 환불요청을 거절함 -> 구매확정
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/refund-request/rejection")
-    public ResponseEntity<ApiResponse<?>> rejectRefundRequest(@PathVariable("id")Long orderId){
-        orderService.rejectRefundRequest(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 거절 완료 , 구매 확정 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자가 구매자의 환불 요청을 승인함
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/refund-request/accept")
-    public ResponseEntity<ApiResponse<?>> acceptRefundRequest(@PathVariable("id")Long orderId){
-        orderService.acceptRefundRequest(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 요청 승인 완료")));
-    }
-
-    /**
-     * [컨트롤러]
-     * 구매자가 판매자에게 다시 상품 환불 배송 시작
-     * @param orderId 주문 아이디
-     * @param requestDto 송장 번호 요청 DTO
-     * @param bindingResult 에러메시지를 바인딩할 객체
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/refund-delivery")
-    public ResponseEntity<ApiResponse<?>> refundDelivery(@PathVariable("id")Long orderId, @Valid @RequestBody TrackingNumberRequestDto requestDto, BindingResult bindingResult) {
-        Map<String, String> errorMessages = new HashMap<>();
-        //필드에러가 있는지 확인
-        //오류 메시지가 존재하면 이를 반환
-        if (errorCheck(bindingResult, errorMessages)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다.", errorMessages));
-        }
-
-        orderService.refundShipItem(orderId,requestDto);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 배송 시작 완료")));
-
-    }
-
-    /**
-     * [컨트롤러]
-     * 판매자 환불 완료 처리
-     * @param orderId 주문 아이디
-     * @return 성공 메시지
-     */
-    @PostMapping("/{id}/refund-complete")
-    public ResponseEntity<ApiResponse<?>> refundComplete(@PathVariable("id")Long orderId){
-        orderService.refundComplete(orderId);
-        return ResponseEntity.ok().body(ApiResponse.success(Map.of("message","환불 처리 완료")));
-
-    }
 
 
     //==필드에러가 있는지 확인하는 로직==//

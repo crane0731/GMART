@@ -40,7 +40,7 @@ public class GPointChargeLogRepositoryImpl implements GPointChargeLogRepositoryC
         QGPointChargeLog gPointChargeLog = QGPointChargeLog.gPointChargeLog;
         BooleanBuilder builder = new BooleanBuilder();
 
-        builder.and(gPointChargeLog.memberId.eq(member.getId()));
+        builder.and(gPointChargeLog.member.eq(member));
         builder.and(gPointChargeLog.deleteStatus.eq(DeleteStatus.UNDELETED));
 
         if(cond.getYear() != null && !cond.getYear().isBlank()) {

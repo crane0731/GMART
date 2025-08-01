@@ -29,8 +29,9 @@ public class GMoneyChargeLog extends BaseAuditingEntity {
     private Long id;
 
     @Comment("회원 아이디")
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Comment("충전 방식")
     @Column(name = "charge_type")
@@ -64,7 +65,7 @@ public class GMoneyChargeLog extends BaseAuditingEntity {
      */
     public static GMoneyChargeLog create(Member member, Long beforeChargeMoney, Long chargeMoney, ChargeType chargeType) {
         GMoneyChargeLog log = new GMoneyChargeLog();
-        log.memberId = member.getId();
+        log.member = member;
 
         log.chargeType = chargeType;
 

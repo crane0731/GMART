@@ -41,9 +41,6 @@ public class UpdateItemRequestDto {
     @NotNull(message = "박스 상태를 입력하세요.")
     private PaintStatus paintStatus; //도색 상태
 
-    @NotNull(message = "거래 타입을 입력하세요.")
-    private DealType dealType; //거래 타입
-
     private List<ItemImageRequestDto> itemImages; //상품 이미지 리스트
 
     private List<Long> gundamList;//건담 리스트

@@ -56,9 +56,6 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "delivery_price")
     private Long deliveryPrice;
 
-    @org.hibernate.annotations.Comment("거래 장소")
-    @Column(name = "location")
-    private String location;
 
     @org.hibernate.annotations.Comment("조회 수")
     @Column(name = "view_count")
@@ -68,9 +65,6 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "favorite_count")
     private Long favoriteCount;
 
-    @org.hibernate.annotations.Comment("채팅 수")
-    @Column(name = "chatting_count")
-    private Long chattingCount;
 
     @org.hibernate.annotations.Comment("신고 받은 수")
     @Column(name = "reported_count")
@@ -107,13 +101,6 @@ public class Item extends BaseAuditingEntity {
     private ItemReportedStatus reportedStatus;
 
 
-
-    //거래 방법
-    @org.hibernate.annotations.Comment("거래 타입")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "deal_type")
-    private DealType dealType;
-
     @Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
@@ -142,20 +129,17 @@ public class Item extends BaseAuditingEntity {
         item.content = command.getContent();
         item.itemPrice = command.getItemPrice();
         item.deliveryPrice = command.getDeliveryPrice();
-        item.location = command.getLocation();
         item.grade= command.getGundamGrade();
 
         item.assemblyStatus=command.getAssemblyStatus();
         item.boxStatus=command.getBoxStatus();
         item.paintStatus=command.getPaintStatus();
-        item.dealType=command.getDealType();
 
         item.saleStatus=SaleStatus.SALE;
         item.reportedStatus=ItemReportedStatus.NOT_REPORTED;
 
         item.viewCount=0L;
         item.favoriteCount=0L;
-        item.chattingCount=0L;
         item.reportedCount=0L;
         item.deleteStatus=DeleteStatus.UNDELETED;
 
@@ -173,11 +157,9 @@ public class Item extends BaseAuditingEntity {
         this.content = command.getContent();
         this.itemPrice = command.getItemPrice();
         this.deliveryPrice = command.getDeliveryPrice();
-        this.location = command.getLocation();
         this.assemblyStatus = command.getAssemblyStatus();
         this.boxStatus = command.getBoxStatus();
         this.paintStatus = command.getPaintStatus();
-        this.dealType =command.getDealType();
         this.grade=command.getGundamGrade();
 
     }
@@ -284,6 +266,8 @@ public class Item extends BaseAuditingEntity {
         this.reportedStatus=ItemReportedStatus.REPORTED;
         plusReportCount();
     }
+
+
 
     //==이미 삭제 상태인지 확인 하는 로직==//
     private void validateDeleted() {

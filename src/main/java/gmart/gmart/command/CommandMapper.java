@@ -22,7 +22,6 @@ public final class CommandMapper {
                 .assemblyStatus(requestDto.getAssemblyStatus())
                 .paintStatus(requestDto.getPaintStatus())
                 .boxStatus(requestDto.getBoxStatus())
-                .dealType(requestDto.getDealType())
                 .gundamGrade(requestDto.getGrade())
                 .build();
     }
@@ -41,7 +40,6 @@ public final class CommandMapper {
                 .assemblyStatus(requestDto.getAssemblyStatus())
                 .paintStatus(requestDto.getPaintStatus())
                 .boxStatus(requestDto.getBoxStatus())
-                .dealType(requestDto.getDealType())
                 .gundamGrade(requestDto.getGrade())
                 .build();
     }

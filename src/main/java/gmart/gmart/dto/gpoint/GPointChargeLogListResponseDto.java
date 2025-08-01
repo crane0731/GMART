@@ -33,7 +33,7 @@ public class GPointChargeLogListResponseDto {
     public static GPointChargeLogListResponseDto create(GPointChargeLog gPointChargeLog){
 
         GPointChargeLogListResponseDto dto = new GPointChargeLogListResponseDto();
-        dto.memberId = gPointChargeLog.getMemberId();
+        dto.memberId = gPointChargeLog.getMember().getId();
         dto.gpointChargeLogId = gPointChargeLog.getId();
         dto.chargeType = gPointChargeLog.getChargeType().toString();
         dto.chargePoint = gPointChargeLog.getChargeAmount();

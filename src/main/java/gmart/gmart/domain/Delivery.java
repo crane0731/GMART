@@ -27,25 +27,7 @@ public class Delivery extends BaseTimeEntity {
     @Column(name = "delivery_id")
     private Long id;
 
-    @org.hibernate.annotations.Comment("송장 번호")
-    @Column(name = "tracking_number")
-    private String trackingNumber;
 
-    @org.hibernate.annotations.Comment("받는 사람 이름")
-    @Column(name = "sender_name")
-    private String senderName;
-
-    @org.hibernate.annotations.Comment("받는 사람 전화번호")
-    @Column(name = "sender_phone")
-    private String senderPhone;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "zipCode", column = @Column(name = "sender_zipcode")),
-            @AttributeOverride(name = "address", column = @Column(name = "sender_address")),
-            @AttributeOverride(name = "addressDetails", column = @Column(name = "sender_address_datails"))
-    })
-    private Address senderAddress;
 
     @org.hibernate.annotations.Comment("받는 사람 이름")
     @Column(name = "receiver_name")
@@ -68,14 +50,6 @@ public class Delivery extends BaseTimeEntity {
     @Column(name = "delivery_status")
     private DeliveryStatus deliveryStatus;
 
-    @org.hibernate.annotations.Comment("환불 상태")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "refund_status")
-    private RefundStatus refundStatus;
-
-    @org.hibernate.annotations.Comment("환불 송장 번호")
-    @Column(name = "refund_tracking_number")
-    private String refundTrackingNumber;
 
 
     @org.hibernate.annotations.Comment("삭제 상태")
@@ -89,18 +63,14 @@ public class Delivery extends BaseTimeEntity {
 
     /**
      * [생성 메서드]
-     * @param sender 보내는 회원
      * @param receiver 받는 회원
-     * @param refundStatus 환불 상태
      * @return Delivery 배송 엔티티
      */
-    public static Delivery create(Member sender , Member receiver, RefundStatus refundStatus) {
+    public static Delivery create( Member receiver) {
 
         Delivery delivery = new Delivery();
 
-        delivery.senderName=sender.getName();
-        delivery.senderPhone= sender.getPhoneNumber();
-        delivery.senderAddress=sender.getAddress();
+
 
         delivery.receiverName=receiver.getName();
         delivery.receiverPhone= receiver.getPhoneNumber();
@@ -108,7 +78,6 @@ public class Delivery extends BaseTimeEntity {
 
         delivery.deliveryStatus=DeliveryStatus.READY;
 
-        delivery.refundStatus=refundStatus;
 
         delivery.deleteStatus=DeleteStatus.UNDELETED;
 
@@ -124,28 +93,6 @@ public class Delivery extends BaseTimeEntity {
     }
 
 
-    /**
-     * [비즈니스 로직]
-     * 송장 번호 세팅
-     * @param trackingNumber 송장 번호
-     */
-    protected void setTrackingNumber(String trackingNumber){
-        this.trackingNumber=trackingNumber;
-
-        this.deliveryStatus=DeliveryStatus.SHIPPING;
-
-        this.refundStatus=RefundStatus.REFUND;
-    }
-
-    /**
-     * [비즈니스 로직]
-     * 환불 - 송장번호 세팅
-     * @param refundTrackingNumber
-     */
-    protected void setRefundTrackingNumber(String refundTrackingNumber){
-        this.refundTrackingNumber=refundTrackingNumber;
-        this.deliveryStatus=DeliveryStatus.SHIPPING;
-    }
 
     /**
      * [비즈니스 로직]

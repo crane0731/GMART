@@ -66,6 +66,7 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_ORDER ="주문을 찾을 수 없습니다.";
     public static final String CANNOT_PURCHASE_OWN_ITEM ="자신이 등록한 상품은 구매할 수 없습니다.";
     public static final String ALREADY_RESERVED_ORDER = "이미 예약한 주문이 있습니다.";
+    public static final String SOLD_OUT = "솔드 아웃 되엇습니다.";
 
     public static final String NOT_ENOUGH_GMONEY="건머니가 부족합니다.";
     public static final String INVALID_GMONEY_DEDUCTION_AMOUNT="차감할 금액은 0보다 커야합니다.";

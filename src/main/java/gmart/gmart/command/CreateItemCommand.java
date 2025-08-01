@@ -24,6 +24,5 @@ public class CreateItemCommand {
     private  AssemblyStatus assemblyStatus;
     private  PaintStatus paintStatus;
     private  BoxStatus boxStatus;
-    private  DealType dealType;
 
 }

@@ -26,7 +26,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/gmart/gmoney-charge")
-public class GMoneyChargeController {
+public class    GMoneyChargeController {
 
     private final GMoneyChargeService gMoneyChargeService; //건머니 충전 서비스
 

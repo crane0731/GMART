@@ -44,8 +44,6 @@ public class CreateItemRequestDto {
     @NotNull(message = "박스 상태를 입력하세요.")
     private BoxStatus boxStatus; //박스 상태
 
-    @NotNull(message = "거래 타입을 입력하세요.")
-    private DealType dealType; //거래 타입
 
 
 }

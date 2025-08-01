@@ -1,5 +1,7 @@
 package gmart.gmart.command;
 
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
 import gmart.gmart.domain.enums.GMoneyDeltaType;
 import gmart.gmart.domain.enums.GPointDeltaType;
 import lombok.AllArgsConstructor;
@@ -14,8 +16,8 @@ import lombok.Getter;
 @Getter
 public class CreateGPointLogCommand {
 
-    private Long memberId; //회원 아이디
-    private Long orderId; //주문 아이디
+    private Member member; //회원
+    private Order order; //주문
     private GPointDeltaType gPointDeltaType; //건포인트 변화 타입
     private String description; //설명
     private Long deltaGPoint; //건포인트 변화량

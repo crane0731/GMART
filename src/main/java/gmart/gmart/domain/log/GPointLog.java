@@ -2,6 +2,8 @@ package gmart.gmart.domain.log;
 
 import gmart.gmart.command.CreateGMoneyLogCommand;
 import gmart.gmart.command.CreateGPointLogCommand;
+import gmart.gmart.domain.Member;
+import gmart.gmart.domain.Order;
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.GPointDeltaType;
@@ -28,12 +30,14 @@ public class GPointLog extends BaseTimeEntity {
     private Long id;
 
     @Comment("회원 아이디")
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Comment("주문 아이디")
-    @Column(name = "order_id" , nullable = false)
-    private Long orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orders_id" , nullable = false)
+    private Order order;
 
     @Comment("건 포인트 변화 타입")
     @Column(name = "g_point_delta_type")
@@ -70,8 +74,8 @@ public class GPointLog extends BaseTimeEntity {
     public static GPointLog create(CreateGPointLogCommand command) {
 
         GPointLog gPointLog = new GPointLog();
-        gPointLog.memberId = command.getMemberId();
-        gPointLog.orderId = command.getOrderId();
+        gPointLog.member = command.getMember();
+        gPointLog.order = command.getOrder();
         gPointLog.gPointDeltaType = command.getGPointDeltaType();
         gPointLog.description = command.getDescription();
         gPointLog.deltaGPoint = command.getDeltaGPoint();

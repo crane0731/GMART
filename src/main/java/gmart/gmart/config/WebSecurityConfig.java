@@ -7,6 +7,7 @@ import gmart.gmart.service.redis.TokenBlackListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -72,9 +73,11 @@ public class WebSecurityConfig {
                                 "/static/***","/test.html","/api/auth/***","/api/auth/kakao/callback"
                                 )
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gmart/item","/api/gmart/store").permitAll()
                         .requestMatchers("/api/gmart/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 
 
