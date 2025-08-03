@@ -39,6 +39,7 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
     @Override
     public Page<GMoneyChargeLog> findAllByCond(Member member, SearchGMoneyChargeLogCondDto cond, Pageable pageable) {
         QGMoneyChargeLog gMoneyChargeLog = QGMoneyChargeLog.gMoneyChargeLog;
+
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(gMoneyChargeLog.member.eq(member));
@@ -64,6 +65,8 @@ public class GMoneyChargeLogRepositoryImpl implements GMoneyChargeLogRepositoryC
                 .from(gMoneyChargeLog)
                 .where(builder)
                 .orderBy(gMoneyChargeLog.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         Long total = query.select(gMoneyChargeLog.count())

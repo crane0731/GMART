@@ -21,6 +21,7 @@ public class ItemListResponseDto {
     public Long itemPrice; //상품 가격
     public Long deliveryPrice; // 배송비
     public String itemMainImageUrl; //상품 메인 이미지 URL
+    public String saleStatus;//판매 상태
     public String createdAt; //상품 등록일
 
     /**
@@ -39,6 +40,8 @@ public class ItemListResponseDto {
         //메인 이미지 세팅
         List<ItemImage> itemImages = item.getItemImages();
         setMainImageUrl(itemImages, dto);
+
+        dto.setSaleStatus(item.getSaleStatus().toString());
 
         dto.setCreatedAt(DateFormatUtil.DateFormat(item.getCreatedDate()));
 

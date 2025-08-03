@@ -75,11 +75,9 @@ public final class ErrorMessage {
 
     public static final String CANNOT_CONFIRM_ORDER ="주문을 수락 처리 할 수 없습니다.";
     public static final String CANNOT_CANCEL_ORDER ="주문을 취소 처리 할 수 없습니다.";
-    public static final String CANNOT_SHIP_DELIVERY ="배송을 설정할 수 없습니다.";
     public static final String CANNOT_CANCEL_READY_DELIVERY = "배송 준비완료를 취소할 수 없습니다.";
-    public static final String CANNOT_COMPLETE_ORDER ="구매 확정 처리를 할 수 없습니다.";
-    public static final String CANNOT_ACCEPT_REFUND_REQUEST ="환불 요청을 승인 할 수 없습니다.";
-    public static final String CANNOT_COMPLETE_REFUND="환불 완료 처리를 할 수 없습니다.";
+    public static final String CANNOT_REJECT_ORDER ="주문을 거절 처리 할 수 없습니다.";
+    public static final String CANNOT_ACCEPT_ORDER ="주문을 수락 처리 할 수 없습니다.";
 
     public static final String NOT_FOUND_REVIEW ="리뷰를 찾을 수 없습니다.";
     public static final String ALREADY_REVIEW="이미 리뷰가 존재합니다.";

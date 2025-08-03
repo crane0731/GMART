@@ -228,7 +228,7 @@ public class Order extends BaseTimeEntity {
 
         //주문이 구매 요청 상태인지 확인
         if(!this.getOrderStatus().equals(OrderStatus.REQUESTED)){
-            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+            throw new OrderCustomException(ErrorMessage.CANNOT_REJECT_ORDER);
         }
 
         //주문 거절 처리
@@ -248,7 +248,7 @@ public class Order extends BaseTimeEntity {
 
         //주문이 구매 요청 상태인지 확인
         if(!this.getOrderStatus().equals(OrderStatus.REQUESTED)){
-            throw new OrderCustomException(ErrorMessage.CANNOT_CANCEL_ORDER);
+            throw new OrderCustomException(ErrorMessage.CANNOT_ACCEPT_ORDER);
         }
 
         //주문 확인 처리
@@ -258,6 +258,48 @@ public class Order extends BaseTimeEntity {
         escrowHolding();
 
 
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 주문 구매 확정 처리
+     * 판매자에게 결제대금이 입금되며 에스크로 해제 상태로 변경
+     * 판매자의 상점 거래 수 1 증가
+     */
+    public Long confirmOrder(){
+
+        //주문이 구매 확인 상태인지 확인
+        if(!this.getOrderStatus().equals(OrderStatus.ACCEPT)){
+            throw new OrderCustomException(ErrorMessage.CANNOT_CONFIRM_ORDER);
+        }
+
+        //구매 확정 처리
+        this.orderStatus=OrderStatus.CONFIRM;
+
+        //판매자 상점의 거래 수 증가
+        this.item.getStore().plusTradeCount();
+
+        //배송 완료 처리
+        this.delivery.finishDelivery();
+
+        //에스크로 결제 대금 해제 처리
+        escrowReleased();
+
+        //상품 가격의 5프로 만큼 구매자의 포인트 충전
+        Long chargePoint = this.itemPrice * 5 / 100;
+        this.buyer.chargeGPoint(chargePoint);
+
+        return chargePoint;
+
+    }
+
+    //==에스크로 결제 대금 해제 처리 로직==//
+    private void escrowReleased() {
+        //판매자의 건 머니 충전
+        this.seller.chargeGMoney(this.totalPrice);
+
+        //에스크로 상태를 해제로 변경 (판매자에게 결제 대금이 입금됨)
+        this.escrowStatus=EscrowStatus.RELEASED;
     }
 
     //=에스크로 결제 대금 홀딩 처리 로직==//

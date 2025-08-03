@@ -2,12 +2,9 @@ package gmart.gmart.service.order;
 
 import gmart.gmart.domain.*;
 import gmart.gmart.domain.enums.*;
-import gmart.gmart.dto.RefundOrderRequestDto;
+import gmart.gmart.domain.log.GPointChargeLog;
 import gmart.gmart.dto.adminmessage.CreateAdminMessageRequestDto;
-import gmart.gmart.dto.delivery.TrackingNumberRequestDto;
-import gmart.gmart.dto.inquiry.InquiryListResponseDto;
 import gmart.gmart.dto.order.BuyerOrderListResponseDto;
-import gmart.gmart.dto.order.CancelOrderRequestDto;
 import gmart.gmart.dto.order.CreateOrderRequestDto;
 import gmart.gmart.dto.order.SellerOrderListResponseDto;
 import gmart.gmart.dto.page.PagedResponseDto;
@@ -17,6 +14,7 @@ import gmart.gmart.repository.order.OrderRepository;
 import gmart.gmart.service.admin.AdminMessageService;
 import gmart.gmart.service.delivery.DeliveryService;
 import gmart.gmart.service.gmoney.GMoneyLogService;
+import gmart.gmart.service.gpoint.GPointChargeService;
 import gmart.gmart.service.gpoint.GPointLogService;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
@@ -42,6 +40,7 @@ public class OrderService {
     private final AdminMessageService adminMessageService;//관리자 메시지 서비스
     private final GMoneyLogService gMoneyLogService; //건머니 거래 로그 서비스
     private final GPointLogService gPointLogService; //건포인트 거래 로그 서비스
+    private final GPointChargeService gPointChargeService;//건포인트 충전 서비스
     private final DeliveryService deliveryService;//배송 서비스
 
     private final OrderRepository orderRepository; //주문 레파지토리
@@ -175,7 +174,15 @@ public class OrderService {
     }
 
 
-    //구매 신청 수락
+
+    /**
+     * [서비스 로직]
+     * 구매 신청 수락
+     * 메시지 생성
+     * 건머니 로그 생성
+     * 건포인트 로그 생성
+     * @param orderId 주문 아이디
+     */
     @Transactional
     public void acceptOrder(Long orderId){
 
@@ -196,7 +203,33 @@ public class OrderService {
 
     }
 
+    /**
+     * [서비스 로직]
+     * 구매자가 구매 확정 처리
+     * 메시지 생성
+     * 건머니 로그 생성
+     * @param orderId 주문 아이디
+     */
+    @Transactional
+    public void confirmOrder(Long orderId){
 
+        //현재 로그인한 회원 (구매자)
+        Member buyer = memberService.findBySecurityContextHolder();
+
+        //주문 조회
+        Order order = findById(orderId);
+
+        //판매자 조회
+        Member seller = order.getSeller();
+
+        //현재 로그인한 회원이 주문의 구매자인지 확인
+        validateOrderBuyer(order, buyer);
+
+        //구매 확정 처리 로직
+        processOrderConfirm(seller, order, buyer);
+
+
+    }
 
     /**
      * [생성]
@@ -264,22 +297,21 @@ public class OrderService {
 
     }
 
-    //==로그 생성 로직==//
-    private void createLog(String description,Member buyer, Order order, Long beforeGMoney, Long afterGMoney, Long beforeGPoint, Long afterGPoint) {
 
-
+    //==건머니 로그 생성 로직==//
+    private void createGMoneyLog(GMoneyDeltaType gMoneyDeltaType,String description,Member member, Order order, Long beforeGMoney, Long afterGMoney){
         //건머니 로그 생성
-        gMoneyLogService.createLog(buyer, order,
-                GMoneyDeltaType.PURCHASE,description, order.getPaidPrice(), beforeGMoney, afterGMoney);
-
-        //만약 건포인트에 변화가 있다면
-        if(!beforeGPoint.equals(afterGPoint)){
-            //건포인트 로그 생성
-            gPointLogService.createLog(buyer, order,
-                    GPointDeltaType.PURCHASE,description, order.getUsedPoint(), beforeGPoint, afterGPoint);
-        }
-
+        gMoneyLogService.createLog(member, order,
+                GMoneyDeltaType.PURCHASE, description, order.getPaidPrice(), beforeGMoney, afterGMoney);
     }
+
+    //==건포인트 로그 생성 로직==//
+    private void createGPointLog(GPointDeltaType gPointDeltaType, String description,Member member, Order order, Long beforeGPoint, Long afterGPoint){
+        //건포인트 로그 생성
+        gPointLogService.createLog(member, order,
+                GPointDeltaType.PURCHASE, description, order.getUsedPoint(), beforeGPoint, afterGPoint);
+    }
+
 
     //==현재 로그인한 회원이 주문의 판매자인지 확인 하는 로직==//
     private void validateOrderSeller(Member seller, Order order) {
@@ -374,7 +406,17 @@ public class OrderService {
 
         //구매자의 건머니 , 건포인트 로그 생성
         String logDescription= "상품 구매";
-        createLog(logDescription, buyer, order,beforeGMoney,afterGMoney,beforeGPoint,afterGPoint);
+
+        //건머니 로그 생성
+        createGMoneyLog(GMoneyDeltaType.PURCHASE,logDescription,buyer,order,beforeGMoney,afterGMoney);
+
+        //만약 건포인트에 변화량 있다면 -> 건포인트를 사용했다면 -> 건포인트 로그 생성
+        if (!beforeGPoint.equals(afterGPoint)) {
+            createGPointLog(GPointDeltaType.PURCHASE,logDescription,buyer,order,beforeGPoint,afterGPoint);
+
+        }
+
+
     }
 
 
@@ -383,6 +425,43 @@ public class OrderService {
         Delivery delivery = Delivery.create(buyer);
         order.setDelivery(delivery);
         deliveryService.save(delivery);
+    }
+
+    //==구매 확정 처리 로직==//
+    private void processOrderConfirm(Member seller, Order order, Member buyer) {
+        //구매 확정 전의 판매자의 건머니
+        Long beforeGMoney = seller.getGMoney();
+
+        //구매 확정 전의 구매자의 건포인트
+        Long beforeGPoint = buyer.getGPoint();
+
+        //주문 구매 확정 처리
+        Long chargedPoint = order.confirmOrder();
+
+        //메시지 생성
+        String buyerMessage= seller.getNickname() + " 에게 구매 확정 알림을 보냈습니다.";
+        String sellerMessage= buyer.getNickname()+" 님이 구매 확정 처리를 하엿습니다.";
+        createMessage(buyer,buyerMessage, seller,sellerMessage);
+
+        //구매 확정 후의 판매자의 건머니
+        Long afterGMoney = seller.getGMoney();
+
+        //구매 확정 후의 구매자의 건포인트
+        Long afterGPoint = buyer.getGPoint();
+
+        String logDescription= "구매 확정";
+
+        //판매자의 건머니 로그 생성
+        createGMoneyLog(GMoneyDeltaType.SALE,logDescription,seller,order,beforeGMoney,afterGMoney);
+
+        //구매자의 건포인트 충전 로그 생성
+        createGPointChargeLog(buyer, chargedPoint, beforeGPoint, afterGPoint);
+
+    }
+
+    //==구매자의 건포인트 충전 로그 생성==//
+    private void createGPointChargeLog(Member buyer, Long chargedPoint, Long beforeGPoint, Long afterGPoint) {
+        gPointChargeService.save(GPointChargeLog.create(buyer, ChargeType.DEAL_REWARD, chargedPoint, beforeGPoint, afterGPoint));
     }
 
 }

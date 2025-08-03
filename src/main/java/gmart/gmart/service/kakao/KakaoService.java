@@ -10,6 +10,8 @@ import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.repository.token.KakaoAccessTokenRepository;
 import gmart.gmart.service.member.MemberService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -37,7 +40,8 @@ public class KakaoService {
 
     private final KakaoAccessTokenRepository kakaoAccessTokenRepository; //카카오 엑세스 토큰 레파지토리
 
-
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * [서비스 로직]
@@ -72,6 +76,17 @@ public class KakaoService {
         //회원 로그인 처리
         TokenResponseDto responseDto = memberService.loginMember(loginRequestDto);
 
+        //만약 회원에게 기존의 카카오 엑세스 토큰이 남아있다면
+        KakaoAccessToken kakaoAccessToken = kakaoAccessTokenRepository.findByMemberId(member.getId()).orElse(null);
+
+        if(kakaoAccessToken!=null){
+            //기존 카카오 엑세스 토큰 삭제
+            kakaoAccessTokenRepository.delete(kakaoAccessToken);
+        }
+
+        em.flush();
+        em.clear();
+
         //카카오 엑세스 토큰 저장
         saveKakaoAccessToken(kakaoToken);
 
@@ -85,7 +100,7 @@ public class KakaoService {
         Member loginMember = memberService.findBySecurityContextHolder();
 
         //카카오 엑세스 토큰 저장
-        kakaoAccessTokenRepository.save(KakaoAccessToken.create(loginMember.getId(), kakaoAccessToken));
+        kakaoAccessTokenRepository.save(KakaoAccessToken.create(loginMember, kakaoAccessToken));
     }
 
     //==회원 가입 진행 로직==//

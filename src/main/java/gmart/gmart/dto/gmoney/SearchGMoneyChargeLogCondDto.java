@@ -12,7 +12,7 @@ import lombok.Setter;
 public class SearchGMoneyChargeLogCondDto {
 
     private String year; //년도
-    private ChargeType chargeType;
+    private ChargeType chargeType;//충전 타입
 
 
     /**

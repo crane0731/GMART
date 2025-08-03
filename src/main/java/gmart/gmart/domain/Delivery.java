@@ -78,7 +78,6 @@ public class Delivery extends BaseTimeEntity {
 
         delivery.deliveryStatus=DeliveryStatus.READY;
 
-
         delivery.deleteStatus=DeleteStatus.UNDELETED;
 
         return delivery;
@@ -102,15 +101,7 @@ public class Delivery extends BaseTimeEntity {
         this.deliveryStatus=DeliveryStatus.READY;
     }
 
-    /**
-     * [비즈니스 로직]
-     * 배송 준비 취소
-     */
-    protected void cancelReady(){
-        //검증 로직
-        validateCancelReady();
-        this.deliveryStatus = DeliveryStatus.CANCELED;
-    }
+
 
     /**
      * [비즈니스 로직]

@@ -23,8 +23,9 @@ public class KakaoAccessToken extends BaseTimeEntity {
     private Long id;
 
     @Comment("회원 아이디")
-    @Column(name = "member_id")
-    private Long memberId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Comment("엑세스 토큰")
     @Column(name = "access_token")
@@ -33,13 +34,13 @@ public class KakaoAccessToken extends BaseTimeEntity {
 
     /**
      * [생성 메서드]
-     * @param memberId 회원 아이디
+     * @param member 회원
      * @param accessToken 카카오 엑세스 토큰
      * @return KakaoAccessToken 카카오 엑세스 토큰 엔티티
      */
-    public static KakaoAccessToken create(Long memberId,String accessToken){
+    public static KakaoAccessToken create(Member member,String accessToken){
         KakaoAccessToken kakaoAccessToken= new KakaoAccessToken();
-        kakaoAccessToken.memberId=memberId;
+        kakaoAccessToken.member=member;
         kakaoAccessToken.accessToken=accessToken;
         return kakaoAccessToken;
     }
