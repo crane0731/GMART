@@ -127,8 +127,8 @@ public class GMoneyChargeService {
 
     //==페이징 생성 메서드==//
     private Pageable createPageable(int page) {
-        Pageable pageable = PageRequest.of(page, 10); // 페이지 0, 10개씩 보여줌
-        return pageable;
+        // 페이지 0, 10개씩 보여줌
+        return PageRequest.of(page, 10);
     }
 
 
