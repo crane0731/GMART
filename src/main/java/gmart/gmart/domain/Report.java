@@ -3,12 +3,10 @@ package gmart.gmart.domain;
 import gmart.gmart.domain.baseentity.BaseAuditingEntity;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.ReportStatus;
-import gmart.gmart.domain.enums.ReporterRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 
 /**
  * 신고 테이블
@@ -49,11 +47,6 @@ public class Report extends BaseAuditingEntity {
     @Column(name = "report_status",nullable = false)
     private ReportStatus reportStatus;
 
-    @org.hibernate.annotations.Comment("신고자 역할")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "reporter_role")
-    private ReporterRole reporterRole;
-
 
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
@@ -69,14 +62,13 @@ public class Report extends BaseAuditingEntity {
      * @param reason 신고사유
      * @return ReportItem 상품 신고 엔티티
      */
-    public static Report create(ReporterRole reporterRole,Member reporter, Member reportedMember, Item item, String reason) {
+    public static Report create(Member reporter, Member reportedMember, Item item, String reason) {
         Report reportItem = new Report();
         reportItem.reporter = reporter;
         reportItem.reportedMember = reportedMember;
         reportItem.item = item;
         reportItem.reason = reason;
         reportItem.reportStatus=ReportStatus.WAITING;
-        reportItem.reporterRole=reporterRole;
         reportItem.deleteStatus=DeleteStatus.UNDELETED;
 
         return reportItem;
@@ -96,8 +88,6 @@ public class Report extends BaseAuditingEntity {
     /**
      * [비즈니스 로직]
      * 관리자가 신고 거절
-     * 만약 신고자가 구매자면 -> 상품의 신고수 내림 + 피신고자의 신고수 내림
-     * 만약 신고자가 판매자면 -> 피신고자의 신고수만 내림
      */
     public void reject() {
         if( this.reportStatus!=ReportStatus.REJECTED){
@@ -105,9 +95,7 @@ public class Report extends BaseAuditingEntity {
 
             this.reportedMember.minusReportedCount();
 
-            if (this.reporterRole==ReporterRole.BUYER) {
-                this.item.minusReportCount();
-            }
+            this.item.minusReportCount();
         }
     }
 

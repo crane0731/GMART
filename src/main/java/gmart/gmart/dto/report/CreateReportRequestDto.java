@@ -1,6 +1,5 @@
 package gmart.gmart.dto.report;
 
-import gmart.gmart.domain.enums.ReporterRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -19,8 +18,6 @@ public class CreateReportRequestDto {
     @NotNull(message = "신고 대상 상품 아이디를 입력해주세요")
     private Long itemId; //신고할 상품 아이디
 
-    @NotNull(message = "신고자의 역할을 입력해 주세요 [BUYER/SELLER]")
-    private ReporterRole reporterRole;//신고자 역할
 
     @NotBlank(message = "신고 사유를 작성해주세요.")
     private String reason; //신고 사유

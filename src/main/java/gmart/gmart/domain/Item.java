@@ -65,7 +65,6 @@ public class Item extends BaseAuditingEntity {
     @Column(name = "favorite_count")
     private Long favoriteCount;
 
-
     @org.hibernate.annotations.Comment("신고 받은 수")
     @Column(name = "reported_count")
     private Long reportedCount;

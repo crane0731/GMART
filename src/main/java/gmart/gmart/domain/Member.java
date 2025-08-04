@@ -1,7 +1,6 @@
 package gmart.gmart.domain;
 
 import gmart.gmart.domain.baseentity.BaseTimeEntity;
-import gmart.gmart.domain.enums.MannerGrade;
 import gmart.gmart.domain.enums.MemberRole;
 import gmart.gmart.dto.AddressDto;
 import gmart.gmart.dto.login.SignUpRequestDto;
@@ -63,15 +62,6 @@ public class Member extends BaseTimeEntity {
     @Comment("건포인트")
     @Column(name = "g_point" ,nullable = false)
     private Long gPoint=0L;
-
-    @Comment("매너포인트")
-    @Column(name = "manner_point" ,nullable = false)
-    private Long mannerPoint;
-
-    @Comment("매너 등급")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "manner_grade",nullable = false)
-    private MannerGrade mannerGrade;
 
     @Comment("총 사용한 금액")
     @Column(name = "total_spent",nullable = false)
@@ -163,8 +153,6 @@ public class Member extends BaseTimeEntity {
         member.address = address;
         member.gMoney=0L;
         member.gPoint=0L;
-        member.mannerPoint=25L;
-        member.mannerGrade = MannerGrade.NORMAL;
         member.totalSpent = 0L;
         member.reportedCount = 0L;
         member.reviewedCount = 0L;

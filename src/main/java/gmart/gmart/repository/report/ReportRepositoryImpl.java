@@ -43,9 +43,6 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
             builder.and(report.reportStatus.eq(cond.getStatus()));
         }
 
-        if(cond.getReporterRole()!=null) {
-            builder.and(report.reporterRole.eq(cond.getReporterRole()));
-        }
 
         OrderSpecifier<LocalDateTime> order =
                 cond.getCreatedDateSortType() == CreatedDateSortType.CREATE_DATE_ASC ? report.createdDate.asc() : report.createdDate.desc();

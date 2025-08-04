@@ -19,7 +19,6 @@ public class ReportDetailsResponseDto {
     public Long reporterId; //신고자 아이디
     public String reporterNickname; //신고자 닉네임
     public String reporterLoginId; //신고자 로그인 아이디
-    public String reporterRole; //신고자 역할
 
     public Long reportedMemberId; //피신고자 아이디
     public String reportedMemberNickname; //피신고자 닉네임
@@ -43,7 +42,6 @@ public class ReportDetailsResponseDto {
         dto.setReporterId(report.getReporter().getId());
         dto.setReporterNickname(report.getReporter().getNickname());
         dto.setReporterLoginId(report.getReporter().getLoginId());
-        dto.setReporterRole(report.getReporterRole().toString());
 
         dto.setReportedMemberId(report.getReportedMember().getId());
         dto.setReportedMemberNickname(report.getReportedMember().getNickname());

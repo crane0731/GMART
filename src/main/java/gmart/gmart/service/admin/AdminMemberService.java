@@ -8,15 +8,16 @@ import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.MemberSuspensionRequestDto;
 import gmart.gmart.dto.mybatis.MemberListResponseDto;
 import gmart.gmart.dto.mybatis.SearchMemberListDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.exception.CustomException;
 import gmart.gmart.exception.ErrorMessage;
-import gmart.gmart.repository.mybatis.MybatisMemberRepository;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.member.MemberSuspensionService;
 import gmart.gmart.service.token.RefreshTokenService;
 import gmart.gmart.service.image.UploadMemberProfileImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +37,36 @@ public class AdminMemberService {
     private final UploadMemberProfileImageService profileImageService;
     private final RefreshTokenService refreshTokenService;
     private final MemberSuspensionService memberSuspensionService;
-    private final MybatisMemberRepository mybatisMemberRepository;
+
 
     /**
-     * 조건에 따른 회원 리스트 조회
-     * @param requestDto 필터링 조회 요청 DTO
-     * @return 회원 리스트
+     * [서비스 로직]
+     * 검색 조건에 따른 회원 리스트 조회
+     * @param cond 검색 조건
+     * @param page 페이지 번호
+     * @return PagedResponseDto<MemberListResponseDto>
      */
-    public List<MemberListResponseDto> findAll(SearchMemberListDto requestDto){
+    public PagedResponseDto<MemberListResponseDto> findAll(SearchMemberListDto cond, int page){
 
-        return mybatisMemberRepository.findAll(requestDto);
+        Page<Member> pageList = memberService.findAllByCond(cond, page);
+        List<MemberListResponseDto> content = pageList.getContent().stream().map(MemberListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+
+    }
+
+    //==페이징 응답 DTO 생성==//
+    private PagedResponseDto<MemberListResponseDto> createPagedResponseDto(List<MemberListResponseDto> content, Page<Member> page) {
+        return PagedResponseDto.<MemberListResponseDto>builder()
+                .content(content)
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .build();
+
     }
 
 

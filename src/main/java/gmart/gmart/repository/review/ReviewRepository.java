@@ -3,12 +3,10 @@ package gmart.gmart.repository.review;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
 import gmart.gmart.domain.Review;
-import gmart.gmart.domain.enums.DeleteStatus;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 /**

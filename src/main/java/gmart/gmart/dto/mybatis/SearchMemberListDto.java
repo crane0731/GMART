@@ -21,4 +21,22 @@ public class SearchMemberListDto {
     private MemberSortType sortType; //suspension_count,reported_count,manner_point,total_spent
     private SortDirection sortDirection; //ASC, DESC
 
+
+    /**
+     * [생성 메서드]
+     * @param nickname 닉네임
+     * @param loginId 로그인 아이디
+     * @param sortType 정렬 타입
+     * @param sortDirection 정렬 방향
+     * @return SearchMemberListDto
+     */
+    public static SearchMemberListDto create(String nickname, String loginId, MemberSortType sortType, SortDirection sortDirection) {
+        SearchMemberListDto dto = new SearchMemberListDto();
+        dto.setNickname(nickname);
+        dto.setLoginId(loginId);
+        dto.setSortType(sortType);
+        dto.setSortDirection(sortDirection);
+        return dto;
+    }
+
 }

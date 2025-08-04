@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * 회원 리포지토리
  */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>,MemberRepositoryCustom {
 
     /**
      * 로그인아이디로 회원 조회

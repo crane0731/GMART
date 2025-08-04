@@ -6,6 +6,8 @@ import gmart.gmart.dto.login.LoginRequestDto;
 import gmart.gmart.dto.login.SignUpRequestDto;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.UpdateMemberInfoRequestDto;
+import gmart.gmart.dto.mybatis.MemberListResponseDto;
+import gmart.gmart.dto.mybatis.SearchMemberListDto;
 import gmart.gmart.dto.password.ChangePasswordRequestDto;
 import gmart.gmart.dto.token.TokenResponseDto;
 import gmart.gmart.exception.CustomException;
@@ -21,6 +23,9 @@ import gmart.gmart.service.redis.TokenBlackListService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -218,6 +223,22 @@ public class MemberService {
 
     }
 
+    /**
+     * [조회]
+     * 검색 조건에 따른 회원 페이징 조회
+     * @param cond 검색 조건
+     * @param page 페이지 번호
+     * @return Page<Member>
+     */
+    public Page<Member> findAllByCond(SearchMemberListDto cond, int page){
+        return memberRepository.findAllByCond(cond, createPageable(page));
+    }
+
+    //==페이징 생성 메서드==//
+    private Pageable createPageable(int page) {
+        // 페이지 0, 10개씩 보여줌
+        return PageRequest.of(page, 10);
+    }
 
     /**
      * Login ID를 통해 회원을 조회

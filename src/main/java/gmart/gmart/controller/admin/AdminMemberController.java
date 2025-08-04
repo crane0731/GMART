@@ -2,10 +2,13 @@ package gmart.gmart.controller.admin;
 
 
 import gmart.gmart.dto.api.ApiResponse;
+import gmart.gmart.dto.enums.MemberSortType;
+import gmart.gmart.dto.enums.SortDirection;
 import gmart.gmart.dto.member.MemberInfoResponseDto;
 import gmart.gmart.dto.member.MemberSuspensionRequestDto;
 import gmart.gmart.dto.mybatis.MemberListResponseDto;
 import gmart.gmart.dto.mybatis.SearchMemberListDto;
+import gmart.gmart.dto.page.PagedResponseDto;
 import gmart.gmart.service.admin.AdminMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -88,17 +91,26 @@ public class AdminMemberController {
 
     }
 
+
     /**
-     * 관리자가 회원 전체를 조회하는 컨트롤러
-     * @param requestDto 필터링 조회 요청 DTO
-     * @return 회원 리스트
+     * [컨트롤러]
+     * 관리자가 검색 조건에 따라 회원 전체를 조회하는 컨트롤러
+     * @param nickname 닉네임
+     * @param loginId 로그인 아이디
+     * @param sortType 정렬 타입
+     * @param sortDirection 정렬 방향
+     * @param page 페이지 번호
+     * @return PagedResponseDto<MemberListResponseDto>
      */
     @GetMapping("")
-    public ResponseEntity<ApiResponse<?>> findAll(@RequestBody SearchMemberListDto requestDto){
+    public ResponseEntity<ApiResponse<?>> findAll(@RequestParam (value = "nickname" , required = false) String nickname,
+                                                  @RequestParam (value = "loginId",required = false)String loginId,
+                                                  @RequestParam(value = "sortType", required = false) MemberSortType sortType,
+                                                  @RequestParam(value = "sortDirection",required = false) SortDirection sortDirection,
+                                                  @RequestParam(value = "page",defaultValue = "0") int page
+                                                  ){
 
-        List<MemberListResponseDto> responseDtos = adminMemberService.findAll(requestDto);
-
-        return ResponseEntity.ok(ApiResponse.success(responseDtos));
+        return ResponseEntity.ok(ApiResponse.success(adminMemberService.findAll(SearchMemberListDto.create(nickname, loginId, sortType, sortDirection), page)));
     }
 
 
