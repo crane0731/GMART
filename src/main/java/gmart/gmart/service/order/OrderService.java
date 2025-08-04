@@ -232,6 +232,16 @@ public class OrderService {
     }
 
     /**
+     * [조회]
+     * 주문 확정 처리된 주문들만 조회 + 페이징 처리
+     * @param page 페이지 번호
+     * @return Page<Order>
+     */
+    public Page<Order> findAllByOrderStatus(int page){
+        return orderRepository.findAllByOrderStatus(OrderStatus.CONFIRM,DeleteStatus.UNDELETED, createPageable(page));
+    }
+
+    /**
      * [생성]
      * @param order 주문 엔티티
      */
@@ -249,6 +259,44 @@ public class OrderService {
     public Order findById(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(()-> new OrderCustomException(ErrorMessage.NOT_FOUND_ORDER));
     }
+
+    /**
+     * [조회]
+     * 구매 확정 상태의 상품(주문)의 수
+     * @return Long
+     */
+    public Long countItemsByOrderStatus(){
+        return orderRepository.countItemsByOrderStatus(OrderStatus.CONFIRM,DeleteStatus.UNDELETED);
+    }
+
+    /**
+     * [조회]
+     * 거래된 전체 상품(주문)의 건머니 가격
+     * @return Long
+     */
+    public Long findTotalGMoneyByOrderStatus(){
+        return orderRepository.findTotalGMoneyByOrderStatus(OrderStatus.CONFIRM,DeleteStatus.UNDELETED);
+    }
+
+    /**
+     * [조회]
+     * 실제 지불된 전체 건머니 금액
+     * @return Long
+     */
+    public Long findTotalPaidGMoneyByOrderStatus(){
+        return orderRepository.findTotalPaidGMoneyByOrderStatus(OrderStatus.CONFIRM,DeleteStatus.UNDELETED);
+    }
+
+    /**
+     * [조회]
+     * 거래에 사용된 건포인트 금액
+     * @return Long
+     */
+    public Long findTotalUsedGPointByOrderStatus(){
+        return orderRepository.findTotalUsedGPointByOrderStatus(OrderStatus.CONFIRM,DeleteStatus.UNDELETED);
+    }
+
+
 
     //==주문 처리 로직==//
     private void processOrder(CreateOrderRequestDto requestDto, Member buyer, Member seller, Item item) {
