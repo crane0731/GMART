@@ -68,6 +68,7 @@ public class MemberSuspension extends BaseAuditingEntity {
      */
     public void releaseMemberActiveStatus(){
         this.memberActiveStatus=MemberActiveStatus.RELEASE;
+        this.endAt=LocalDateTime.now();
     }
 
 }
