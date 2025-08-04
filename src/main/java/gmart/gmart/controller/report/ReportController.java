@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/gmart/report")
-public class ReportController {
+public class    ReportController {
 
     private final ReportService reportItemService; //신고 상품 서비스
 

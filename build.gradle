@@ -41,8 +41,6 @@ dependencies {
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	//MyBatis 스프링 부트 3.0 추가
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
 	//Querydsl 추가
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

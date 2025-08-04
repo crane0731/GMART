@@ -3,9 +3,9 @@ package gmart.gmart.repository.image;
 import gmart.gmart.domain.UploadedImage;
 import gmart.gmart.domain.enums.ImageDefaultStatus;
 import gmart.gmart.domain.enums.UploadPurpose;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,5 +30,5 @@ public interface UploadedImageRepository extends JpaRepository<UploadedImage,Lon
     List<UploadedImage> findByIsUsedFalse();
 
     @Query("SELECT u FROM UploadedImage u where u.defaultStatus=:defaultStatus and u.purpose=:uploadPurpose")
-    Optional<UploadedImage>findDefaultMemberProfileImage(@Param("defaultStatus") ImageDefaultStatus defaultStatus ,@Param("uploadPurpose") UploadPurpose uploadPurpose);
+    Optional<UploadedImage>findDefaultMemberProfileImage(@Param("defaultStatus") ImageDefaultStatus defaultStatus , @Param("uploadPurpose") UploadPurpose uploadPurpose);
 }

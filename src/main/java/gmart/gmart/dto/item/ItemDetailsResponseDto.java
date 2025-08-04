@@ -20,6 +20,8 @@ import java.util.List;
 @Setter
 public class ItemDetailsResponseDto {
 
+    private Long memberId;//판매자 아이디
+
     private Long storeId;// 상점 아이디
     private String storeName;// 상점 이름
     private String storeProfileImage;//상점 프로필 이미지
@@ -62,6 +64,7 @@ public class ItemDetailsResponseDto {
 
         ItemDetailsResponseDto dto = new ItemDetailsResponseDto();
 
+        dto.setMemberId(item.getStore().getMember().getId());
         dto.setStoreId(item.getStore().getId());
         dto.setStoreName(item.getStore().getName());
         dto.setStoreProfileImage(item.getStore().getStoreProfileImage().getImageUrl());

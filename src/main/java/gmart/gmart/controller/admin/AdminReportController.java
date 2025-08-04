@@ -1,7 +1,6 @@
 package gmart.gmart.controller.admin;
 
 import gmart.gmart.domain.enums.ReportStatus;
-import gmart.gmart.domain.enums.ReporterRole;
 import gmart.gmart.dto.api.ApiResponse;
 import gmart.gmart.dto.enums.CreatedDateSortType;
 import gmart.gmart.dto.page.PagedResponseDto;
@@ -58,17 +57,15 @@ public class AdminReportController {
      * [컨트롤러]
      * 관리자 신고 목록 리스트 조회
      * @param status 신고 처리 상태
-     * @param reporterRole 신고자 역할
      * @param createdDateSortType 날짜 정렬 타입
      * @return PagedResponseDto<ReportListResponseDto> 응답 DTO
      */
     @GetMapping("")
     public ResponseEntity<ApiResponse<?>> getAllReports(@RequestParam(value = "status",required = false) ReportStatus status,
-                                                        @RequestParam(value = "reporterRole",required = false)ReporterRole reporterRole,
                                                         @RequestParam(value = "createdDateSortType") CreatedDateSortType createdDateSortType
                                                         ) {
         
-        SearchReportCondDto condDto = SearchReportCondDto.create(status, reporterRole, createdDateSortType);
+        SearchReportCondDto condDto = SearchReportCondDto.create(status, createdDateSortType);
         PagedResponseDto<ReportListResponseDto> responseDtos = adminReportService.getAllReports(condDto);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));

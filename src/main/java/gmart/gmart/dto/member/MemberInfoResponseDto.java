@@ -23,8 +23,6 @@ public class MemberInfoResponseDto {
 
     private Long gMoney; //g머니
     private Long gPoint; //g포인트
-    private Long mannerPoint; //매너포인트
-    private String mannerGrade; //매너등급
 
 
     private Long totalSpent; //총 사용 금액
@@ -53,8 +51,7 @@ public class MemberInfoResponseDto {
 
         dto.setGMoney(member.getGMoney());
         dto.setGPoint(member.getGPoint());
-        dto.setMannerPoint(member.getMannerPoint());
-        dto.setMannerGrade(member.getMannerGrade().toString());
+
 
         dto.setTotalSpent(member.getTotalSpent());
         dto.setReportedCount(member.getReportedCount());

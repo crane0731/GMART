@@ -3,9 +3,7 @@ package gmart.gmart.service.report;
 import gmart.gmart.domain.Item;
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Report;
-import gmart.gmart.domain.enums.ReporterRole;
 import gmart.gmart.dto.report.CreateReportRequestDto;
-import gmart.gmart.dto.report.ReportListResponseDto;
 import gmart.gmart.dto.report.SearchReportCondDto;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ItemCustomException;
@@ -14,13 +12,10 @@ import gmart.gmart.repository.report.ReportRepository;
 import gmart.gmart.service.item.ItemService;
 import gmart.gmart.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * 상품 신고 서비스
@@ -54,7 +49,7 @@ public class ReportService {
         Member reportedMember = memberService.findById(requestDto.getReportedMemberId());
 
         //검증 로직
-        validateLogic(requestDto, reporter, reportedMember, item);
+        validateLogic(reporter, reportedMember, item);
 
         //상품 신고 로직 진행
         processReport(requestDto, reporter, reportedMember, item);
@@ -104,25 +99,24 @@ public class ReportService {
     }
 
     //==검증 로직==//
-    private void validateLogic(CreateReportRequestDto requestDto, Member reporter, Member reportedMember, Item item) {
+    private void validateLogic( Member reporter, Member reportedMember, Item item) {
         //만약 이미 같은 신고 내용이 있는지 확인
-        validateExistsReport(requestDto, reporter, reportedMember, item);
+        validateExistsReport(reporter, reportedMember, item);
 
         //신고자와 피신고자가 같은지 확인
         validateReporterEqualsReportedMember(reporter, reportedMember);
 
-        //만약 신고자가 구매자 라면
-        if(requestDto.getReporterRole().equals(ReporterRole.BUYER)){
-            //신고할 상품이 피신고자의 상품인지 확인
-            validateItemOwner(item, reportedMember);
-        }
+
+        //신고할 상품이 피신고자의 상품인지 확인
+        validateItemOwner(item, reportedMember);
+
     }
 
 
     //==상품 신고 로직==//
     private void processReport(CreateReportRequestDto requestDto, Member reporter, Member reportedMember, Item item) {
         //상품 신고 객체 생성
-        Report report = Report.create(requestDto.getReporterRole(),reporter, reportedMember, item, requestDto.getReason());
+        Report report = Report.create(reporter, reportedMember, item, requestDto.getReason());
 
         //상품 신고 저장
         save(report);
@@ -150,8 +144,8 @@ public class ReportService {
     }
 
     //==만약 이미 같은 신고 내용이 있는지 확인 하는 로직==//
-    private void validateExistsReport(CreateReportRequestDto requestDto, Member reporter, Member reportedMember, Item item) {
-        Boolean exists = reportRepository.existsByReporterAndReportedMemberAndItemAndReporterRole(reporter, reportedMember, item, requestDto.getReporterRole());
+    private void validateExistsReport( Member reporter, Member reportedMember, Item item) {
+        Boolean exists = reportRepository.existsByReporterAndReportedMemberAndItem(reporter, reportedMember, item);
         if(exists) {
             throw new ReportCustomException(ErrorMessage.ALREADY_REPORT);
         }

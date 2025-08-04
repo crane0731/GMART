@@ -15,7 +15,6 @@ public class StoreResponseDto {
     private String memberLoginId;
     private String memberNickname;
     private String memberPhone;
-    private String memberMannerGrade;
     private String memberRole;
     private String memberProfileImageUrl;
     private Long memberSuspensionCount;
@@ -45,7 +44,6 @@ public class StoreResponseDto {
         dto.memberLoginId = store.getMember().getLoginId();
         dto.memberNickname = store.getMember().getNickname();
         dto.memberPhone = store.getMember().getPhoneNumber();
-        dto.memberMannerGrade=store.getMember().getMannerGrade().toString();
         dto.memberRole=store.getMember().getMemberRole().toString();
         dto.memberProfileImageUrl=store.getMember().getProfileImageUrl();
         dto.memberSuspensionCount=store.getMember().getSuspensionCount();

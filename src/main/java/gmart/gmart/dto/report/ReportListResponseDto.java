@@ -15,7 +15,6 @@ public class ReportListResponseDto {
     private Long reporterId; //신고자 아이디
     private Long reportedMemberId; //피신고자 아이디
     private Long itemId; //상품 아이디
-    private String reporterRole; //신고자 역할
     private String reportStatus;//신고 처리 상태
 
 
@@ -30,7 +29,6 @@ public class ReportListResponseDto {
         dto.setReporterId(report.getReporter().getId());
         dto.setReportedMemberId(report.getReportedMember().getId());
         dto.setItemId(report.getItem().getId());
-        dto.setReporterRole(report.getReporterRole().toString());
         dto.setReportStatus(report.getReportStatus().toString());
         return dto;
     }
