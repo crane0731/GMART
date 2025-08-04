@@ -252,4 +252,35 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
+
+    @Override
+    public Page<Item> findAllByGundams(List<Gundam> gundams, Pageable pageable) {
+
+        QItem item = QItem.item;
+        QItemGundam itemGundam = QItemGundam.itemGundam;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(item.deleteStatus.eq(DeleteStatus.UNDELETED));
+
+        List<Item> content = query.select(item)
+                .from(item)
+                .leftJoin(item.itemGundams, itemGundam).fetchJoin()
+                .where(builder.and(itemGundam.gundam.in(gundams)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = query
+                .select(item.count())
+                .from(item)
+                .join(item.itemGundams, itemGundam)
+                .where(builder.and(itemGundam.gundam.in(gundams)))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+
+    }
+
+
 }

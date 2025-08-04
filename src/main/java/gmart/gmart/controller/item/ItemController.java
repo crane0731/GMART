@@ -119,6 +119,23 @@ public class ItemController {
 
     }
 
+
+    /**
+     * [컨트롤러]
+     * 로그인한 회원의 관심 건담에 해당되는 상품목록을 조회
+     * @param page 페이지 번호
+     * @return PagedResponseDto<ItemListResponseDto>
+     */
+    @GetMapping("/favorite-gundams")
+    public ResponseEntity<ApiResponse<?>> getAllItemsByMemberFavoriteGundams(@RequestParam(value = "page", defaultValue = "0") int page
+    ) {
+
+        return ResponseEntity.ok().body(ApiResponse.success(itemService.getItemsByMemberFavoriteGundams(page)));
+
+    }
+
+
+
     /**
      * [컨트롤러]
      * 검색 조건에 따라 상품 목록 조회

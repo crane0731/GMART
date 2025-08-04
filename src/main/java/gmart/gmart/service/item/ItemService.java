@@ -40,7 +40,7 @@ public class ItemService {
 
 
     /**
-     * [비즈니스 로직]
+     * [서비스 로직]
      * 상품 판매 상태 변경
      * @param itemId 상품 아이디
      * @param requestDto 판매 상태 변경 요청 DTO
@@ -197,6 +197,29 @@ public class ItemService {
         return createPagedResponseDto(content,pageList);
 
     }
+
+    /**
+     * [서비스 로직]
+     * 로그인한 회원의 관심 건담에 해당되는 상품목록을 조회
+     * @param page 페이지 번호
+     * @return PagedResponseDto<ItemListResponseDto>
+     */
+    public PagedResponseDto<ItemListResponseDto> getItemsByMemberFavoriteGundams(int page) {
+
+        //현재 로그인한 회원 조회
+        Member member = memberService.findBySecurityContextHolder();
+
+        //회원 관심 건담 -> 건담 리스트 조회
+        List<Gundam> gundams = member.getFavoriteGundams().stream().map(FavoriteGundam::getGundam)
+                .toList();
+
+        Page<Item> pageList = itemRepository.findAllByGundams(gundams, createPageable(page));
+
+        List<ItemListResponseDto> content = pageList.getContent().stream().map(ItemListResponseDto::create).toList();
+
+        return createPagedResponseDto(content,pageList);
+    }
+
 
     //==페이징 응답 DTO 생성==//
     private PagedResponseDto<ItemListResponseDto> createPagedResponseDto(List<ItemListResponseDto> content, Page<Item> page) {
