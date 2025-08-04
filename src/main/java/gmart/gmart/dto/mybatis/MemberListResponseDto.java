@@ -22,6 +22,7 @@ public class MemberListResponseDto {
     private Long suspensionCount;
     private Long reportedCount;
     private Long totalSpent;
+
     private String createdDate;
 
     /**

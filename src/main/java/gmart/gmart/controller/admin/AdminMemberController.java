@@ -9,7 +9,9 @@ import gmart.gmart.dto.member.MemberSuspensionRequestDto;
 import gmart.gmart.dto.mybatis.MemberListResponseDto;
 import gmart.gmart.dto.mybatis.SearchMemberListDto;
 import gmart.gmart.dto.page.PagedResponseDto;
+import gmart.gmart.dto.suspension.MemberSuspensionListResponseDto;
 import gmart.gmart.service.admin.AdminMemberService;
+import gmart.gmart.service.member.MemberSuspensionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +29,28 @@ import java.util.Map;
 @RequestMapping("/api/gmart/admin/members")
 public class AdminMemberController {
 
-    private final AdminMemberService adminMemberService;
+    private final AdminMemberService adminMemberService; //관리자 회원 서비스
+    private final MemberSuspensionService memberSuspensionService;  //회원 계정 정지 서비스
 
     /**
-     * 관리자가 회원 상세 조회
-     * @param id 회원 아이디(PK)
-     * @return MemberInfoResponseDto 회원 상세 정보를 담은 DTO
+     * [컨트롤러]
+     * 관리자가 특정 회원의 계정 정지 내역 목록을 조회
+     * @param id 회원 아이디
+     * @return List<MemberSuspensionListResponseDto>
      */
+    @GetMapping("/{id}/suspension")
+    public ResponseEntity<ApiResponse<?>> findMemberSuspension(@PathVariable("id") Long id) {
+
+        return ResponseEntity.ok(ApiResponse.success(memberSuspensionService.findAll(id)));
+
+    }
+
+
+        /**
+         * 관리자가 회원 상세 조회
+         * @param id 회원 아이디(PK)
+         * @return MemberInfoResponseDto 회원 상세 정보를 담은 DTO
+         */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> findMemberDetailInfo(@PathVariable("id") Long id){
 

@@ -2,6 +2,8 @@ package gmart.gmart.service.member;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.MemberSuspension;
+import gmart.gmart.domain.enums.MemberActiveStatus;
+import gmart.gmart.dto.suspension.MemberSuspensionListResponseDto;
 import gmart.gmart.repository.suspension.MemberSuspensionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 회원 계정 일시 정지 서비스
@@ -21,6 +24,19 @@ import java.time.LocalDateTime;
 public class MemberSuspensionService {
 
     private final MemberSuspensionRepository memberSuspensionRepository;
+
+
+    /**
+     * [서비스 로직]
+     * 회원 정지 내역 목록 조회
+     * @param memberId 회원 아이디
+     * @return List<MemberSuspensionListResponseDto>
+     */
+    public List<MemberSuspensionListResponseDto> findAll(Long memberId){
+        return memberSuspensionRepository.findByMemberId(memberId).stream().map(MemberSuspensionListResponseDto::create).toList();
+    }
+
+
 
     /**
      * 저장
@@ -45,7 +61,7 @@ public class MemberSuspensionService {
      * @return
      */
     public boolean isCurrentlySuspended(Member member) {
-        return memberSuspensionRepository.existsActiveSuspension(member.getId(), LocalDateTime.now());
+        return memberSuspensionRepository.existsActiveSuspension(member.getId(), LocalDateTime.now(), MemberActiveStatus.ACTIVE);
     }
 
 
