@@ -53,7 +53,6 @@ public class Review extends BaseAuditingEntity {
     @Column(name = "rating")
     private Long rating;
 
-
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
@@ -76,6 +75,8 @@ public class Review extends BaseAuditingEntity {
         review.setReviewee(reviewee);
 
         review.order = order;
+        order.reviewedOrder();
+
         review.content = content;
         review.reviewType = reviewType;
         review.rating = rating;

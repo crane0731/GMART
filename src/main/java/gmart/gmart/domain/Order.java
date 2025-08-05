@@ -77,6 +77,11 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private EscrowStatus escrowStatus;
 
+    @org.hibernate.annotations.Comment("리뷰 상태")
+    @Column(name = "review_status")
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
     @org.hibernate.annotations.Comment("삭제 상태")
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status")
@@ -125,6 +130,7 @@ public class Order extends BaseTimeEntity {
         }
 
         order.escrowStatus= EscrowStatus.NONE;
+        order.reviewStatus=ReviewStatus.NOT_REVIEWED;
         order.deleteStatus = DeleteStatus.UNDELETED;
 
         return order;
@@ -199,6 +205,14 @@ public class Order extends BaseTimeEntity {
     public void setSeller(Member seller) {
         this.seller = seller;
         seller.getSaleOrders().add(this);
+    }
+
+    /**
+     * [비즈니스 로직]
+     * 리뷰상태를 리뷰완료 상태로 변경
+     */
+    public void reviewedOrder(){
+        this.reviewStatus=ReviewStatus.REVIEWED;
     }
 
 

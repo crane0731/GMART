@@ -70,25 +70,25 @@ public class AdminReportService {
      * @param condDto 검색 조건 DTO
      * @return PagedResponseDto<ReportListResponseDto> 페이징 응답 DTO
      */
-    public PagedResponseDto<ReportListResponseDto> getAllReports(SearchReportCondDto condDto){
+    public PagedResponseDto<ReportListResponseDto> getAllReports(SearchReportCondDto condDto,int page){
 
-        Page<Report> page = reportService.findAllByCond(condDto, createPageable());
+        Page<Report> pageList = reportService.findAllByCond(condDto, createPageable(page));
 
-        List<ReportListResponseDto> content = page.getContent()
+        List<ReportListResponseDto> content = pageList.getContent()
                 .stream()
                 .map(ReportListResponseDto::create)
                 .toList();
 
-        return createPagedResponseDto(content,page);
+        return createPagedResponseDto(content,pageList);
 
     }
 
 
 
     //==페이징 생성 메서드==//
-    private Pageable createPageable() {
+    private Pageable createPageable(int page) {
         // 페이지 0, 10개씩 보여줌
-        return PageRequest.of(0, 10);
+        return PageRequest.of(page, 10);
     }
 
     //==페이징 응답 DTO 생성==//
