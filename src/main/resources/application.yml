@@ -21,8 +21,7 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 6c510f79687aff15675884e9f2764fb2
-            client-secret: SeoOJlod3Hqmi1zkkWjOwvRuGS8FuPQB
+         
             redirect-uri: http://localhost:8081/api/auth/kakao/callback
             authorization-grant-type: authorization_code
             scope:
