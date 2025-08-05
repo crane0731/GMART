@@ -62,11 +62,11 @@ public class AdminReportController {
      */
     @GetMapping("")
     public ResponseEntity<ApiResponse<?>> getAllReports(@RequestParam(value = "status",required = false) ReportStatus status,
-                                                        @RequestParam(value = "createdDateSortType") CreatedDateSortType createdDateSortType
-                                                        ) {
+                                                        @RequestParam(value = "createdDateSortType") CreatedDateSortType createdDateSortType,
+                                                        @RequestParam(value = "page",defaultValue = "0") int page) {
         
         SearchReportCondDto condDto = SearchReportCondDto.create(status, createdDateSortType);
-        PagedResponseDto<ReportListResponseDto> responseDtos = adminReportService.getAllReports(condDto);
+        PagedResponseDto<ReportListResponseDto> responseDtos = adminReportService.getAllReports(condDto,page);
 
         return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
 

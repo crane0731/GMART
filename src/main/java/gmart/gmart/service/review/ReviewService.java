@@ -6,13 +6,12 @@ import gmart.gmart.domain.Review;
 import gmart.gmart.domain.Store;
 import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.domain.enums.OrderStatus;
+import gmart.gmart.domain.enums.ReviewType;
 import gmart.gmart.dto.page.PagedResponseDto;
-import gmart.gmart.dto.review.CreateReviewRequestDto;
-import gmart.gmart.dto.review.ReviewDetailsResponseDto;
-import gmart.gmart.dto.review.ReviewListResponseDto;
-import gmart.gmart.dto.review.SearchReviewCondDto;
+import gmart.gmart.dto.review.*;
 import gmart.gmart.exception.ErrorMessage;
 import gmart.gmart.exception.ReviewCustomException;
+import gmart.gmart.repository.order.OrderRepository;
 import gmart.gmart.repository.review.ReviewRepository;
 import gmart.gmart.service.member.MemberService;
 import gmart.gmart.service.order.OrderService;
@@ -37,7 +36,6 @@ public class ReviewService {
     private final OrderService orderService;//주문 서비스
 
     private final ReviewRepository reviewRepository; //리뷰 레파지토리
-
 
     /**
      * [서비스 로직]
@@ -103,21 +101,53 @@ public class ReviewService {
 
     /**
      * [서비스 로직]
+     * 주문 아이디(PK)로 리뷰 상세 조회
+     * @param orderId 주문 아이디
+     * @return ReviewDetailsResponseDto
+     */
+    public ReviewDetailsResponseDto getReviewDetailsByOrder(Long orderId){
+        
+        //주문 아이디(PK)을 통해 리뷰를 조회
+        Review review = findByOrderId(orderId);
+
+        //조회한 리뷰가 삭제된 상태인지 확인
+        validateReviewDeleted(review);
+
+        //응답 DTO 생성 + 반환
+        return ReviewDetailsResponseDto.create(review);
+
+    }
+
+
+    /**
+     * [서비스 로직]
      * 자신의 리뷰 조회
      * @param condDto 검색 조건 DTO
-     * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
+     * @return PagedReviewListResponseDto
      */
-    public PagedResponseDto<ReviewListResponseDto> getMyReviews(SearchReviewCondDto condDto){
+    public PagedReviewListResponseDto getMyReviews(SearchReviewCondDto condDto,int page){
 
         //현재 로그인한 회원 조회
         Member member = memberService.findBySecurityContextHolder();
 
-        Page<Review> page = reviewRepository.findByCondByMember(member, condDto, createPageable());
+        //페이징 된 리뷰 리스트 조회
+        Page<Review> pageList = reviewRepository.findByCondByMember(member, condDto, createPageable(page));
 
-        List<ReviewListResponseDto> content = page.getContent().stream().map(ReviewListResponseDto::create).toList();
+        //좋아요 리뷰 수
+        Long goodCount = reviewRepository.countReviewsByReviewType(member, ReviewType.GOOD);
+
+        //별로에요 리뷰 수
+        Long badCount = reviewRepository.countReviewsByReviewType(member, ReviewType.BAD);
+
+        //받은 리뷰 총 평균
+        Long ratingAverage = reviewRepository.totalReviewsByMember(member);
+
+        //응답 리뷰 리스트 DTO  생성
+        List<ReviewListResponseDto> content = pageList.getContent().stream().map(ReviewListResponseDto::create).toList();
 
         //페이징 응답 DTO 생성 + 반환
-        return createPagedResponseDto(content, page);
+        return PagedReviewListResponseDto.create(goodCount,badCount,ratingAverage,content,pageList.getNumber(),
+                pageList.getSize(), pageList.getTotalPages(), pageList.getTotalElements(), pageList.isFirst(), pageList.isLast());
     }
     
 
@@ -128,17 +158,29 @@ public class ReviewService {
      * @param condDto 검색 조건 DTO
      * @return PagedResponseDto<ReviewListResponseDto> 페이징된 응답 DTO 리스트
      */
-    public PagedResponseDto<ReviewListResponseDto>getReviews(Long memberId,SearchReviewCondDto condDto){
+    public PagedReviewListResponseDto getReviews(Long memberId,SearchReviewCondDto condDto,int page){
 
         //회원 조회
         Member member = memberService.findById(memberId);
 
-        Page<Review> page = reviewRepository.findByCondByMember(member, condDto, createPageable());
+        //페이징 된 리뷰 리스트 조회
+        Page<Review> pageList = reviewRepository.findByCondByMember(member, condDto, createPageable(page));
 
-        List<ReviewListResponseDto> content = page.getContent().stream().map(ReviewListResponseDto::create).toList();
+        //좋아요 리뷰 수
+        Long goodCount = reviewRepository.countReviewsByReviewType(member, ReviewType.GOOD);
 
-        //페이징 된 응답 DTO + 반환
-        return createPagedResponseDto(content, page);
+        //별로에요 리뷰 수
+        Long badCount = reviewRepository.countReviewsByReviewType(member, ReviewType.BAD);
+
+        //받은 리뷰 총 평균
+        Long ratingAverage = reviewRepository.totalReviewsByMember(member);
+
+        //응답 리뷰 리스트 DTO  생성
+        List<ReviewListResponseDto> content = pageList.getContent().stream().map(ReviewListResponseDto::create).toList();
+
+        //페이징 응답 DTO 생성 + 반환
+        return PagedReviewListResponseDto.create(goodCount,badCount,ratingAverage,content,pageList.getNumber(),
+                pageList.getSize(), pageList.getTotalPages(), pageList.getTotalElements(), pageList.isFirst(), pageList.isLast());
 
     }
 
@@ -179,6 +221,11 @@ public class ReviewService {
         }
     }
 
+    //==주문 아이디(PK)을 통해 리뷰를 조회==//
+    private Review findByOrderId(Long orderId) {
+        return reviewRepository.findByOrderId(orderId).orElseThrow(() -> new ReviewCustomException(ErrorMessage.NOT_FOUND_REVIEW));
+    }
+
     //==리뷰 생성 로직==//
     private void processCreateReview(CreateReviewRequestDto requestDto, Order order, Member buyer) {
         //주문의 판매자 조회
@@ -196,7 +243,7 @@ public class ReviewService {
         //판매자의 리뷰 받은 수 증가
         seller.plusReviewedCount();
 
-        //판매자 상점의 리뷰 받은 수증가
+        //판매자 상점의 리뷰 받은 수 증가
         store.plusReviewedCount();
 
         //리뷰 저장
@@ -251,8 +298,8 @@ public class ReviewService {
     }
 
     //==페이징 생성 메서드==//
-    private Pageable createPageable() {
-        Pageable pageable = PageRequest.of(0, 10); // 페이지 0, 10개씩 보여줌
+    private Pageable createPageable(int page) {
+        Pageable pageable = PageRequest.of(page, 5); // 페이지 0, 10개씩 보여줌
         return pageable;
     }
 

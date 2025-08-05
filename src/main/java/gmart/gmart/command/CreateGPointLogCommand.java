@@ -2,7 +2,6 @@ package gmart.gmart.command;
 
 import gmart.gmart.domain.Member;
 import gmart.gmart.domain.Order;
-import gmart.gmart.domain.enums.GMoneyDeltaType;
 import gmart.gmart.domain.enums.GPointDeltaType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

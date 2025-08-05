@@ -33,6 +33,7 @@ public class BuyerOrderListResponseDto {
     private Long usedGPoint; //사용 건포인트
 
     private String orderStatus;//주문 상태
+    private String reviewStatus; //리뷰 상태
 
     private String createdAt; //생성일
     private String updatedAt; //수정일
@@ -65,6 +66,8 @@ public class BuyerOrderListResponseDto {
         dto.setUsedGPoint(order.getUsedPoint());
 
         dto.setOrderStatus(order.getOrderStatus().toString());
+        dto.setReviewStatus(order.getReviewStatus().toString());
+
 
         dto.setCreatedAt(DateFormatUtil.DateFormat(order.getCreatedDate()));
         dto.setUpdatedAt(DateFormatUtil.DateFormat(order.getUpdatedDate()));

@@ -51,7 +51,7 @@ public class ReviewController {
 
     /**
      * [컨트롤러]
-     * aaaaa
+     * 리뷰 논리적 삭제
      * @param reviewId 리뷰 아이디
      * @return 성공 메시지
      */
@@ -79,6 +79,18 @@ public class ReviewController {
 
     /**
      * [컨트롤러]
+     * 주문 아이디(PK) 를 통해 리뷰 상세 조회(단 건 조회)
+     * @param orderId 주문 아이디
+     * @return ReviewResponseDto
+     */
+    @GetMapping("/review/order/{id}")
+    public ResponseEntity<ApiResponse<?>> getReviewDetailsByOrder(@PathVariable("id") Long orderId) {
+
+        return ResponseEntity.ok().body(ApiResponse.success(reviewService.getReviewDetailsByOrder(orderId)));
+    }
+
+    /**
+     * [컨트롤러]
      * 회원이 자신의 리뷰 목록을 조건에 따라 조회
      * @param reviewRole 리뷰 역할
      * @param reviewType 리뷰 타입
@@ -88,13 +100,12 @@ public class ReviewController {
     @GetMapping("/members/me/review")
     public ResponseEntity<ApiResponse<?>> getMyReviews(@RequestParam("reviewRole") ReviewRole reviewRole,
                                                        @RequestParam("reviewType") ReviewType reviewType,
-                                                       @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType) {
+                                                       @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType,
+                                                       @RequestParam(value = "page",defaultValue = "0") int page) {
 
         SearchReviewCondDto condDto = SearchReviewCondDto.create(reviewRole, reviewType, createdDateSortType);
 
-        PagedResponseDto<ReviewListResponseDto> responseDtos = reviewService.getMyReviews(condDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+        return ResponseEntity.ok().body(ApiResponse.success(reviewService.getMyReviews(condDto,page)));
     }
 
     /**
@@ -110,13 +121,13 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<?>> getReviews(@PathVariable("id")Long memberId,
                                                      @RequestParam("reviewRole") ReviewRole reviewRole,
                                                      @RequestParam("reviewType") ReviewType reviewType,
-                                                     @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType) {
+                                                     @RequestParam("createdDateSortType") CreatedDateSortType createdDateSortType,
+                                                     @RequestParam(value = "page",defaultValue = "0") int page
+                                                     ) {
 
         SearchReviewCondDto condDto = SearchReviewCondDto.create(reviewRole, reviewType, createdDateSortType);
 
-        PagedResponseDto<ReviewListResponseDto> responseDtos = reviewService.getReviews(memberId,condDto);
-
-        return ResponseEntity.ok().body(ApiResponse.success(responseDtos));
+        return ResponseEntity.ok().body(ApiResponse.success(reviewService.getReviews(memberId,condDto,page)));
     }
 
 
