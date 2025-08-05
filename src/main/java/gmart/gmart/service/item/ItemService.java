@@ -2,6 +2,7 @@ package gmart.gmart.service.item;
 
 import gmart.gmart.command.CommandMapper;
 import gmart.gmart.domain.*;
+import gmart.gmart.domain.enums.DeleteStatus;
 import gmart.gmart.dto.inquiry.InquiryListResponseDto;
 import gmart.gmart.dto.inquiry.SearchInquiryCondDto;
 import gmart.gmart.dto.item.*;
@@ -210,7 +211,9 @@ public class ItemService {
         Member member = memberService.findBySecurityContextHolder();
 
         //회원 관심 건담 -> 건담 리스트 조회
-        List<Gundam> gundams = member.getFavoriteGundams().stream().map(FavoriteGundam::getGundam)
+        List<Gundam> gundams = member.getFavoriteGundams().stream()
+                .filter(fg -> fg.getDeleteStatus() == DeleteStatus.UNDELETED)
+                .map(FavoriteGundam::getGundam)
                 .toList();
 
         Page<Item> pageList = itemRepository.findAllByGundams(gundams, createPageable(page));

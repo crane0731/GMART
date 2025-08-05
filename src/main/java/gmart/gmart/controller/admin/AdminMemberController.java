@@ -46,11 +46,11 @@ public class AdminMemberController {
     }
 
 
-        /**
-         * 관리자가 회원 상세 조회
-         * @param id 회원 아이디(PK)
-         * @return MemberInfoResponseDto 회원 상세 정보를 담은 DTO
-         */
+    /**
+     * 관리자가 회원 상세 조회
+     * @param id 회원 아이디(PK)
+     * @return MemberInfoResponseDto 회원 상세 정보를 담은 DTO
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> findMemberDetailInfo(@PathVariable("id") Long id){
 
