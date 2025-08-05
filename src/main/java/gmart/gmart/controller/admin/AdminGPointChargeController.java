@@ -95,7 +95,7 @@ public class AdminGPointChargeController {
      * @param page 페이지 번호
      * @return PagedResponseDto<GPointChargeLogListResponseDto> 페이징된 응답 DTO 리스트
      */
-    @PostMapping("/member/{id}")
+    @GetMapping("/member/{id}")
     public ResponseEntity<ApiResponse<?>> findAllLogs(@PathVariable("id") Long memberId,
                                                       @RequestParam(value = "year",required = false)String year,
                                                       @RequestParam(value = "chargeType",required = false) ChargeType chargeType,

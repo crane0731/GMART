@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import static gmart.gmart.domain.QGundam.gundam;
+
 /**
  * 상품 레파지토리 커스텀 구현체 클래스
  */
