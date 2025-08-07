@@ -197,6 +197,7 @@ https://www.erdcloud.com/d/g5ejXHwNS2Kj4rnwh
 - Spring Security
 - Spring Data Jpa
 - OAuth 2.0
+- Redis
 
 ### 📚DB
 
